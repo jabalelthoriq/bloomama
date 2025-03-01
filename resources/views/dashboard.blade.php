@@ -19,13 +19,13 @@
             overflow-x: hidden;
         }
 
-        /* Vertical navbar styling with consistent aspect ratio */
+
         .vertical-navbar {
             position: fixed;
             top: 0;
             left: 0;
             width: 80px;
-            height: 100vh;
+            height: 92vh;
             background-color: #ffffff;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -33,6 +33,8 @@
             align-items: center;
             padding: 20px 0;
             z-index: 1000;
+            border-radius: 15px 15px 15px 15px;
+            margin: 30px 30px;
         }
 
         .nav-icon {
@@ -63,10 +65,11 @@
             color: #f44336;
         }
 
-        /* Main content with consistent spacing */
+
         .main-content {
             margin-left: 80px;
-            padding: 2rem;
+            padding-left: 5rem;
+            padding-top: 3rem;
             width: calc(100% - 80px);
             max-width: 1440px;
             margin-right: auto;
@@ -79,7 +82,7 @@
             align-items: center;
         }
 
-        /* Card styling with consistent sizing */
+
         .card {
             border-radius: 12px;
             border: none;
@@ -238,7 +241,7 @@
             <h2 class="fs-3 fw-bold m-0">Dashboard</h2>
         </div>
 
-        <!-- Stats Cards -->
+
         <div class="row g-4 mb-4">
             <!-- Card 1 -->
             <div class="col-md-4">
@@ -293,7 +296,6 @@
         </div>
 
         <div class="row mb-5">
-            <!-- Hospital Survey Card - First Chart -->
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
@@ -340,7 +342,8 @@
                 </div>
             </div>
 
-            <!-- Patient Statistics Card - Second Chart -->
+
+
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
@@ -393,7 +396,7 @@
             </div>
         </div>
 
-        <!-- Appointment Activity Card with added spacing -->
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
