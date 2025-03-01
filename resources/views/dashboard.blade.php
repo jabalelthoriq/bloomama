@@ -14,7 +14,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #f8f9fa;
+            background-color: #F6F8FB;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow-x: hidden;
         }
@@ -35,7 +35,30 @@
             z-index: 1000;
             border-radius: 15px 15px 15px 15px;
             margin: 30px 30px;
+
         }
+        .nav-icon a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .nav-indicator {
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 48px;
+            background-color: #00b8d4;
+            border-radius: 0 4px 4px 0;
+            transition: top 0.3s ease;
+            pointer-events: none;
+        }
+
 
         .nav-icon {
             width: 48px;
@@ -48,17 +71,26 @@
             color: #777;
             font-size: 20px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
+
         }
 
         .nav-icon:hover {
             background-color: #f0f0f0;
-        }
+
+            transform: scale(1.2);
+}
 
         .nav-icon.active {
             background-color: #00b8d4;
             color: white;
+            transition: background-color 1s ease;
+
         }
+
+
+
 
         .nav-icon.logout {
             margin-top: auto;
@@ -106,7 +138,7 @@
             border-radius: 12px;
         }
 
-        /* Chart styling with consistent aspect ratio */
+
         .chart-container {
             position: relative;
             aspect-ratio: 2.5/1;
@@ -145,7 +177,6 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Table styling with consistent padding */
         .table-responsive {
             overflow-x: auto;
         }
@@ -175,12 +206,13 @@
             font-size: 16px;
         }
 
-        /* Added spacing between main cards */
+
         .mb-5 {
             margin-bottom: 3rem !important;
         }
 
-        /* Responsive adjustments */
+
+
         @media (max-width: 768px) {
             .vertical-navbar {
                 width: 60px;
@@ -201,6 +233,29 @@
                 height: 120px;
             }
         }
+
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 0px;
+        }
+
+        .pagination .page-item .page-link {
+            color: #00b8d4;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #00b8d4;
+            border-color: #00b8d4;
+            color: white;
+        }
+
+        .bi-pencil, .bi-trash {
+        cursor: pointer;
+        }
+
+
+
     </style>
 </head>
 
@@ -211,23 +266,33 @@
         </div>
 
         <div class="nav-icon active">
-            <i class="fas fa-th-large"></i>
+            <a href="dashboard">
+                <i class="fas fa-th-large" ></i>
+            </a>
         </div>
 
         <div class="nav-icon">
+            <a href="acara">
             <i class="far fa-calendar-alt"></i>
+            </a>
         </div>
 
         <div class="nav-icon">
+            <a href="chat">
             <i class="far fa-comment-alt"></i>
+            </a>
         </div>
 
         <div class="nav-icon">
+            <a href="user">
             <i class="far fa-clock"></i>
+            </a>
         </div>
 
         <div class="nav-icon">
+            <a href="setting">
             <i class="fas fa-cog"></i>
+            </a>
         </div>
 
         <div class="nav-icon logout" onclick="handleLogout()">
@@ -425,8 +490,8 @@
                                         <td>Dr. Jacob Jones</td>
                                         <td>Mumps Stage II</td>
                                         <td class="text-end">
-                                            <i class="bi bi-pencil action-icon"></i>
-                                            <i class="bi bi-trash action-icon"></i>
+                                            <i class="bi bi-pencil text-primary"></i>
+                                            <i class="bi bi-trash text-danger ms-2"></i>
                                         </td>
                                     </tr>
                                     <tr>
@@ -440,8 +505,8 @@
                                         <td>Dr. Theresa Webb</td>
                                         <td>Depression</td>
                                         <td class="text-end">
-                                            <i class="bi bi-pencil action-icon"></i>
-                                            <i class="bi bi-trash action-icon"></i>
+                                            <i class="bi bi-pencil text-primary"></i>
+                                    <i class="bi bi-trash text-danger ms-2"></i>
                                         </td>
                                     </tr>
                                     <tr>
@@ -455,8 +520,8 @@
                                         <td>Dr. Jacob Jones</td>
                                         <td>Arthritis</td>
                                         <td class="text-end">
-                                            <i class="bi bi-pencil action-icon"></i>
-                                            <i class="bi bi-trash action-icon"></i>
+                                            <i class="bi bi-pencil text-primary"></i>
+                                    <i class="bi bi-trash text-danger ms-2"></i>
                                         </td>
                                     </tr>
                                     <tr>
@@ -470,8 +535,8 @@
                                         <td>Dr. Arlene McCoy</td>
                                         <td>Fracture</td>
                                         <td class="text-end">
-                                            <i class="bi bi-pencil action-icon"></i>
-                                            <i class="bi bi-trash action-icon"></i>
+                                            <i class="bi bi-pencil text-primary"></i>
+                                            <i class="bi bi-trash text-danger ms-2"></i>
                                         </td>
                                     </tr>
                                     <tr>
@@ -485,13 +550,31 @@
                                         <td>Dr. Esther Howard</td>
                                         <td>Depression</td>
                                         <td class="text-end">
-                                            <i class="bi bi-pencil action-icon"></i>
-                                            <i class="bi bi-trash action-icon"></i>
+                                            <i class="bi bi-pencil text-primary"></i>
+                                            <i class="bi bi-trash text-danger ms-2"></i>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                         <!-- Pagination -->
+                         <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                    </a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -500,6 +583,87 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+     // Add navbar animation code
+     document.addEventListener('DOMContentLoaded', function() {
+            // Get all nav icons except logo and logout
+            const navIcons = document.querySelectorAll('.nav-icon:not(:first-child):not(.logout)');
+
+            // Create the sliding indicator element
+            const indicator = document.createElement('div');
+            indicator.className = 'nav-indicator';
+            document.querySelector('.vertical-navbar').appendChild(indicator);
+
+            // Position the indicator at the currently active menu item on load
+            const activeIcon = document.querySelector('.nav-icon.active');
+            if (activeIcon) {
+                positionIndicator(activeIcon);
+            }
+
+            // Add click event listeners to all nav icons
+            navIcons.forEach(icon => {
+                icon.addEventListener('click', function(e) {
+                    // If clicking on the icon itself
+                    if (e.target.tagName === 'I') {
+                        e.preventDefault();
+
+                        // Get the parent anchor href
+                        const href = this.querySelector('a').getAttribute('href');
+
+                        // Handle the active class and animation
+                        handleNavClick(this, href);
+                    }
+                });
+            });
+
+            // Add click event listeners to all anchors within nav icons
+            document.querySelectorAll('.nav-icon a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const navIcon = this.parentElement;
+                    const href = this.getAttribute('href');
+
+                    // Handle the active class and animation
+                    handleNavClick(navIcon, href);
+                });
+            });
+
+            // Function to handle nav click animation and navigation
+            function handleNavClick(clickedIcon, href) {
+                // Skip if already active
+                if (clickedIcon.classList.contains('active')) return;
+
+                // Remove active class from current active icon
+                const currentActive = document.querySelector('.nav-icon.active');
+                if (currentActive) {
+                    currentActive.classList.remove('active');
+                }
+
+                // Add active class to clicked icon
+                clickedIcon.classList.add('active');
+
+                // Animate the indicator
+                positionIndicator(clickedIcon);
+
+                // Navigate after animation completes
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 300);
+            }
+
+            // Function to position the indicator
+            function positionIndicator(targetIcon) {
+                const rect = targetIcon.getBoundingClientRect();
+                const navbarRect = document.querySelector('.vertical-navbar').getBoundingClientRect();
+
+                // Calculate position relative to navbar
+                const top = rect.top - navbarRect.top;
+
+                // Update indicator position
+                indicator.style.top = top + 'px';
+            }
+        });
+
         function handleLogout() {
             Swal.fire({
                 title: 'Logout Confirmation',
