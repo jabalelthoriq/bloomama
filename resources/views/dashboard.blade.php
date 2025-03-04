@@ -468,112 +468,90 @@
                     <div class="card-body">
                         <h5 class="card-title mb-4 fw-bold">Appointment Activity</h5>
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Visit Time</th>
-                                        <th>Doctor</th>
-                                        <th>Conditions</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-primary">LA</div>
-                                                <span>Leslie Alexander</span>
-                                            </div>
-                                        </td>
-                                        <td>09:15-09:45am</td>
-                                        <td>Dr. Jacob Jones</td>
-                                        <td>Mumps Stage II</td>
-                                        <td class="text-end">
-                                            <i class="bi bi-pencil text-primary"></i>
-                                            <i class="bi bi-trash text-danger ms-2"></i>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-info">RR</div>
-                                                <span>Ronald Richards</span>
-                                            </div>
-                                        </td>
-                                        <td>12:00-12:45pm</td>
-                                        <td>Dr. Theresa Webb</td>
-                                        <td>Depression</td>
-                                        <td class="text-end">
-                                            <i class="bi bi-pencil text-primary"></i>
-                                    <i class="bi bi-trash text-danger ms-2"></i>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-warning">JC</div>
-                                                <span>Jane Cooper</span>
-                                            </div>
-                                        </td>
-                                        <td>01:15-01:45pm</td>
-                                        <td>Dr. Jacob Jones</td>
-                                        <td>Arthritis</td>
-                                        <td class="text-end">
-                                            <i class="bi bi-pencil text-primary"></i>
-                                    <i class="bi bi-trash text-danger ms-2"></i>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-success">RF</div>
-                                                <span>Robert Fox</span>
-                                            </div>
-                                        </td>
-                                        <td>02:00-02:45pm</td>
-                                        <td>Dr. Arlene McCoy</td>
-                                        <td>Fracture</td>
-                                        <td class="text-end">
-                                            <i class="bi bi-pencil text-primary"></i>
-                                            <i class="bi bi-trash text-danger ms-2"></i>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-danger">JW</div>
-                                                <span>Jenny Wilson</span>
-                                            </div>
-                                        </td>
-                                        <td>12:00-12:45pm</td>
-                                        <td>Dr. Esther Howard</td>
-                                        <td>Depression</td>
-                                        <td class="text-end">
-                                            <i class="bi bi-pencil text-primary"></i>
-                                            <i class="bi bi-trash text-danger ms-2"></i>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                         <!-- Pagination -->
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Visit Time</th>
+                <th>Status</th>
+                <th>Conditions</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($appointments as $appointment)
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-primary">{{ $appointment->getInitials() }}</div>
+                        <span>User {{ $appointment->user_id }}</span>
+                    </div>
+                </td>
+                <td>{{ $appointment->getFormattedVisitTime() }}</td>
+                <td>{{ $appointment->status }}</td>
+                <td>{{ $appointment->notes }}</td>
+                <td class="text-end">
+                    <a href="{{ route('appointments.edit', ['appointment' => $appointment->id]) }}" class="text-decoration-none">
+                        <i class="bi bi-pencil text-primary"></i>
+                    </a>
+                    <form action="{{ route('appointments.destroy', ['appointment' => $appointment->id]) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <i class="bi bi-trash text-danger ms-2" onclick="confirmDelete(event, this)"></i>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+                         <!-- Updated Pagination -->
                          <nav aria-label="Page navigation">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Previous">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-                                    </a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                    </a>
-                                </li>
-                            </ul>
+                            @if ($appointments->hasPages())
+                                <ul class="pagination">
+                                    {{-- Previous Page Link --}}
+                                    @if ($appointments->onFirstPage())
+                                        <li class="page-item disabled">
+                                            <span class="page-link">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </span>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $appointments->previousPageUrl() }}"
+                                               onclick="handlePaginationClick(event, '{{ $appointments->previousPageUrl() }}')"
+                                               aria-label="Previous">
+                                                <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                            </a>
+                                        </li>
+                                    @endif
+
+                                    {{-- Pagination Elements --}}
+                                    @foreach ($appointments->getUrlRange(1, $appointments->lastPage()) as $page => $url)
+                                        <li class="page-item {{ $page == $appointments->currentPage() ? 'active' : '' }}">
+                                            <a class="page-link" href="{{ $url }}"
+                                               onclick="handlePaginationClick(event, '{{ $url }}')">{{ $page }}</a>
+                                        </li>
+                                    @endforeach
+
+                                    {{-- Next Page Link --}}
+                                    @if ($appointments->hasMorePages())
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $appointments->nextPageUrl() }}"
+                                               onclick="handlePaginationClick(event, '{{ $appointments->nextPageUrl() }}')"
+                                               aria-label="Next">
+                                                <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                            </a>
+                                        </li>
+                                    @else
+                                        <li class="page-item disabled">
+                                            <span class="page-link">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </span>
+                                        </li>
+                                    @endif
+                                </ul>
+                            @endif
                         </nav>
                     </div>
                 </div>
@@ -582,6 +560,49 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+     // Add this to your existing JavaScript section
+document.addEventListener('DOMContentLoaded', function() {
+    // Store scroll position in session storage before page unload/refresh
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    });
+
+    // Set up pagination links to use AJAX if possible, or fallback to regular navigation
+    document.querySelectorAll('.pagination .page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Store the current scroll position
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        });
+    });
+
+    // Restore scroll position after page loads
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+    if (savedScrollPosition) {
+        window.scrollTo(0, parseInt(savedScrollPosition));
+        // Optional: Clear the stored position after restoring
+        // sessionStorage.removeItem('scrollPosition');
+    }
+});
+    </script>
+    <script>
+function confirmDelete(event, element) {
+    event.preventDefault();
+    Swal.fire({
+        title: 'Delete Confirmation',
+        text: 'Are you sure you want to delete this appointment?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            element.closest('form').submit();
+        }
+    });
+}
+</script>
     <script>
      // Add navbar animation code
      document.addEventListener('DOMContentLoaded', function() {
