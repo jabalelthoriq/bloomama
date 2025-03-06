@@ -8,6 +8,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// login register route
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
 // Dashboard route
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
