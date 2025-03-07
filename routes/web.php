@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserPregnantController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AppointmentController;
@@ -26,3 +27,4 @@ Route::get('/chat', [AuthController::class, 'chat']);
 Route::get('/user', [AuthController::class, 'user']);
 Route::get('/setting', [AuthController::class, 'setting']);
 Route::get('/security', [AuthController::class, 'security']);
+Route::get('/pregnant-users/chart', [UserPregnantController::class, 'index'])->name('pregnant-users.chart');
