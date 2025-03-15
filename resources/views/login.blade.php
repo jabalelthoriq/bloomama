@@ -57,7 +57,7 @@
             margin-right: 0px;
 
 
-        }
+        }   
         .form-side {
             width: 45%;
             height: 70%;
@@ -147,9 +147,26 @@
             <div class="form-side">
                 <div class="login-form">
                     <h2>Sign in</h2>
-                    <form>
-                        <input type="email" class="form-control" placeholder="Enter email or user name" />
-                        <input type="password" class="form-control" placeholder="Password" />
+                    @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    <form action="{{ route('login') }}" method="POST">
+                        @csrf
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
+                            placeholder="Enter email" value="{{ old('email') }}" required />
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
+                            placeholder="Password" required />
                         <div class="additional-links">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="remember" />

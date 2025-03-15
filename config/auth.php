@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'midwife' => [
+        'driver' => 'session',
+        'provider' => 'midwives',
+    ],
     ],
 
     /*
@@ -63,6 +67,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+        'midwives' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Midwive::class,
         ],
 
         // 'users' => [
