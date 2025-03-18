@@ -57,7 +57,7 @@
             margin-right: 0px;
 
 
-        }   
+        }
         .form-side {
             width: 45%;
             height: 70%;
@@ -163,9 +163,9 @@
                     @endif
                     <form action="{{ route('login') }}" method="POST">
                         @csrf
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                             placeholder="Enter email" value="{{ old('email') }}" required />
-                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
                             placeholder="Password" required />
                         <div class="additional-links">
                             <div class="form-check">
@@ -177,7 +177,7 @@
                         <button type="submit" class="btn-login">Login</button>
                         <div class="signup-text">
                             <p>Don't have an account?
-                                <a href="#" class="create-account">Create account</a>
+                                <a href="register" class="create-account">Create account</a>
                             </p>
                         </div>
                     </form>

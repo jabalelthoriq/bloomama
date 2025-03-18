@@ -81,10 +81,7 @@ class AuthController extends Controller{
         return redirect('/');
     }
 
-    public function acara()
-    {
-        return view('acara');
-    }
+   
 
     public function chat()
     {

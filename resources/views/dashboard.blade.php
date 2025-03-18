@@ -811,7 +811,7 @@ function confirmDelete(event, element) {
                 if (result.isConfirmed) {
                     localStorage.removeItem('token');
                     sessionStorage.clear();
-                    window.location.href = '/test';
+                    window.location.href = '/';
                 }
             });
         }

@@ -217,7 +217,7 @@
                 if (result.isConfirmed) {
                     localStorage.removeItem('token');
                     sessionStorage.clear();
-                    window.location.href = '/login';
+                    window.location.href = '/';
                 }
             });
         }

@@ -287,18 +287,23 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title mb-4 fw-bold">Input Event</h5>
-                        <form>
+                        <form action="{{ route('acara') }}" method="POST">
+                            @csrf
                             <div class="mb-3">
-                                <label for="name" class="form-label">Nama Acara</label>
-                                <input type="text" class="form-control" id="name" placeholder="Masukkan nama acara">
+                                <label for="title" class="form-label">Nama Acara</label>
+                                <input type="text" class="form-control" id="title" name="title" placeholder="Masukkan nama acara">
                             </div>
                             <div class="mb-3">
-                                <label for="date" class="form-label">Tanggal Dimulai</label>
-                                <input type="date" class="form-control" id="date">
+                                <label for="start_date_time" class="form-label">Tanggal Dimulai</label>
+                                <input type="datetime-local" class="form-control" id="start_date_time" name="start_date_time">
+                            </div>
+                            <div class="mb-3">
+                                <label for="end_date_time" class="form-label">Tanggal Selesai</label>
+                                <input type="datetime-local" class="form-control" id="end_date_time" name="end_date_time">
                             </div>
                             <div class="mb-3">
                                 <label for="description" class="form-label">Deskripsi</label>
-                                <textarea class="form-control" id="description" rows="3" placeholder="Masukkan deskripsi acara"></textarea>
+                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Masukkan deskripsi acara"></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary w-100" style="background-color: #00b3db">Submit</button>
                         </form>
@@ -328,109 +333,72 @@
                                 <thead>
                                     <tr>
                                         <th>Nama</th>
-                                        <th>Waktu</th>
-                                        <th>Jenis Acara</th>
+                                        <th>Tanggal Mulai</th>
+                                        <th>Tanggal Selesai</th>
                                         <th>Deskripsi</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @forelse($events as $event)
                                     <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="text-primary me-2">12</div>
-                                        <span>Leslie Alexander</span>
-                                    </div>
-                                </td>
-                                <td>09:15-09:45am</td>
-                                <td>Dr. Jacob Jones</td>
-                                <td>Mumps Stage II</td>
-                                <td class="text-end">
-                                    <i class="bi bi-pencil text-primary"></i>
-                                    <i class="bi bi-trash text-danger ms-2"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="text-primary me-2">12</div>
-                                        <span>Ronald Richards</span>
-                                    </div>
-                                </td>
-                                <td>12:00-12:45pm</td>
-                                <td>Dr. Theresa Webb</td>
-                                <td>Depression</td>
-                                <td class="text-end">
-                                    <i class="bi bi-pencil text-primary"></i>
-                                    <i class="bi bi-trash text-danger ms-2"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="text-primary me-2">12</div>
-                                        <span>Jane Cooper</span>
-                                    </div>
-                                </td>
-                                <td>01:15-01:45pm</td>
-                                <td>Dr. Jacob Jones</td>
-                                <td>Arthritis</td>
-                                <td class="text-end">
-                                    <i class="bi bi-pencil text-primary"></i>
-                                    <i class="bi bi-trash text-danger ms-2"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="text-primary me-2">12</div>
-                                        <span>Robert Fox</span>
-                                    </div>
-                                </td>
-                                <td>02:00-02:45pm</td>
-                                <td>Dr. Arlene McCoy</td>
-                                <td>Fracture</td>
-                                <td class="text-end">
-                                    <i class="bi bi-pencil text-primary"></i>
-                                    <i class="bi bi-trash text-danger ms-2"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="text-primary me-2">12</div>
-                                        <span>Jenny Wilson</span>
-                                    </div>
-                                </td>
-                                <td>12:00-12:45pm</td>
-                                <td>Dr. Esther Howard</td>
-                                <td>Depression</td>
-                                <td class="text-end">
-                                    <i class="bi bi-pencil text-primary"></i>
-                                    <i class="bi bi-trash text-danger ms-2"></i>
-                                </td>
-                            </tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-primary">{{ substr($event->title, 0, 2) }}</div>
+                                                <span>{{ $event->title }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($event->start_date_time)->format('d M Y, H:i') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($event->end_date_time)->format('d M Y, H:i') }}</td>
+                                        <td>{{ Str::limit($event->description, 50) }}</td>
+                                        <th >
+                                            <a href="{{ route('event.edit', ['id' => $event->id]) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form action="{{ route('event.destroy', ['id' => $event->id]) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </th>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Tidak ada acara yang tersedia</td>
+                                    </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
                         <!-- Pagination -->
+                        @if($events->hasPages())
                         <nav aria-label="Page navigation">
                             <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Previous">
+                                {{-- Previous Page Link --}}
+                                <li class="page-item {{ $events->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $events->previousPageUrl() }}" aria-label="Previous">
                                         <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                     </a>
                                 </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next">
+
+                                {{-- Pagination Elements --}}
+                                @foreach($events->getUrlRange(1, $events->lastPage()) as $page => $url)
+                                    <li class="page-item {{ $events->currentPage() == $page ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                <li class="page-item {{ $events->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" href="{{ $events->nextPageUrl() }}" aria-label="Next">
                                         <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
                                     </a>
                                 </li>
                             </ul>
                         </nav>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -453,7 +421,7 @@
                 if (result.isConfirmed) {
                     localStorage.removeItem('token');
                     sessionStorage.clear();
-                    window.location.href = '/login';
+                    window.location.href = '/';
                 }
             });
         }
@@ -538,6 +506,26 @@
                 indicator.style.top = top + 'px';
             }
         });
+
+        // Add this to your existing script section
+function confirmDelete(event, button) {
+    event.preventDefault();
+
+    Swal.fire({
+        title: 'Konfirmasi Hapus',
+        text: 'Apakah Anda yakin ingin menghapus acara ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            button.closest('form').submit();
+        }
+    });
+}
     </script>
 </body>
 </html>
