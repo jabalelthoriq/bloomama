@@ -245,52 +245,98 @@
     </div>
 
     <div class="main-content">
-
         <div class="d-flex mb-4 border-bottom">
-            <a href="setting" class="tab-link ">Account Setting</a>
+            <a href="setting" class="tab-link">Account Setting</a>
             <a href="security" class="tab-link tab-underline">Security</a>
         </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
+                        @if (session('status'))
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{ session('status') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
+                        <form method="POST" action="{{ route('security.change-password') }}">
+                            @csrf
 
-        <form>
+                            <div class="form-group">
+                                <label for="current_password" class="form-label">Kata Sandi Saat Ini</label>
+                                <input type="password" class="form-control @error('current_password') is-invalid @enderror"
+                                       id="current_password" name="current_password" placeholder="Masukkan kata sandi saat ini">
+                                @error('current_password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-            <div class="form-group">
-                <label for="currentPassword" class="form-label">Kata Sandi Saat Ini</label>
-                <input type="password" class="form-control" id="currentPassword" placeholder="Masukkan kata sandi saat ini">
+                            <div class="form-group">
+                                <label for="new_password" class="form-label">Kata Sandi Baru</label>
+                                <input type="password" class="form-control @error('new_password') is-invalid @enderror"
+                                       id="new_password" name="new_password" placeholder="Masukkan kata sandi baru">
+                                @error('new_password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="new_password_confirmation" class="form-label">Konfirmasi Kata Sandi</label>
+                                <input type="password" class="form-control"
+                                       id="new_password_confirmation" name="new_password_confirmation"
+                                       placeholder="Konfirmasi kata sandi baru">
+                            </div>
+
+                            <div class="form-group">
+                                <span>Lupa kata sandi?</span><br>
+                                <span>Kirim melalui <a href="#" data-bs-toggle="modal" data-bs-target="#resetPasswordModal" class="email-link">Email</a> !</span>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="submit" class="btn btn-primary update-btn">Simpan Kata Sandi</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-
-
-            <div class="form-group">
-                <label for="newPassword" class="form-label">Kata Sandi Baru</label>
-                <input type="password" class="form-control" id="newPassword" placeholder="Masukkan kata sandi baru">
-            </div>
-
-
-            <div class="form-group">
-                <label for="newPassword" class="form-label">Kata Sandi Baru</label>
-                <input type="password" class="form-control" id="newPassword" placeholder="Masukkan kata sandi baru">
-            </div>
-
-
-            <div class="form-group">
-                <span>lupa kata sandi?</span><br>
-                <span>Kirim melalui <a href="#" class="email-link">Email</a> !</span>
-            </div>
-
-
-            <div class="d-flex justify-content-end mt-4">
-                <button type="submit" class="btn btn-primary update-btn">Simpan Kata Sandi</button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-</div>
+
+    <!-- Reset Password Email Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ route('security.reset-password-email') }}">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Alamat Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="Masukkan alamat email Anda" >
+                        </div>
+                        <p class="text-muted">Kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Kirim Email Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

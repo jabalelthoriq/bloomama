@@ -2,45 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Midwive;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
-class UsersController extends Controller
+class MidwiveController extends Controller
 {
-    /**
-     * Show the users page with users data.
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
-
-     // In UsersController.php
-
-public function showUsersAndMidwives()
-{
-    $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
-    $users = User::paginate(10, ['*'], 'user_page');
-    return view('users', compact('users', 'midwives'));
-}
-
-
 
     /**
-     * Show the form for editing the specified user.
+     * Show the form for editing the specified midwive.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id): View
     {
-        $user = User::findOrFail($id);
-        return view('users.edit', compact('user'));
+        $midwive = Midwive::findOrFail($id);
+        return view('midwives.edit', compact('midwive'));
     }
 
     /**
-     * Update the specified user in database.
+     * Update the specified midwive in database.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -48,11 +31,11 @@ public function showUsersAndMidwives()
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        $user = User::findOrFail($id);
+        $midwive = Midwive::findOrFail($id);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$id,
+            'email' => 'required|string|email|max:255|unique:midwives,email,'.$id,
             'phone_number' => 'required|string|max:20',
         ]);
 
@@ -60,22 +43,22 @@ public function showUsersAndMidwives()
             $validated['password'] = bcrypt($request->password);
         }
 
-        $user->update($validated);
+        $midwive->update($validated);
 
         return redirect()->route('user')
             ->with('success', 'Data bidan berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified user from database.
+     * Remove the specified midwive from database.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id): RedirectResponse
     {
-        $user = User::findOrFail($id);
-        $user->delete();
+        $midwive = Midwive::findOrFail($id);
+        $midwive->delete();
 
         return redirect()->route('user')
             ->with('success', 'Bidan berhasil dihapus.');

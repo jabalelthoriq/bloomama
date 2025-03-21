@@ -323,7 +323,7 @@
         </div>
 
         <!-- Event Table -->
-        <div class="row">
+        <div class="row" id="events-table">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
@@ -336,6 +336,7 @@
                                         <th>Tanggal Mulai</th>
                                         <th>Tanggal Selesai</th>
                                         <th>Deskripsi</th>
+                                        <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -351,10 +352,18 @@
                                         <td>{{ \Carbon\Carbon::parse($event->start_date_time)->format('d M Y, H:i') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($event->end_date_time)->format('d M Y, H:i') }}</td>
                                         <td>{{ Str::limit($event->description, 50) }}</td>
+                                        <td>
+                                            <span class="badge {{ $event->status == 'up coming' ? 'bg-primary' : 'bg-danger' }}">
+                                                {{ $event->status }}
+                                            </span>
+                                        </td>
                                         <th >
                                             <a href="{{ route('event.edit', ['id' => $event->id]) }}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
+
+
+
                                             <form action="{{ route('event.destroy', ['id' => $event->id]) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -526,6 +535,33 @@ function confirmDelete(event, button) {
         }
     });
 }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Save the scroll position before page reload for events pagination
+            const eventPaginationLinks = document.querySelectorAll('nav[aria-label="Page navigation"] .page-link');
+
+            eventPaginationLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Store current scroll position in sessionStorage
+                    sessionStorage.setItem('eventScrollPosition', window.pageYOffset);
+
+                    // Add a hash to the URL to identify the events table section
+                    const url = new URL(this.href);
+                    url.hash = 'events-table';
+
+                    // Navigate to the modified URL
+                    window.location.href = url.toString();
+                });
+            });
+
+            // Restore scroll position after page load if we're coming back from pagination
+            if (window.location.hash === '#events-table' && sessionStorage.getItem('eventScrollPosition')) {
+                window.scrollTo(0, parseInt(sessionStorage.getItem('eventScrollPosition')));
+            }
+        });
     </script>
 </body>
 </html>

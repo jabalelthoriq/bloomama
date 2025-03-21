@@ -93,4 +93,12 @@ class EventController extends Controller
 
         return redirect()->route('acara')->with('success', 'Event berhasil dihapus');
     }
+    public function updateStatus(Request $request, $id)
+{
+    $event = Event::findOrFail($id);
+    $event->status = $request->status;
+    $event->save();
+
+    return redirect()->back()->with('success', 'Event status updated successfully');
+}
 }

@@ -19,7 +19,6 @@
        overflow-x: hidden;
    }
 
-
    .vertical-navbar {
        position: fixed;
        top: 0;
@@ -87,7 +86,6 @@
        margin-top: auto;
        color: #f44336;
    }
-
 
    .main-content {
        margin-left: 80px;
@@ -186,7 +184,46 @@
             border-radius: 5px;
             background-color: #f8f9fa;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
+
+        .profile-pic-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .profile-pic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            color: white;
+        }
+
+        .profile-pic-container:hover .profile-pic-overlay {
+            opacity: 1;
+        }
+
+        .profile-pic-container .upload-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
         .update-btn {
             background-color: #00b3db;
             border-color: #00b3db;
@@ -202,8 +239,6 @@
             margin-bottom: 24px;
             height: 100%;
         }
-
-
    </style>
 <body>
     <div class="vertical-navbar">
@@ -244,75 +279,126 @@
         </div>
     </div>
 
-
     <div class="main-content">
-
-            <div class="d-flex mb-4 border-bottom">
-                <a href="setting" class="tab-link tab-underline">Account Setting</a>
-                <a href="security" class="tab-link">Security</a>
+        <!-- Display success message if exists -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+        @endif
+
+        <!-- Display error messages if any -->
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <div class="d-flex mb-4 border-bottom">
+            <a href="setting" class="tab-link tab-underline">Account Setting</a>
+            <a href="security" class="tab-link">Security</a>
+        </div>
 
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-
-                        <form>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{{ route('update.profile') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
 
                             <div class="form-group">
                                 <label class="mb-2">Your Profile Picture</label>
-                                <div class="profile-pic-container">
-                                    <i class="bi bi-arrow-repeat fs-4"></i>
-                                    <span class="text-center mt-1" style="font-size: 0.8rem;">Upload your photo</span>
+                                <div class="profile-pic-container" id="profilePicContainer">
+                                    <!-- Show current profile picture if available -->
+                                    @if(isset($userData['profile_picture']) && !empty($userData['profile_picture']))
+                                            <img src="{{ asset('storage/' . $userData['profile_picture']) }}" alt="Profile Picture" id="profileImage">
+                                        @else
+                                            <div class="upload-info" id="uploadInfo">
+                                                <i class="bi bi-arrow-repeat fs-4"></i>
+                                                <span class="text-center mt-1" style="font-size: 0.8rem;">Upload your photo</span>
+                                            </div>
+                                        @endif
+                                    <div class="profile-pic-overlay">
+                                        <i class="bi bi-camera fs-4"></i>
+                                        <span class="text-center mt-1" style="font-size: 0.8rem;">Change photo</span>
+                                    </div>
+                                    <input type="file" name="profile_picture" id="profile_picture" class="d-none" accept="image/*">
                                 </div>
                             </div>
 
-
                             <div class="form-group">
-                                <label for="fullName" class="form-label">Full name</label>
-                                <input type="text" class="form-control" id="fullName" placeholder="nama bidan">
+                                <label for="name" class="form-label">Full name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ $userData['name'] ?? old('name') }}" placeholder="Enter your full name">
                             </div>
-
-
-                            <div class="form-group">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" placeholder="username bidan">
-                            </div>
-
 
                             <div class="form-group">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" placeholder="email bidan">
+                                <input type="email" class="form-control" id="email" name="email" value="{{ $userData['email'] ?? old('email') }}" placeholder="Enter your email">
                             </div>
-
 
                             <div class="form-group">
                                 <label for="phone" class="form-label">Phone number</label>
                                 <div class="input-group">
                                     <span class="input-group-text">+62</span>
-                                    <input type="text" class="form-control" id="phone" placeholder="no hp bidan">
+                                    <input type="text" class="form-control" id="phone" name="phone" value="{{ $userData['phone_number'] ?? old('phone') }}" placeholder="Enter your phone number">
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="bio" class="form-label">Bio</label>
-                                <textarea class="form-control" id="bio" rows="4" placeholder="PKD DESA KALIJAMBE, UNGARAN, SEMARANG&#10;SENIN - KAMIS&#10;BUKA PUKUL 10.00 - 16.00&#10;&#10;JUMAT - MINGGU&#10;BUKA PUKUL 12.00 - Selesai"></textarea>
-                            </div>
-
-
                             <div class="d-flex justify-content-end mt-4">
-                                <button type="button" class="btn btn-outline-secondary me-2">Reset</button>
                                 <button type="submit" class="btn btn-primary update-btn">Update Profile</button>
                             </div>
                         </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // File upload handling
+        document.querySelector('.profile-pic-container').addEventListener('click', function() {
+            document.getElementById('profile_picture').click();
+        });
+
+        document.getElementById('profile_picture').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                let reader = new FileReader();
+
+                reader.onload = function(event) {
+                    // Create or update profile image
+                    let profileImage = document.getElementById('profileImage');
+
+                    if (!profileImage) {
+                        // Create new image element if it doesn't exist
+                        profileImage = document.createElement('img');
+                        profileImage.id = 'profileImage';
+                        profileImage.alt = 'Profile Picture';
+
+                        // Remove upload info
+                        const uploadInfo = document.getElementById('uploadInfo');
+                        if (uploadInfo) {
+                            uploadInfo.remove();
+                        }
+
+                        // Add the image to the container
+                        document.getElementById('profilePicContainer').prepend(profileImage);
+                    }
+
+                    // Set the image source to the loaded file
+                    profileImage.src = event.target.result;
+                };
+
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
         function handleLogout() {
             Swal.fire({
                 title: 'Logout Confirmation',
@@ -325,8 +411,6 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.removeItem('token');
-                    sessionStorage.clear();
                     window.location.href = '/';
                 }
             });
