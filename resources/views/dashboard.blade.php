@@ -8,7 +8,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
@@ -37,6 +38,7 @@
             margin: 30px 30px;
 
         }
+
         .nav-icon a {
             text-decoration: none;
             color: inherit;
@@ -80,7 +82,7 @@
             background-color: #f0f0f0;
 
             transform: scale(1.2);
-}
+        }
 
         .nav-icon.active {
             background-color: #00b8d4;
@@ -283,8 +285,9 @@
             color: white;
         }
 
-        .bi-pencil, .bi-trash {
-        cursor: pointer;
+        .bi-pencil,
+        .bi-trash {
+            cursor: pointer;
         }
 
 
@@ -313,7 +316,7 @@
             display: none;
             pointer-events: none;
             z-index: 5;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
             transition: transform 0.1s ease;
         }
 
@@ -329,7 +332,7 @@
             display: none;
             pointer-events: none;
             z-index: 6;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             min-width: 120px;
             text-align: center;
         }
@@ -350,6 +353,7 @@
             0% {
                 stroke-dashoffset: 1000;
             }
+
             100% {
                 stroke-dashoffset: 0;
             }
@@ -359,6 +363,7 @@
             0% {
                 opacity: 0;
             }
+
             100% {
                 opacity: 1;
             }
@@ -381,44 +386,42 @@
             animation: fade-in 0.5s ease-in-out forwards;
             animation-delay: 0.5s;
         }
-
-
     </style>
 </head>
 
 <body>
     <div class="vertical-navbar">
-        <div class="nav-icon">
+        <div >
             <img src="{{ asset('image/logo.png') }}" alt="Logo">
         </div>
 
         <div class="nav-icon active">
             <a href="dashboard">
-                <i class="fas fa-th-large" ></i>
+                <i class="fas fa-th-large"></i>
             </a>
         </div>
 
         <div class="nav-icon">
             <a href="acara">
-            <i class="far fa-calendar-alt"></i>
+                <i class="far fa-calendar-alt"></i>
             </a>
         </div>
 
         <div class="nav-icon">
             <a href="chat">
-            <i class="far fa-comment-alt"></i>
+                <i class="far fa-comment-alt"></i>
             </a>
         </div>
 
         <div class="nav-icon">
             <a href="user">
-            <i class="far fa-clock"></i>
+                <i class="far fa-clock"></i>
             </a>
         </div>
 
         <div class="nav-icon">
             <a href="setting">
-            <i class="fas fa-cog"></i>
+                <i class="fas fa-cog"></i>
             </a>
         </div>
 
@@ -444,8 +447,10 @@
                             <h2 class="display-6 fw-bold mb-0">{{ number_format($totalUsers) }}</h2>
                         </div>
                         <div class="icon-container bg-primary bg-opacity-10 rounded-circle p-3">
-                            <svg class="text-primary" style="width: 32px; height: 32px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            <svg class="text-primary" style="width: 32px; height: 32px;" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
                         </div>
                     </div>
@@ -461,8 +466,10 @@
                             <h2 class="display-6 fw-bold mb-0">{{ number_format($totalPregnant) }}</h2>
                         </div>
                         <div class="icon-container bg-warning bg-opacity-10 rounded-circle p-3">
-                            <svg class="text-warning" style="width: 32px; height: 32px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <svg class="text-warning" style="width: 32px; height: 32px;" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
@@ -478,8 +485,10 @@
                             <h2 class="display-6 fw-bold mb-0">{{ number_format($totalAppointment) }}</h2>
                         </div>
                         <div class="icon-container bg-success bg-opacity-10 rounded-circle p-3">
-                            <svg class="text-success" style="width: 32px; height: 32px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <svg class="text-success" style="width: 32px; height: 32px;" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
@@ -487,24 +496,24 @@
             </div>
         </div>
 
-    <div class="row mb-5">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title m-0 fw-bold">Pregnant Users Statistics</h5>
-                        <small class="text-muted">Last 12 months</small>
-                    </div>
-                    <div class="chart-container">
-                        <svg class="chart" viewBox="0 0 500 200" id="pregnant-users-chart">
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title m-0 fw-bold">Pregnant Users Statistics</h5>
+                            <small class="text-muted">Last 12 months</small>
+                        </div>
+                        <div class="chart-container">
+                            <svg class="chart" viewBox="0 0 500 200" id="pregnant-users-chart">
 
-                        </svg>
+                            </svg>
                             <div class="chart-point"></div>
                             <div class="chart-value"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
 
 
@@ -518,11 +527,16 @@
                         <div class="chart-container">
                             <svg class="chart" viewBox="0 0 500 200">
                                 <!-- Grid lines -->
-                                <line x1="0" y1="0" x2="500" y2="0" stroke="#eee" stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="50" x2="500" y2="50" stroke="#eee" stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="100" x2="500" y2="100" stroke="#eee" stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="150" x2="500" y2="150" stroke="#eee" stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="200" x2="500" y2="200" stroke="#eee" stroke-width="1" stroke-dasharray="2" />
+                                <line x1="0" y1="0" x2="500" y2="0" stroke="#eee"
+                                    stroke-width="1" stroke-dasharray="2" />
+                                <line x1="0" y1="50" x2="500" y2="50" stroke="#eee"
+                                    stroke-width="1" stroke-dasharray="2" />
+                                <line x1="0" y1="100" x2="500" y2="100" stroke="#eee"
+                                    stroke-width="1" stroke-dasharray="2" />
+                                <line x1="0" y1="150" x2="500" y2="150" stroke="#eee"
+                                    stroke-width="1" stroke-dasharray="2" />
+                                <line x1="0" y1="200" x2="500" y2="200" stroke="#eee"
+                                    stroke-width="1" stroke-dasharray="2" />
 
                                 <!-- Labels Y axis -->
                                 <text x="10" y="200" fill="#888" font-size="10">0</text>
@@ -544,15 +558,24 @@
                                 <text x="470" y="195" fill="#888" font-size="10">Oct</text>
 
                                 <!-- Bar chart data -->
-                                <rect x="20" y="80" width="30" height="120" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="70" y="100" width="30" height="100" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="120" y="50" width="30" height="150" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="170" y="90" width="30" height="110" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="220" y="40" width="30" height="160" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="270" y="70" width="30" height="130" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="320" y="100" width="30" height="100" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="370" y="60" width="30" height="140" fill="rgba(146, 109, 222, 0.8)" rx="4" />
-                                <rect x="420" y="80" width="30" height="120" fill="rgba(146, 109, 222, 0.8)" rx="4" />
+                                <rect x="20" y="80" width="30" height="120" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="70" y="100" width="30" height="100" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="120" y="50" width="30" height="150" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="170" y="90" width="30" height="110" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="220" y="40" width="30" height="160" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="270" y="70" width="30" height="130" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="320" y="100" width="30" height="100" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="370" y="60" width="30" height="140" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
+                                <rect x="420" y="80" width="30" height="120" fill="rgba(146, 109, 222, 0.8)"
+                                    rx="4" />
                             </svg>
                         </div>
                     </div>
@@ -579,34 +602,40 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($appointments as $appointment)
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-primary">{{ $appointment->getInitials() }}</div>
-                                                <span>User {{ $appointment->user_id }}</span>
-                                            </div>
-                                        </td>
-                                        <td>{{ $appointment->getFormattedVisitTime() }}</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-{{ $appointment->status == 'Completed' ? 'success' : ($appointment->status == 'Cancelled' ? 'danger' : 'warning') }}">
-                                                {{ $appointment->status }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $appointment->notes }}</td>
-                                        <td class="text-end">
-                                            <a href="{{ route('appointments.edit', ['appointment' => $appointment->id]) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <form action="{{ route('appointments.destroy', ['appointment' => $appointment->id]) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                    @foreach ($appointments as $appointment)
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar bg-primary">{{ $appointment->getInitials() }}
+                                                    </div>
+                                                    <span>User {{ $appointment->user_id }}</span>
+                                                </div>
+                                            </td>
+                                            <td>{{ $appointment->getFormattedVisitTime() }}</td>
+                                            <td>
+                                                <span
+                                                    class="badge rounded-pill bg-{{ $appointment->status == 'Completed' ? 'success' : ($appointment->status == 'Cancelled' ? 'danger' : 'warning') }}">
+                                                    {{ $appointment->status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $appointment->notes }}</td>
+                                            <td class="text-end">
+                                                <a href="{{ route('appointments.edit', ['appointment' => $appointment->id]) }}"
+                                                    class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form
+                                                    action="{{ route('appointments.destroy', ['appointment' => $appointment->id]) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-1"
+                                                        onclick="confirmDelete(event, this)">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -626,8 +655,8 @@
                                     @else
                                         <li class="page-item">
                                             <a class="page-link" href="{{ $appointments->previousPageUrl() }}"
-                                               onclick="handlePaginationClick(event, '{{ $appointments->previousPageUrl() }}')"
-                                               aria-label="Previous">
+                                                onclick="handlePaginationClick(event, '{{ $appointments->previousPageUrl() }}')"
+                                                aria-label="Previous">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                             </a>
                                         </li>
@@ -635,9 +664,10 @@
 
                                     {{-- Pagination Elements --}}
                                     @foreach ($appointments->getUrlRange(1, $appointments->lastPage()) as $page => $url)
-                                        <li class="page-item {{ $page == $appointments->currentPage() ? 'active' : '' }}">
+                                        <li
+                                            class="page-item {{ $page == $appointments->currentPage() ? 'active' : '' }}">
                                             <a class="page-link" href="{{ $url }}"
-                                               onclick="handlePaginationClick(event, '{{ $url }}')">{{ $page }}</a>
+                                                onclick="handlePaginationClick(event, '{{ $url }}')">{{ $page }}</a>
                                         </li>
                                     @endforeach
 
@@ -645,8 +675,8 @@
                                     @if ($appointments->hasMorePages())
                                         <li class="page-item">
                                             <a class="page-link" href="{{ $appointments->nextPageUrl() }}"
-                                               onclick="handlePaginationClick(event, '{{ $appointments->nextPageUrl() }}')"
-                                               aria-label="Next">
+                                                onclick="handlePaginationClick(event, '{{ $appointments->nextPageUrl() }}')"
+                                                aria-label="Next">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
                                             </a>
                                         </li>
@@ -673,51 +703,51 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-     // Add this to your existing JavaScript section
-document.addEventListener('DOMContentLoaded', function() {
-    // Store scroll position in session storage before page unload/refresh
-    window.addEventListener('beforeunload', function() {
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-    });
+        // Add this to your existing JavaScript section
+        document.addEventListener('DOMContentLoaded', function() {
+            // Store scroll position in session storage before page unload/refresh
+            window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+            });
 
-    // Set up pagination links to use AJAX if possible, or fallback to regular navigation
-    document.querySelectorAll('.pagination .page-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Store the current scroll position
-            sessionStorage.setItem('scrollPosition', window.scrollY);
+            // Set up pagination links to use AJAX if possible, or fallback to regular navigation
+            document.querySelectorAll('.pagination .page-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Store the current scroll position
+                    sessionStorage.setItem('scrollPosition', window.scrollY);
+                });
+            });
+
+            // Restore scroll position after page loads
+            const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+            if (savedScrollPosition) {
+                window.scrollTo(0, parseInt(savedScrollPosition));
+                // Optional: Clear the stored position after restoring
+                // sessionStorage.removeItem('scrollPosition');
+            }
         });
-    });
-
-    // Restore scroll position after page loads
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition) {
-        window.scrollTo(0, parseInt(savedScrollPosition));
-        // Optional: Clear the stored position after restoring
-        // sessionStorage.removeItem('scrollPosition');
-    }
-});
     </script>
     <script>
-function confirmDelete(event, element) {
-    event.preventDefault();
-    Swal.fire({
-        title: 'Delete Confirmation',
-        text: 'Are you sure you want to delete this appointment?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            element.closest('form').submit();
+        function confirmDelete(event, element) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Delete Confirmation',
+                text: 'Are you sure you want to delete this appointment?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    element.closest('form').submit();
+                }
+            });
         }
-    });
-}
-</script>
+    </script>
     <script>
-     // Add navbar animation code
-     document.addEventListener('DOMContentLoaded', function() {
+        // Add navbar animation code
+        document.addEventListener('DOMContentLoaded', function() {
             // Get all nav icons except logo and logout
             const navIcons = document.querySelectorAll('.nav-icon:not(:first-child):not(.logout)');
 
@@ -817,296 +847,446 @@ function confirmDelete(event, element) {
         }
     </script>
     <script>
-       document.addEventListener('DOMContentLoaded', function() {
-    // Chart data from server
-    const monthlyData = @json($monthlyData);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart data from server
+            const monthlyData = @json($monthlyData);
 
-    // Calculate appropriate max for Y-axis (round to nearest multiple of 50)
-    const maxValue = Math.max(...monthlyData.map(item => item.count));
-    const roundedMax = Math.max(3, Math.ceil(maxValue / 3) * 3); // Ensure minimum of 50 for proper scale
+            // Calculate appropriate max for Y-axis (round to nearest multiple of 50)
+            const maxValue = Math.max(...monthlyData.map(item => item.count));
+            const roundedMax = Math.max(3, Math.ceil(maxValue / 3) * 3); // Ensure minimum of 50 for proper scale
 
-    // Get SVG element and clear previous content
-    const svg = document.getElementById('pregnant-users-chart');
-    svg.innerHTML = '';
+            // Get SVG element and clear previous content
+            const svg = document.getElementById('pregnant-users-chart');
+            svg.innerHTML = '';
 
-    // Chart settings
-    const chartWidth = 500;
-    const chartHeight = 200;
-    const padding = { top: 10, right: 20, bottom: 30, left: 40 };
-    const innerWidth = chartWidth - padding.left - padding.right;
-    const innerHeight = chartHeight - padding.top - padding.bottom;
+            // Chart settings
+            const chartWidth = 500;
+            const chartHeight = 200;
+            const padding = {
+                top: 10,
+                right: 20,
+                bottom: 30,
+                left: 40
+            };
+            const innerWidth = chartWidth - padding.left - padding.right;
+            const innerHeight = chartHeight - padding.top - padding.bottom;
 
-    // Create group for chart elements with correct positioning
-    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    g.setAttribute("transform", `translate(${padding.left}, ${padding.top})`);
-    svg.appendChild(g);
+            // Create group for chart elements with correct positioning
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.setAttribute("transform", `translate(${padding.left}, ${padding.top})`);
+            svg.appendChild(g);
 
-    // Add grid lines
-    for (let i = 0; i <= 4; i++) {
-        const y = innerHeight - (i * (innerHeight / 4));
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", "0");
-        line.setAttribute("y1", y);
-        line.setAttribute("x2", innerWidth);
-        line.setAttribute("y2", y);
-        line.setAttribute("stroke", "#eee");
-        line.setAttribute("stroke-width", "1");
-        line.setAttribute("stroke-dasharray", "2");
-        g.appendChild(line);
+            // Add grid lines
+            for (let i = 0; i <= 4; i++) {
+                const y = innerHeight - (i * (innerHeight / 4));
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", "0");
+                line.setAttribute("y1", y);
+                line.setAttribute("x2", innerWidth);
+                line.setAttribute("y2", y);
+                line.setAttribute("stroke", "#eee");
+                line.setAttribute("stroke-width", "1");
+                line.setAttribute("stroke-dasharray", "2");
+                g.appendChild(line);
 
-        // Add Y-axis labels
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", "-5");
-        text.setAttribute("y", y + 4);  // +4 for vertical centering
-        text.setAttribute("fill", "#888");
-        text.setAttribute("font-size", "10");
-        text.setAttribute("text-anchor", "end");
-        text.textContent = Math.round((roundedMax / 4) * i);
-        g.appendChild(text);
-    }
+                // Add Y-axis labels
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", "-5");
+                text.setAttribute("y", y + 4); // +4 for vertical centering
+                text.setAttribute("fill", "#888");
+                text.setAttribute("font-size", "10");
+                text.setAttribute("text-anchor", "end");
+                text.textContent = Math.round((roundedMax / 4) * i);
+                g.appendChild(text);
+            }
 
-    // Add title for Y-axis
-    const yAxisTitle = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    yAxisTitle.setAttribute("transform", "rotate(-90)");
-    yAxisTitle.setAttribute("x", -(innerHeight / 2));
-    yAxisTitle.setAttribute("y", -30);
-    yAxisTitle.setAttribute("fill", "#666");
-    yAxisTitle.setAttribute("font-size", "10");
-    yAxisTitle.setAttribute("text-anchor", "middle");
-    yAxisTitle.textContent = "New Pregnancies";
-    g.appendChild(yAxisTitle);
+            // Add title for Y-axis
+            const yAxisTitle = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            yAxisTitle.setAttribute("transform", "rotate(-90)");
+            yAxisTitle.setAttribute("x", -(innerHeight / 2));
+            yAxisTitle.setAttribute("y", -30);
+            yAxisTitle.setAttribute("fill", "#666");
+            yAxisTitle.setAttribute("font-size", "10");
+            yAxisTitle.setAttribute("text-anchor", "middle");
+            yAxisTitle.textContent = "New Pregnancies";
+            g.appendChild(yAxisTitle);
 
-    // Add X-axis labels
-    monthlyData.forEach((item, index) => {
-        // Display fewer labels on smaller screens
-        if (index % Math.ceil(monthlyData.length / 12) === 0 || index === monthlyData.length - 1) {
-            const x = (index * (innerWidth / (monthlyData.length - 1)));
-            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.setAttribute("x", x);
-            text.setAttribute("y", innerHeight + 15);
-            text.setAttribute("fill", "#888");
-            text.setAttribute("font-size", "10");
-            text.setAttribute("text-anchor", "middle");
-            text.textContent = item.month_year; // Use month and year
-            g.appendChild(text);
-        }
-    });
+            // Add X-axis labels
+            monthlyData.forEach((item, index) => {
+                // Display fewer labels on smaller screens
+                if (index % Math.ceil(monthlyData.length / 12) === 0 || index === monthlyData.length - 1) {
+                    const x = (index * (innerWidth / (monthlyData.length - 1)));
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", x);
+                    text.setAttribute("y", innerHeight + 15);
+                    text.setAttribute("fill", "#888");
+                    text.setAttribute("font-size", "10");
+                    text.setAttribute("text-anchor", "middle");
+                    text.textContent = item.month_year; // Use month and year
+                    g.appendChild(text);
+                }
+            });
 
-    // Create area path for fill
-    let areaPathData = "";
-    monthlyData.forEach((item, index) => {
-        const x = (index * (innerWidth / (monthlyData.length - 1)));
-        const y = innerHeight - ((item.count / roundedMax) * innerHeight);
+            // Create area path for fill
+            let areaPathData = "";
+            monthlyData.forEach((item, index) => {
+                const x = (index * (innerWidth / (monthlyData.length - 1)));
+                const y = innerHeight - ((item.count / roundedMax) * innerHeight);
 
-        if (index === 0) {
-            areaPathData += `M${x},${y} `;
-        } else {
-            // Create smooth curve
-            const prevX = ((index - 1) * (innerWidth / (monthlyData.length - 1)));
-            const prevY = innerHeight - ((monthlyData[index - 1].count / roundedMax) * innerHeight);
-            const cpX1 = prevX + (x - prevX) / 3;
-            const cpX2 = prevX + 2 * (x - prevX) / 3;
+                if (index === 0) {
+                    areaPathData += `M${x},${y} `;
+                } else {
+                    // Create smooth curve
+                    const prevX = ((index - 1) * (innerWidth / (monthlyData.length - 1)));
+                    const prevY = innerHeight - ((monthlyData[index - 1].count / roundedMax) * innerHeight);
+                    const cpX1 = prevX + (x - prevX) / 3;
+                    const cpX2 = prevX + 2 * (x - prevX) / 3;
 
-            areaPathData += `C${cpX1},${prevY} ${cpX2},${y} ${x},${y} `;
-        }
-    });
+                    areaPathData += `C${cpX1},${prevY} ${cpX2},${y} ${x},${y} `;
+                }
+            });
 
-    // Close the path to create area
-    const lastX = ((monthlyData.length - 1) * (innerWidth / (monthlyData.length - 1)));
-    areaPathData += `L${lastX},${innerHeight} L0,${innerHeight} Z`;
+            // Close the path to create area
+            const lastX = ((monthlyData.length - 1) * (innerWidth / (monthlyData.length - 1)));
+            areaPathData += `L${lastX},${innerHeight} L0,${innerHeight} Z`;
 
-    // Add area to SVG
-    const areaPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    areaPath.setAttribute("d", areaPathData);
-    areaPath.setAttribute("fill", "rgba(79, 198, 219, 0.2)");
-    areaPath.setAttribute("stroke", "none");
-    g.appendChild(areaPath);
+            // Add area to SVG
+            const areaPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            areaPath.setAttribute("d", areaPathData);
+            areaPath.setAttribute("fill", "rgba(79, 198, 219, 0.2)");
+            areaPath.setAttribute("stroke", "none");
+            g.appendChild(areaPath);
 
-    // Create line path
-    let linePathData = "";
-    monthlyData.forEach((item, index) => {
-        const x = (index * (innerWidth / (monthlyData.length - 1)));
-        const y = innerHeight - ((item.count / roundedMax) * innerHeight);
+            // Create line path
+            let linePathData = "";
+            monthlyData.forEach((item, index) => {
+                const x = (index * (innerWidth / (monthlyData.length - 1)));
+                const y = innerHeight - ((item.count / roundedMax) * innerHeight);
 
-        if (index === 0) {
-            linePathData += `M${x},${y} `;
-        } else {
-            // Create smooth curve
-            const prevX = ((index - 1) * (innerWidth / (monthlyData.length - 1)));
-            const prevY = innerHeight - ((monthlyData[index - 1].count / roundedMax) * innerHeight);
-            const cpX1 = prevX + (x - prevX) / 3;
-            const cpX2 = prevX + 2 * (x - prevX) / 3;
+                if (index === 0) {
+                    linePathData += `M${x},${y} `;
+                } else {
+                    // Create smooth curve
+                    const prevX = ((index - 1) * (innerWidth / (monthlyData.length - 1)));
+                    const prevY = innerHeight - ((monthlyData[index - 1].count / roundedMax) * innerHeight);
+                    const cpX1 = prevX + (x - prevX) / 3;
+                    const cpX2 = prevX + 2 * (x - prevX) / 3;
 
-            linePathData += `C${cpX1},${prevY} ${cpX2},${y} ${x},${y} `;
-        }
-    });
+                    linePathData += `C${cpX1},${prevY} ${cpX2},${y} ${x},${y} `;
+                }
+            });
 
-    // Add line to SVG
-    const linePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    linePath.setAttribute("d", linePathData);
-    linePath.setAttribute("fill", "none");
-    linePath.setAttribute("stroke", "#4FC6DB");
-    linePath.setAttribute("stroke-width", "3");
-    g.appendChild(linePath);
+            // Add line to SVG
+            const linePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            linePath.setAttribute("d", linePathData);
+            linePath.setAttribute("fill", "none");
+            linePath.setAttribute("stroke", "#4FC6DB");
+            linePath.setAttribute("stroke-width", "3");
+            g.appendChild(linePath);
 
-    // Add data points
-    monthlyData.forEach((item, index) => {
-        const x = (index * (innerWidth / (monthlyData.length - 1)));
-        const y = innerHeight - ((item.count / roundedMax) * innerHeight);
+            // Add data points
+            monthlyData.forEach((item, index) => {
+                const x = (index * (innerWidth / (monthlyData.length - 1)));
+                const y = innerHeight - ((item.count / roundedMax) * innerHeight);
 
-        const point = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        point.setAttribute("cx", x);
-        point.setAttribute("cy", y);
-        point.setAttribute("r", "4");
-        point.setAttribute("fill", "#ffffff");
-        point.setAttribute("stroke", "#4FC6DB");
-        point.setAttribute("stroke-width", "2");
-        point.setAttribute("data-value", item.count);
-        point.setAttribute("data-month", item.month_year);
-        g.appendChild(point);
-    });
+                const point = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                point.setAttribute("cx", x);
+                point.setAttribute("cy", y);
+                point.setAttribute("r", "4");
+                point.setAttribute("fill", "#ffffff");
+                point.setAttribute("stroke", "#4FC6DB");
+                point.setAttribute("stroke-width", "2");
+                point.setAttribute("data-value", item.count);
+                point.setAttribute("data-month", item.month_year);
+                g.appendChild(point);
+            });
 
-    // Set up hover interaction
-    const chartContainer = document.querySelector('.chart-container');
-    const chartPoint = document.querySelector('.chart-point');
-    const chartValue = document.querySelector('.chart-value');
+            // Set up hover interaction
+            const chartContainer = document.querySelector('.chart-container');
+            const chartPoint = document.querySelector('.chart-point');
+            const chartValue = document.querySelector('.chart-value');
 
-    // Add mouse events to track hover position
-    chartContainer.addEventListener('mousemove', function(e) {
-        const svgRect = svg.getBoundingClientRect();
-        const mouseX = e.clientX - svgRect.left - padding.left;
+            // Add mouse events to track hover position
+            chartContainer.addEventListener('mousemove', function(e) {
+                const svgRect = svg.getBoundingClientRect();
+                const mouseX = e.clientX - svgRect.left - padding.left;
 
-        // Find closest point
-        const xPoints = monthlyData.map((_, index) => index * (innerWidth / (monthlyData.length - 1)));
-        const closestPointIndex = xPoints.reduce((closest, x, index) => {
-            return Math.abs(x - mouseX) < Math.abs(xPoints[closest] - mouseX) ? index : closest;
-        }, 0);
+                // Find closest point
+                const xPoints = monthlyData.map((_, index) => index * (innerWidth / (monthlyData.length -
+                    1)));
+                const closestPointIndex = xPoints.reduce((closest, x, index) => {
+                    return Math.abs(x - mouseX) < Math.abs(xPoints[closest] - mouseX) ? index :
+                        closest;
+                }, 0);
 
-        // Get data for closest point
-        const data = monthlyData[closestPointIndex];
-        const pointX = xPoints[closestPointIndex] + padding.left;
-        const pointY = innerHeight - ((data.count / roundedMax) * innerHeight) + padding.top;
+                // Get data for closest point
+                const data = monthlyData[closestPointIndex];
+                const pointX = xPoints[closestPointIndex] + padding.left;
+                const pointY = innerHeight - ((data.count / roundedMax) * innerHeight) + padding.top;
 
-        // Position pointer
-        chartPoint.style.left = `${pointX}px`;
-        chartPoint.style.top = `${pointY}px`;
-        chartPoint.style.display = 'block';
+                // Position pointer
+                chartPoint.style.left = `${pointX}px`;
+                chartPoint.style.top = `${pointY}px`;
+                chartPoint.style.display = 'block';
 
-        // Update tooltip
-        chartValue.innerHTML = `<strong>${data.month_year}</strong>: ${data.count} pregnancies`;
-        chartValue.style.left = `${pointX}px`;
-        chartValue.style.top = `${pointY - 30}px`;
-        chartValue.style.display = 'block';
-    });
+                // Update tooltip
+                chartValue.innerHTML = `<strong>${data.month_year}</strong>: ${data.count} pregnancies`;
+                chartValue.style.left = `${pointX}px`;
+                chartValue.style.top = `${pointY - 30}px`;
+                chartValue.style.display = 'block';
+            });
 
-    chartContainer.addEventListener('mouseleave', function() {
-        chartPoint.style.display = 'none';
-        chartValue.style.display = 'none';
-    });
-});
-        </script>
+            chartContainer.addEventListener('mouseleave', function() {
+                chartPoint.style.display = 'none';
+                chartValue.style.display = 'none';
+            });
+        });
+    </script>
 
-        <script>
-import React, { useState } from 'react';
+    <script>
+        import React, {
+            useState
+        } from 'react';
 
-const MonthlyAppointmentChart = () => {
-  // Sample monthly data for a full year (January - December)
-  const [monthlyData, setMonthlyData] = useState([
-    { month: 1, name: 'Jan', count: 45 },
-    { month: 2, name: 'Feb', count: 38 },
-    { month: 3, name: 'Mar', count: 65 },
-    { month: 4, name: 'Apr', count: 42 },
-    { month: 5, name: 'May', count: 74 },
-    { month: 6, name: 'Jun', count: 58 },
-    { month: 7, name: 'Jul', count: 39 },
-    { month: 8, name: 'Aug', count: 62 },
-    { month: 9, name: 'Sep', count: 45 },
-    { month: 10, name: 'Oct', count: 53 },
-    { month: 11, name: 'Nov', count: 49 },
-    { month: 12, name: 'Dec', count: 41 }
-  ]);
+        const MonthlyAppointmentChart = () => {
+            // Sample monthly data for a full year (January - December)
+            const [monthlyData, setMonthlyData] = useState([{
+                    month: 1,
+                    name: 'Jan',
+                    count: 45
+                },
+                {
+                    month: 2,
+                    name: 'Feb',
+                    count: 38
+                },
+                {
+                    month: 3,
+                    name: 'Mar',
+                    count: 65
+                },
+                {
+                    month: 4,
+                    name: 'Apr',
+                    count: 42
+                },
+                {
+                    month: 5,
+                    name: 'May',
+                    count: 74
+                },
+                {
+                    month: 6,
+                    name: 'Jun',
+                    count: 58
+                },
+                {
+                    month: 7,
+                    name: 'Jul',
+                    count: 39
+                },
+                {
+                    month: 8,
+                    name: 'Aug',
+                    count: 62
+                },
+                {
+                    month: 9,
+                    name: 'Sep',
+                    count: 45
+                },
+                {
+                    month: 10,
+                    name: 'Oct',
+                    count: 53
+                },
+                {
+                    month: 11,
+                    name: 'Nov',
+                    count: 49
+                },
+                {
+                    month: 12,
+                    name: 'Dec',
+                    count: 41
+                }
+            ]);
 
-  // Calculate the maximum count for scaling
-  const maxCount = Math.max(...monthlyData.map(item => item.count));
-  const scaleFactor = 150 / maxCount; // 150 is the max height for bars
+            // Calculate the maximum count for scaling
+            const maxCount = Math.max(...monthlyData.map(item => item.count));
+            const scaleFactor = 150 / maxCount; // 150 is the max height for bars
 
-  return (
-    <div className="w-full p-4 rounded-lg shadow bg-white">
-      <div className="flex justify-between items-center mb-3">
-        <h5 className="text-lg font-bold">Patient Statistics</h5>
-        <small className="text-gray-500">Monthly Data (Jan-Dec)</small>
-      </div>
+            return ( <
+                div className = "w-full p-4 rounded-lg shadow bg-white" >
+                <
+                div className = "flex justify-between items-center mb-3" >
+                <
+                h5 className = "text-lg font-bold" > Patient Statistics < /h5> <
+                small className = "text-gray-500" > Monthly Data(Jan - Dec) < /small> <
+                /div>
 
-      <div className="overflow-x-auto">
-        <svg className="w-full" viewBox="0 0 600 220" style="min-width: 580px;">
-          {/* Grid lines */}
-          <line x1="50" y1="0" x2="550" y2="0" stroke="#eee" strokeWidth="1" strokeDasharray="2" />
-          <line x1="50" y1="50" x2="550" y2="50" stroke="#eee" strokeWidth="1" strokeDasharray="2" />
-          <line x1="50" y1="100" x2="550" y2="100" stroke="#eee" strokeWidth="1" strokeDasharray="2" />
-          <line x1="50" y1="150" x2="550" y2="150" stroke="#eee" strokeWidth="1" strokeDasharray="2" />
-          <line x1="50" y1="200" x2="550" y2="200" stroke="#eee" strokeWidth="1" strokeDasharray="2" />
+                <
+                div className = "overflow-x-auto" >
+                <
+                svg className = "w-full"
+                viewBox = "0 0 600 220"
+                style = "min-width: 580px;" > {
+                    /* Grid lines */ } <
+                line x1 = "50"
+                y1 = "0"
+                x2 = "550"
+                y2 = "0"
+                stroke = "#eee"
+                strokeWidth = "1"
+                strokeDasharray = "2" / >
+                <
+                line x1 = "50"
+                y1 = "50"
+                x2 = "550"
+                y2 = "50"
+                stroke = "#eee"
+                strokeWidth = "1"
+                strokeDasharray = "2" / >
+                <
+                line x1 = "50"
+                y1 = "100"
+                x2 = "550"
+                y2 = "100"
+                stroke = "#eee"
+                strokeWidth = "1"
+                strokeDasharray = "2" / >
+                <
+                line x1 = "50"
+                y1 = "150"
+                x2 = "550"
+                y2 = "150"
+                stroke = "#eee"
+                strokeWidth = "1"
+                strokeDasharray = "2" / >
+                <
+                line x1 = "50"
+                y1 = "200"
+                x2 = "550"
+                y2 = "200"
+                stroke = "#eee"
+                strokeWidth = "1"
+                strokeDasharray = "2" / >
 
-          {/* Y-axis labels */}
-          <text x="10" y="200" fill="#888" fontSize="10">0</text>
-          <text x="10" y="150" fill="#888" fontSize="10">25</text>
-          <text x="10" y="100" fill="#888" fontSize="10">50</text>
-          <text x="10" y="50" fill="#888" fontSize="10">75</text>
-          <text x="5" y="15" fill="#888" fontSize="10">100</text>
+                {
+                    /* Y-axis labels */ } <
+                text x = "10"
+                y = "200"
+                fill = "#888"
+                fontSize = "10" > 0 < /text> <
+                text x = "10"
+                y = "150"
+                fill = "#888"
+                fontSize = "10" > 25 < /text> <
+                text x = "10"
+                y = "100"
+                fill = "#888"
+                fontSize = "10" > 50 < /text> <
+                text x = "10"
+                y = "50"
+                fill = "#888"
+                fontSize = "10" > 75 < /text> <
+                text x = "5"
+                y = "15"
+                fill = "#888"
+                fontSize = "10" > 100 < /text>
 
-          {/* X-axis labels and bars */}
-          {monthlyData.map((data, index) => {
-            const barX = 60 + (index * 40);
-            const barHeight = data.count * scaleFactor;
-            const barY = 200 - barHeight;
+                {
+                    /* X-axis labels and bars */ } {
+                    monthlyData.map((data, index) => {
+                        const barX = 60 + (index * 40);
+                        const barHeight = data.count * scaleFactor;
+                        const barY = 200 - barHeight;
 
-            return (
-              <g key={data.month}>
-                {/* Month label */}
-                <text x={barX + 15} y="215" fill="#888" fontSize="10" textAnchor="middle">
-                  {data.name}
-                </text>
+                        return ( <
+                            g key = {
+                                data.month
+                            } > {
+                                /* Month label */ } <
+                            text x = {
+                                barX + 15
+                            }
+                            y = "215"
+                            fill = "#888"
+                            fontSize = "10"
+                            textAnchor = "middle" > {
+                                data.name
+                            } <
+                            /text>
 
-                {/* Count label on top of bar */}
-                <text
-                  x={barX + 15}
-                  y={barY - 5}
-                  fill="#666"
-                  fontSize="10"
-                  textAnchor="middle"
-                >
-                  {data.count}
-                </text>
+                            {
+                                /* Count label on top of bar */ } <
+                            text x = {
+                                barX + 15
+                            }
+                            y = {
+                                barY - 5
+                            }
+                            fill = "#666"
+                            fontSize = "10"
+                            textAnchor = "middle" >
+                            {
+                                data.count
+                            } <
+                            /text>
 
-                {/* Bar */}
-                <rect
-                  x={barX}
-                  y={barY}
-                  width="30"
-                  height={barHeight}
-                  fill="rgba(146, 109, 222, 0.8)"
-                  rx="4"
-                />
-              </g>
+                            {
+                                /* Bar */ } <
+                            rect x = {
+                                barX
+                            }
+                            y = {
+                                barY
+                            }
+                            width = "30"
+                            height = {
+                                barHeight
+                            }
+                            fill = "rgba(146, 109, 222, 0.8)"
+                            rx = "4" /
+                            >
+                            <
+                            /g>
+                        );
+                    })
+                }
+
+                {
+                    /* Y-axis line */ } <
+                line x1 = "50"
+                y1 = "0"
+                x2 = "50"
+                y2 = "200"
+                stroke = "#ddd"
+                strokeWidth = "1" / >
+
+                {
+                    /* X-axis line */ } <
+                line x1 = "50"
+                y1 = "200"
+                x2 = "550"
+                y2 = "200"
+                stroke = "#ddd"
+                strokeWidth = "1" / >
+                <
+                /svg> <
+                /div>
+
+                <
+                div className = "mt-3 text-sm text-gray-600" >
+                <
+                p className = "text-center" > Appointments per Month(Current Year) < /p> <
+                /div> <
+                /div>
             );
-          })}
+        };
 
-          {/* Y-axis line */}
-          <line x1="50" y1="0" x2="50" y2="200" stroke="#ddd" strokeWidth="1" />
-
-          {/* X-axis line */}
-          <line x1="50" y1="200" x2="550" y2="200" stroke="#ddd" strokeWidth="1" />
-        </svg>
-      </div>
-
-      <div className="mt-3 text-sm text-gray-600">
-        <p className="text-center">Appointments per Month (Current Year)</p>
-      </div>
-    </div>
-  );
-};
-
-export default MonthlyAppointmentChart;
-            </script>
+        export default MonthlyAppointmentChart;
+    </script>
 </body>
 
 </html>
