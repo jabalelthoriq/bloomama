@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Setting</title>
+    <title>Chatting</title>
 </head>
 <style>
     body {
@@ -52,7 +52,7 @@
        left: 0;
        width: 4px;
        height: 48px;
-       background-color: #00b8d4;
+       background-color: #D21F3C;
        border-radius: 0 4px 4px 0;
        transition: top 0.3s ease;
        pointer-events: none;
@@ -78,7 +78,7 @@
    }
 
    .nav-icon.active {
-       background-color: #00b8d4;
+       background-color: #D21F3C;
        color: white;
        transition: background-color 1s ease;
    }
@@ -162,48 +162,7 @@
                 height: 40px;
             }
         }
-
-        .tab-underline {
-            border-bottom: 2px solid #00b3db;
-            color: #00b3db;
-            font-weight: 500;
-        }
-        .tab-link {
-            color: #6c757d;
-            text-decoration: none;
-            padding-bottom: 10px;
-            margin-right: 20px;
-            display: inline-block;
-        }
-        .profile-pic-container {
-            border: 1px dashed #ccc;
-            width: 100px;
-            height: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-            cursor: pointer;
-        }
-        .update-btn {
-            background-color: #00b3db;
-            border-color: #00b3db;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .card {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 24px;
-            height: 100%;
-        }
-
-        .nav-logo {
+         .nav-logo {
        width: 48px;
        height: 48px;
        margin: 12px 0;
@@ -213,145 +172,37 @@
        border-radius: 8px;
        color: #777;
        font-size: 20px;
-     
+
        transition: all 0.2s ease;
    }
-
    </style>
 <body>
     <div class="vertical-navbar">
         <div class="nav-logo" >
-            <img src="{{ asset('image/logo.png') }}" alt="Logo">
+            <img src="{{ asset('image/logo2.png') }}" alt="Logo">
         </div>
-        <div class="nav-icon">
-            <a href="dashboard">
+        <div class="nav-icon active">
+            <a href="menu1">
                 <i class="fas fa-th-large" ></i>
             </a>
         </div>
 
         <div class="nav-icon">
-            <a href="acara">
+            <a href="menu2">
             <i class="far fa-calendar-alt"></i>
             </a>
         </div>
 
         <div class="nav-icon">
-            <a href="chat">
-            <i class="far fa-comment-alt"></i>
-            </a>
-        </div>
-
-        <div class="nav-icon">
-            <a href="user">
+            <a href="menu3">
             <i class="far fa-clock"></i>
             </a>
         </div>
 
-        <div class="nav-icon active">
-            <a href="setting">
-            <i class="fas fa-cog"></i>
-            </a>
-        </div>
         <div class="nav-icon logout" onclick="handleLogout()">
             <i class="fas fa-sign-out-alt"></i>
         </div>
     </div>
-
-    <div class="main-content">
-        <div class="d-flex mb-4 border-bottom">
-            <a href="setting" class="tab-link">Account Setting</a>
-            <a href="security" class="tab-link tab-underline">Security</a>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        @if (session('status'))
-                            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                                {{ session('status') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        <form method="POST" action="{{ route('security.change-password') }}">
-                            @csrf
-
-                            <div class="form-group">
-                                <label for="current_password" class="form-label">Kata Sandi Saat Ini</label>
-                                <input type="password" class="form-control @error('current_password') is-invalid @enderror"
-                                       id="current_password" name="current_password" placeholder="Masukkan kata sandi saat ini">
-                                @error('current_password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="new_password" class="form-label">Kata Sandi Baru</label>
-                                <input type="password" class="form-control @error('new_password') is-invalid @enderror"
-                                       id="new_password" name="new_password" placeholder="Masukkan kata sandi baru">
-                                @error('new_password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="new_password_confirmation" class="form-label">Konfirmasi Kata Sandi</label>
-                                <input type="password" class="form-control"
-                                       id="new_password_confirmation" name="new_password_confirmation"
-                                       placeholder="Konfirmasi kata sandi baru">
-                            </div>
-
-                            <div class="form-group">
-                                <span>Lupa kata sandi?</span><br>
-                                <span>Kirim melalui <a href="#" data-bs-toggle="modal" data-bs-target="#resetPasswordModal" class="email-link">Email</a> !</span>
-                            </div>
-
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="submit" class="btn btn-primary update-btn">Simpan Kata Sandi</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reset Password Email Modal -->
-    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="{{ route('security.reset-password-email') }}">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Alamat Email</label>
-                            <input type="email" class="form-control" id="email" name="email"
-                                   placeholder="Masukkan alamat email Anda" >
-                        </div>
-                        <p class="text-muted">Kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Kirim Email Reset</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function handleLogout() {

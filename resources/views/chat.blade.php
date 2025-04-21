@@ -162,10 +162,23 @@
                 height: 40px;
             }
         }
+         .nav-logo {
+       width: 48px;
+       height: 48px;
+       margin: 12px 0;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       border-radius: 8px;
+       color: #777;
+       font-size: 20px;
+   
+       transition: all 0.2s ease;
+   }
    </style>
 <body>
     <div class="vertical-navbar">
-        <div class="nav-icon">
+        <div class="nav-logo" >
             <img src="{{ asset('image/logo.png') }}" alt="Logo">
         </div>
         <div class="nav-icon">

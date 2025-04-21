@@ -1,10 +1,15 @@
+<?php
+// resources/views/landingpage.blade.php
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BundaCare - Pendamping Setia Ibu Hamil</title>
+    <title>Bloomama - Pendamping Setia Ibu Hamil</title>
     <style>
+        /* Your existing CSS styles remain the same */
         :root {
             --primary: #11B3CF;
             --dark: #333333;
@@ -25,6 +30,8 @@
             background-color: var(--light);
             color: var(--dark);
             overflow-x: hidden;
+            margin: 0; /* Ensure no margin on body */
+            padding: 0; /* Ensure no padding on body */
         }
 
         .container {
@@ -41,6 +48,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            width: 100%;
         }
 
         .navbar {
@@ -205,53 +213,30 @@
             object-fit: contain;
         }
 
-        .floating-card {
-            position: absolute;
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
         }
 
-        .floating-card.doctor {
-            bottom: 20%;
-            right: 5%;
-        }
-
-        .floating-card.stats {
-            top: 30%;
-            right: 0;
-        }
-
-        .floating-card img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .floating-card-text h4 {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .floating-card-text p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .rating {
-            display: flex;
-            gap: 3px;
-            margin-top: 5px;
-        }
-
-        .star {
-            color: #FFD700;
-            font-size: 12px;
+        .scroll-top.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Features Section */
@@ -510,26 +495,6 @@
             min-height: 120px;
         }
 
-        /* CTA Section */
-        .cta {
-            padding: 100px 0;
-            text-align: center;
-        }
-
-        .cta h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .cta p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
         /* Footer */
         footer {
             background-color: var(--dark);
@@ -602,70 +567,6 @@
             font-size: 14px;
         }
 
-        /* Scroll to top button */
-        .scroll-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            z-index: 999;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .scroll-top.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Decorative Elements */
-        .shape {
-            position: absolute;
-            z-index: 1;
-        }
-
-        .shape-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-        }
-
-        .shape-circle.primary {
-            background-color: rgba(17, 179, 207, 0.1);
-            top: -50px;
-            right: -50px;
-        }
-
-        .shape-circle.secondary {
-            background-color: rgba(255, 133, 162, 0.1);
-            bottom: -100px;
-            left: -100px;
-            width: 300px;
-            height: 300px;
-        }
-
-        .shape-ring {
-            width: 100px;
-            height: 100px;
-            border: 20px solid rgba(17, 179, 207, 0.1);
-            border-radius: 50%;
-        }
-
-        .shape-ring.left {
-            top: 30%;
-            left: -50px;
-        }
-
         /* Mobile responsive */
         @media (max-width: 992px) {
             .hero-content, .about-content, .contact-content {
@@ -735,6 +636,105 @@
                 font-size: 36px;
             }
         }
+
+      /* Animasi Fade */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+}
+
+.fade-out {
+    opacity: 1;
+    animation: fadeOut 2s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Variasi fade dengan gerakan */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(50px);
+    animation: fadeInUp 1.5s ease forwards;
+}
+
+.fade-in-down {
+    opacity: 0;
+    transform: translateY(-50px);
+    animation: fadeInDown 1.5s ease forwards;
+}
+
+.fade-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    animation: fadeInLeft 1.5s ease forwards;
+}
+
+.fade-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+    animation: fadeInRight 1.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Animasi dengan delay */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+
     </style>
 </head>
 <body>
@@ -750,8 +750,10 @@
         <div class="container">
             <nav class="navbar">
                 <div class="logo">
-                    <div class="logo-icon">B</div>
-                    BundaCare
+                    <div>
+                        <img src="{{ asset('image/logo.png') }}" alt="Logo">
+                    </div>
+                    Bloomama
                 </div>
                 <div class="nav-links">
                     <a href="#beranda" class="nav-link active" data-section="beranda">Beranda</a>
@@ -760,8 +762,7 @@
                     <a href="#contact-us" class="nav-link" data-section="contact-us">Contact Us</a>
                 </div>
                 <div class="auth-buttons">
-                    <a href="#" class="btn btn-outline">Login</a>
-
+                    <a href="login" class="btn btn-outline">Login</a>
                 </div>
                 <button class="mobile-menu-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -779,34 +780,14 @@
         <div class="container hero-content">
             <div class="hero-text">
                 <h1>Temani Perjalanan <span>Kehamilan Anda</span> Dengan Informasi Terpercaya</h1>
-                <p>BundaCare hadir sebagai sahabat terpercaya untuk ibu hamil, memberikan informasi terkini, tips kesehatan, dan dukungan selama masa kehamilan hingga persalinan.</p>
+                <p>Bloomama hadir sebagai sahabat terpercaya untuk ibu hamil, memberikan informasi terkini, tips kesehatan, dan dukungan selama masa kehamilan hingga persalinan.</p>
                 <div class="hero-buttons">
                     <a href="#" class="btn btn-primary">Mulai Sekarang</a>
                     <a href="#" class="btn btn-outline">Konsultasi Dokter</a>
                 </div>
             </div>
             <div class="hero-image">
-                <img src="/api/placeholder/500/500" alt="Ilustrasi Ibu Hamil">
-                <div class="floating-card doctor">
-                    <img src="/api/placeholder/50/50" alt="Dokter">
-                    <div class="floating-card-text">
-                        <h4>dr. Siti Rahmawati</h4>
-                        <p>Spesialis Kandungan</p>
-                        <div class="rating">
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="floating-card stats">
-                    <div class="floating-card-text">
-                        <h4>Minggu ke-12</h4>
-                        <p>Perkembangan Janin</p>
-                    </div>
-                </div>
+                <div id="animation-container" style="width: 100%; height: 400px;"></div>
             </div>
         </div>
 
@@ -820,7 +801,7 @@
     <section class="features" id="fitur">
         <div class="container">
             <div class="section-header">
-                <h2>Fitur Unggulan BundaCare</h2>
+                <h2>Fitur Unggulan Bloomama</h2>
                 <p>Dapatkan berbagai manfaat untuk mendukung perjalanan kehamilan Anda dengan fitur-fitur terbaik kami</p>
             </div>
 
@@ -888,69 +869,66 @@
         </div>
     </section>
 
- <!-- About Us Section -->
-<section class="about-us" id="about-us">
-    <div class="container">
-        <div class="about-content">
-            <div class="about-image">
-                <img src="/api/placeholder/500/400" alt="Tim BundaCare">
-            </div>
-            <div class="about-text">
-                <h2>Tentang BundaCare</h2>
-                <p>BundaCare adalah platform digital kesehatan ibu hamil terdepan di Indonesia. Didirikan pada tahun 2023, kami berkomitmen untuk memberikan pendampingan terbaik bagi ibu hamil di seluruh Indonesia melalui teknologi yang inovatif dan tim medis yang berpengalaman.</p>
-                <p>Dengan lebih dari 100 dokter spesialis kandungan dan 50 bidan profesional, kami telah membantu lebih dari 10.000 ibu hamil menjalani kehamilan yang sehat dan aman. BundaCare hadir sebagai solusi untuk memudahkan akses informasi kesehatan maternal yang terpercaya.</p>
+    <!-- About Us Section -->
+    <section class="about-us" id="about-us">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Tentang Bloomama</h2>
+                    <p>Bloomama adalah platform digital kesehatan ibu hamil terdepan di Indonesia. Didirikan pada tahun 2023, kami berkomitmen untuk memberikan pendampingan terbaik bagi ibu hamil di seluruh Indonesia melalui teknologi yang inovatif dan tim medis yang berpengalaman.</p>
+                    <p>Dengan lebih dari 100 dokter spesialis kandungan dan 50 bidan profesional, kami telah membantu lebih dari 10.000 ibu hamil menjalani kehamilan yang sehat dan aman. Bloomama hadir sebagai solusi untuk memudahkan akses informasi kesehatan maternal yang terpercaya.</p>
 
-                <div class="mission-vision">
-                    <div class="mission">
-                        <h3>Misi Kami</h3>
-                        <p>Menyediakan informasi kesehatan terpercaya dan dukungan yang komprehensif untuk setiap ibu hamil di Indonesia, memastikan perjalanan kehamilan yang sehat dan aman hingga persalinan.</p>
-                    </div>
-                    <div class="vision">
-                        <h3>Visi Kami</h3>
-                        <p>Menjadi platform kesehatan maternal terpercaya yang dapat diakses oleh semua ibu hamil di Indonesia, menurunkan angka kematian ibu dan bayi melalui edukasi dan layanan kesehatan yang berkualitas.</p>
+                    <div class="mission-vision">
+                        <div class="mission">
+                            <h3>Misi Kami</h3>
+                            <p>Menyediakan informasi kesehatan terpercaya dan dukungan yang komprehensif untuk setiap ibu hamil di Indonesia, memastikan perjalanan kehamilan yang sehat dan aman hingga persalinan.</p>
+                        </div>
+                        <div class="vision">
+                            <h3>Visi Kami</h3>
+                            <p>Menjadi platform kesehatan maternal terpercaya yang dapat diakses oleh semua ibu hamil di Indonesia, menurunkan angka kematian ibu dan bayi melalui edukasi dan layanan kesehatan yang berkualitas.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Contact Us Section -->
-<section class="contact-us" id="contact-us">
-    <div class="container">
-        <div class="section-header">
-            <h2>Hubungi Kami</h2>
-            <p>Jika Anda memiliki pertanyaan atau membutuhkan bantuan, tim kami siap membantu Anda</p>
-        </div>
+    <!-- Contact Us Section -->
+    <section class="contact-us" id="contact-us">
+        <div class="container">
+            <div class="section-header">
+                <h2>Hubungi Kami</h2>
+                <p>Jika Anda memiliki pertanyaan atau membutuhkan bantuan, tim kami siap membantu Anda</p>
+            </div>
 
-        <div class="contact-content">
-            <div class="contact-info">
-                <h2>Informasi Kontak</h2>
-                <p>Kami senang mendengar dari Anda. Silakan hubungi kami melalui informasi berikut atau isi formulir untuk mengirimkan pesan langsung.</p>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h2>Informasi Kontak</h2>
+                    <p>Kami senang mendengar dari Anda. Silakan hubungi kami melalui informasi berikut atau isi formulir untuk mengirimkan pesan langsung.</p>
 
-                <div class="contact-details">
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                            </svg>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Telepon</h4>
+                                <p>+62 21 1234 5678</p>
+                            </div>
                         </div>
-                        <div class="contact-text">
-                            <h4>Telepon</h4>
-                            <p>+62 21 1234 5678</p>
-                        </div>
-                    </div>
 
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
                             </svg>
                         </div>
                         <div class="contact-text">
                             <h4>Email</h4>
-                            <p>info@bundacare.id</p>
+                            <p>info@Bloomama.id</p>
                         </div>
                     </div>
 
@@ -1022,14 +1000,7 @@
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta">
-    <div class="container">
-        <h2>Siap Memulai Perjalanan Kehamilan yang Sehat?</h2>
-        <p>Bergabunglah dengan ribuan ibu hamil lainnya yang telah merasakan manfaat BundaCare sebagai pendamping kehamilan mereka.</p>
-        <a href="#" class="btn btn-primary">Daftar Sekarang - Gratis!</a>
-    </div>
-</section>
+
 
 <!-- Footer -->
 <footer>
@@ -1037,8 +1008,10 @@
         <div class="footer-content">
             <div class="footer-about">
                 <div class="footer-logo">
-                    <div class="footer-logo-icon">B</div>
-                    BundaCare
+                    <div >
+            <img src="{{ asset('image/logo.png') }}" alt="Logo">
+        </div>
+                    Bloomama
                 </div>
                 <p>Platform pendamping kehamilan terpercaya yang menyediakan informasi kesehatan ibu hamil, perkembangan janin, dan konsultasi dengan dokter spesialis.</p>
             </div>
@@ -1075,13 +1048,60 @@
         </div>
 
         <div class="copyright">
-            <p>&copy; 2025 BundaCare. All Rights Reserved.</p>
+            <p>&copy; 2025 Bloomama. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
 
 <!-- JavaScript for toggle menu and scroll to top -->
 <script>
+     // Fungsi untuk mengaktifkan animasi fade saat elemen terlihat di viewport
+     document.addEventListener('DOMContentLoaded', function() {
+        // Tambahkan kelas untuk elemen yang ingin dianimasikan
+        const heroText = document.querySelector('.hero-text');
+        heroText.classList.add('fade-in-left');
+
+        const heroImage = document.querySelector('.hero-image');
+        heroImage.classList.add('fade-in-right');
+
+        // Observer untuk animasi saat scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {threshold: 0.2});
+
+        // Terapkan untuk elemen-elemen yang ingin dianimasikan saat scroll
+        document.querySelectorAll('.feature-card').forEach((card, index) => {
+            card.classList.add('delay-' + ((index % 6) + 1) + '00');
+            observer.observe(card);
+        });
+
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.classList.add('fade-in-up');
+            observer.observe(header);
+        });
+
+        document.querySelectorAll('.about-text, .about-image').forEach(element => {
+            element.classList.add('fade-in-up');
+            observer.observe(element);
+        });
+
+        document.querySelectorAll('.mission, .vision').forEach((element, index) => {
+            element.classList.add('fade-in-up');
+            element.classList.add('delay-' + ((index + 1) * 2) + '00');
+            observer.observe(element);
+        });
+
+        document.querySelectorAll('.contact-info, .contact-form').forEach((element, index) => {
+            element.classList.add('fade-in');
+            element.classList.add('delay-' + ((index + 1) * 2) + '00');
+            observer.observe(element);
+        });
+    });
     // Mobile menu toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
@@ -1132,5 +1152,97 @@
         });
     });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    lottie.loadAnimation({
+        container: document.getElementById('animation-container'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '{{ asset("animation/landingpage.json") }}'
+    });
+});
+</script>
+
+<script>
+    // Handle navbar click events for smooth scrolling and animations
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Get the target section
+        const targetId = this.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+
+        // Smooth scroll to the section
+        window.scrollTo({
+            top: targetSection.offsetTop - 80, // Adjust for header height
+            behavior: 'smooth'
+        });
+
+        // Reset animations on the target section elements
+        resetAndTriggerAnimations(targetId);
+    });
+});
+
+// Function to reset and trigger animations for a specific section
+function resetAndTriggerAnimations(sectionId) {
+    // Define elements to animate based on section
+    let elementsToAnimate = [];
+
+    switch(sectionId) {
+        case 'beranda':
+            elementsToAnimate = [
+                { element: document.querySelector('.hero-text'), classes: ['fade-in-left'] },
+                { element: document.querySelector('.hero-image'), classes: ['fade-in-right'] }
+            ];
+            break;
+        case 'fitur':
+            elementsToAnimate = [
+                { element: document.querySelector('#fitur .section-header'), classes: ['fade-in-up'] }
+            ];
+            // Add feature cards with delay
+            document.querySelectorAll('#fitur .feature-card').forEach((card, index) => {
+                elementsToAnimate.push({
+                    element: card,
+                    classes: ['fade-in', `delay-${((index % 6) + 1)}00`]
+                });
+            });
+            break;
+        case 'about-us':
+            elementsToAnimate = [
+                { element: document.querySelector('.about-text'), classes: ['fade-in-up'] },
+                { element: document.querySelector('.mission'), classes: ['fade-in-up', 'delay-200'] },
+                { element: document.querySelector('.vision'), classes: ['fade-in-up', 'delay-400'] }
+            ];
+            break;
+        case 'contact-us':
+            elementsToAnimate = [
+                { element: document.querySelector('#contact-us .section-header'), classes: ['fade-in-up'] },
+                { element: document.querySelector('.contact-info'), classes: ['fade-in', 'delay-200'] },
+                { element: document.querySelector('.contact-form'), classes: ['fade-in', 'delay-400'] }
+            ];
+            break;
+    }
+
+    // Reset and trigger animations
+    elementsToAnimate.forEach(item => {
+        if (item.element) {
+            // Reset by removing classes
+            item.element.classList.remove(...item.classes);
+
+            // Force reflow
+            void item.element.offsetWidth;
+
+            // Add classes back to trigger animation
+            setTimeout(() => {
+                item.element.classList.add(...item.classes);
+            }, 10);
+        }
+    });
+}
+</script>
+
   </body>
   </html>

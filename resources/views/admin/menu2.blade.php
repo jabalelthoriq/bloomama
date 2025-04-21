@@ -1,4 +1,3 @@
-<!-- resources/views/users.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,8 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <title>Users</title>
+    <title>Chatting</title>
 </head>
 <style>
     body {
@@ -20,6 +18,7 @@
        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
        overflow-x: hidden;
    }
+
 
    .vertical-navbar {
        position: fixed;
@@ -53,7 +52,7 @@
        left: 0;
        width: 4px;
        height: 48px;
-       background-color: #00b8d4;
+       background-color: #D21F3C;
        border-radius: 0 4px 4px 0;
        transition: top 0.3s ease;
        pointer-events: none;
@@ -79,7 +78,7 @@
    }
 
    .nav-icon.active {
-       background-color: #00b8d4;
+       background-color: #D21F3C;
        color: white;
        transition: background-color 1s ease;
    }
@@ -126,6 +125,26 @@
             transform: translateY(-50%);
             color: #6c757d;
         }
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-container input {
+            padding-left: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-container i {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
 
         @media (max-width: 768px) {
             .vertical-navbar {
@@ -143,8 +162,20 @@
                 height: 40px;
             }
         }
+         .nav-logo {
+       width: 48px;
+       height: 48px;
+       margin: 12px 0;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       border-radius: 8px;
+       color: #777;
+       font-size: 20px;
 
-        .card {
+       transition: all 0.2s ease;
+         }
+         .card {
             border-radius: 12px;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -169,12 +200,12 @@
         }
 
         .pagination .page-item .page-link {
-            color: #00b8d4;
+            color: #D21F3C;
         }
 
         .pagination .page-item.active .page-link {
-            background-color: #00b8d4;
-            border-color: #00b8d4;
+            background-color: #D21F3C;
+            border-color: #D21F3C;
             color: white;
         }
 
@@ -205,64 +236,37 @@
             margin-left: 12px;
             font-size: 16px;
         }
-
-        .bi-pencil, .bi-trash {
-        cursor: pointer;
-        }
-        .nav-logo {
-       width: 48px;
-       height: 48px;
-       margin: 12px 0;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       border-radius: 8px;
-       color: #777;
-       font-size: 20px;
-
-       transition: all 0.2s ease;
-   }
    </style>
 <body>
     <div class="vertical-navbar">
         <div class="nav-logo" >
-            <img src="{{ asset('image/logo.png') }}" alt="Logo">
+            <img src="{{ asset('image/logo2.png') }}" alt="Logo">
         </div>
         <div class="nav-icon">
-            <a href="{{ route('dashboard') }}">
-                <i class="fas fa-th-large"></i>
+            <a href="menu1">
+                <i class="fas fa-th-large" ></i>
             </a>
         </div>
 
-        <div class="nav-icon">
-            <a href="{{ route('acara') }}">
+        <div class="nav-icon active">
+            <a href="menu2">
             <i class="far fa-calendar-alt"></i>
             </a>
         </div>
 
         <div class="nav-icon">
-            <a href="/chat">
-            <i class="far fa-comment-alt"></i>
-            </a>
-        </div>
-
-        <div class="nav-icon active">
-            <a href="{{ route('user') }}">
+            <a href="menu3">
             <i class="far fa-clock"></i>
-            </a>
-        </div>
-
-        <div class="nav-icon">
-            <a href="/setting">
-            <i class="fas fa-cog"></i>
             </a>
         </div>
         <div class="nav-icon logout" onclick="handleLogout()">
             <i class="fas fa-sign-out-alt"></i>
         </div>
     </div>
-    <!-- Main Content -->
-    <div class="main-content">
+
+
+     <!-- Main Content -->
+     <div class="main-content">
         <div class="header-container">
             <h2 class="fs-3 fw-bold m-0">Users</h2>
         </div>
@@ -289,7 +293,7 @@
                                         <th>Email</th>
                                         <th>Phone number</th>
                                         <th>Status</th>
-
+                                        <th class="text-end">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -305,6 +309,18 @@
                                             <td>{{ $midwive->phone_number }}</td>
                                             <td>
                                                 <span class="badge bg-success">Active</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <a href="{{ route('midwives.edit', $midwive->id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="{{ route('midwives.destroy', $midwive->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @empty
@@ -347,96 +363,7 @@
                 </div>
             </div>
         </div>
-
-                    <div class="row" id="users-table">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
-                                    </div>
-
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Phone Number</th>
-                                                    <th>Address</th>
-                                                    <th class="text-end">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($users as $user)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar bg-primary">{{ substr($user->name, 0, 2) }}</div>
-                                                                <span>{{ $user->name }}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td>{{ $user->email }}</td>
-                                                        <td>{{ $user->phone_number }}</td>
-                                                        <td>{{ $user->address }}</td>
-                                                        <td class="text-end">
-                                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
-                                                                <i class="fas fa-edit"></i>
-                                                            </a>
-                                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteUser(event, this)">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="5" class="text-center">Tidak ada data pasien</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <!-- Pagination for Users with separate query parameter -->
-                                    @if($users->hasPages())
-                                    <nav aria-label="Page navigation for users">
-                                        <ul class="pagination">
-                                            {{-- Previous Page Link --}}
-                                            <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                                <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->previousPageUrl() . '&user_page=' . ($users->currentPage() - 1) }}" aria-label="Previous">
-                                                    <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-                                                </a>
-                                            </li>
-
-                                            {{-- Pagination Elements --}}
-                                            @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
-                                                <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
-                                                    <a class="page-link" href="{{ $url . '&user_page=' . $page . '&midwife_page=' . request('midwife_page', 1) }}">{{ $page }}</a>
-                                                </li>
-                                            @endforeach
-
-                                            {{-- Next Page Link --}}
-                                            <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                                <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->nextPageUrl() . '&user_page=' . ($users->currentPage() + 1) }}" aria-label="Next">
-                                                    <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function handleLogout() {
@@ -536,71 +463,6 @@
 
                 // Update indicator position
                 indicator.style.top = top + 'px';
-            }
-        });
-
-        function confirmDelete(event, button) {
-    event.preventDefault();
-
-    Swal.fire({
-        title: 'Konfirmasi Hapus',
-        text: 'Apakah Anda yakin ingin menghapus bidan ini?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            button.closest('form').submit();
-        }
-    });
-}
-
-function confirmDeleteUser(event, button) {
-    event.preventDefault();
-
-    Swal.fire({
-        title: 'Konfirmasi Hapus',
-        text: 'Apakah Anda yakin ingin menghapus user ini?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            button.closest('form').submit();
-        }
-    });
-}
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Save the scroll position before page reload
-            const userPaginationLinks = document.querySelectorAll('nav[aria-label="Page navigation for users"] .page-link');
-
-            userPaginationLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-
-                    // Store current scroll position in sessionStorage
-                    sessionStorage.setItem('scrollPosition', window.pageYOffset);
-
-                    // Add a hash to the URL to identify the users table section
-                    const url = new URL(this.href);
-                    url.hash = 'users-table';
-
-                    // Navigate to the modified URL
-                    window.location.href = url.toString();
-                });
-            });
-
-            // Restore scroll position after page load if we're coming back from pagination
-            if (window.location.hash === '#users-table' && sessionStorage.getItem('scrollPosition')) {
-                window.scrollTo(0, parseInt(sessionStorage.getItem('scrollPosition')));
             }
         });
     </script>

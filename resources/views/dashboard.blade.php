@@ -386,12 +386,25 @@
             animation: fade-in 0.5s ease-in-out forwards;
             animation-delay: 0.5s;
         }
+        .nav-logo {
+       width: 48px;
+       height: 48px;
+       margin: 12px 0;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       border-radius: 8px;
+       color: #777;
+       font-size: 20px;
+     
+       transition: all 0.2s ease;
+   }
     </style>
 </head>
 
 <body>
     <div class="vertical-navbar">
-        <div >
+        <div class="nav-logo" >
             <img src="{{ asset('image/logo.png') }}" alt="Logo">
         </div>
 

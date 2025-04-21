@@ -6,12 +6,15 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\MidwiveController;
+use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\AdminController;
 
-
+//landing page route
+Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
 
 // login register route
-Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/', [AuthController::class, 'login']);
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -51,7 +54,10 @@ Route::get('/security', [AuthController::class, 'security']);
 Route::post('/security/change-password', [AuthController::class, 'changePassword'])->name('security.change-password');
 Route::post('/security/reset-password-email', [AuthController::class, 'sendResetLinkEmail'])->name('security.reset-password-email');
 
-
+//admin route
+Route::get('/menu1', [AdminController::class, 'menu1']);
+Route::get('/menu2', [AdminController::class, 'showUsersAndMidwives'])->name('user');
+Route::get('/menu3', [AdminController::class, 'menu3']);
 
 
 
