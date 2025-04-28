@@ -222,6 +222,35 @@
 
        transition: all 0.2s ease;
    }
+
+   /* Tab styles */
+   .nav-tabs {
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 20px;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #777;
+        font-weight: 600;
+        padding: 12px 20px;
+        margin-right: 5px;
+        border-radius: 0;
+    }
+
+    .nav-tabs .nav-link.active {
+        border-bottom: 3px solid #00b8d4;
+        color: #00b8d4;
+        background-color: transparent;
+    }
+
+    .nav-tabs .nav-link:hover:not(.active) {
+        border-bottom: 3px solid #f0f0f0;
+    }
+
+    .tab-content {
+        padding: 20px 0;
+    }
    </style>
 <body>
     <div class="vertical-navbar">
@@ -262,67 +291,94 @@
         </div>
     </div>
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="header-container">
-            <h2 class="fs-3 fw-bold m-0">Users</h2>
-        </div>
+<div class="main-content">
+    <div class="header-container">
+        <h2 class="fs-3 fw-bold m-0">Users</h2>
+    </div>
 
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
+    <!-- Tab navigation -->
+    <ul class="nav nav-tabs" id="userTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="bidan-tab" data-bs-toggle="tab" data-bs-target="#bidan-content" type="button" role="tab" aria-controls="bidan-content" aria-selected="true">
+                <i class="fas fa-user-md me-2"></i>Bidan
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pasien-tab" data-bs-toggle="tab" data-bs-target="#pasien-content" type="button" role="tab" aria-controls="pasien-content" aria-selected="false">
+                <i class="fas fa-user me-2"></i>Pasien
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pregnancies-tab" data-bs-toggle="tab" data-bs-target="#pregnancies-content" type="button" role="tab" aria-controls="pregnancies-content" aria-selected="false">
+                <i class="fas fa-baby me-2"></i>Kehamilan
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content" id="userTabsContent">
+        <!-- Bidan Content -->
+        <div class="tab-pane fade show active" id="bidan-content" role="tabpanel" aria-labelledby="bidan-tab">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
+                        
+                    </div>
+
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+                    @endif
 
-                        @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone number</th>
+                                    <th>Status</th>
 
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($midwives as $midwife)
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone number</th>
-                                        <th>Status</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-primary">{{ substr($midwife->name, 0, 2) }}</div>
+                                                <span class="ms-2">{{ $midwife->name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $midwife->email }}</td>
+                                        <td>{{ $midwife->phone_number }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $midwife->status ? 'success' : 'danger' }}">
+                                                {{ $midwife->status ? 'Active' : 'Inactive' }}
+                                            </span>
+                                        </td>
 
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($midwives as $midwive)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar bg-primary">{{ substr($midwive->name, 0, 2) }}</div>
-                                                    <span>{{ $midwive->name }}</span>
-                                                </div>
-                                            </td>
-                                            <td>{{ $midwive->email }}</td>
-                                            <td>{{ $midwive->phone_number }}</td>
-                                            <td>
-                                                <span class="badge bg-success">Active</span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center">Tidak ada data bidan</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Tidak ada data bidan</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
 
-                        <!-- Pagination for Midwives with separate query parameter -->
-                        @if($midwives->hasPages())
+                    <!-- Pagination for Midwives -->
+                    @if($midwives->hasPages())
+                    <div class="mt-3">
                         <nav aria-label="Page navigation for midwives">
-                            <ul class="pagination">
+                            <ul class="pagination justify-content-center">
                                 {{-- Previous Page Link --}}
                                 <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() . '&midwife_page=' . ($midwives->currentPage() - 1) }}" aria-label="Previous">
+                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->previousPageUrl() }}" aria-label="Previous">
                                         <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                     </a>
                                 </li>
@@ -330,112 +386,207 @@
                                 {{-- Pagination Elements --}}
                                 @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
                                     <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $url . '&midwife_page=' . $page . '&user_page=' . request('user_page', 1) }}">{{ $page }}</a>
+                                        <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->url($page) }}">{{ $page }}</a>
                                     </li>
                                 @endforeach
 
                                 {{-- Next Page Link --}}
                                 <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() . '&midwife_page=' . ($midwives->currentPage() + 1) }}" aria-label="Next">
+                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->nextPageUrl() }}" aria-label="Next">
                                         <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
                                     </a>
                                 </li>
                             </ul>
                         </nav>
-                        @endif
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
 
-                    <div class="row" id="users-table">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
-                                    </div>
-
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Phone Number</th>
-                                                    <th>Address</th>
-                                                    <th class="text-end">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($users as $user)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar bg-primary">{{ substr($user->name, 0, 2) }}</div>
-                                                                <span>{{ $user->name }}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td>{{ $user->email }}</td>
-                                                        <td>{{ $user->phone_number }}</td>
-                                                        <td>{{ $user->address }}</td>
-                                                        <td class="text-end">
-                                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
-                                                                <i class="fas fa-edit"></i>
-                                                            </a>
-                                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteUser(event, this)">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="5" class="text-center">Tidak ada data pasien</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <!-- Pagination for Users with separate query parameter -->
-                                    @if($users->hasPages())
-                                    <nav aria-label="Page navigation for users">
-                                        <ul class="pagination">
-                                            {{-- Previous Page Link --}}
-                                            <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                                <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->previousPageUrl() . '&user_page=' . ($users->currentPage() - 1) }}" aria-label="Previous">
-                                                    <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-                                                </a>
-                                            </li>
-
-                                            {{-- Pagination Elements --}}
-                                            @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
-                                                <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
-                                                    <a class="page-link" href="{{ $url . '&user_page=' . $page . '&midwife_page=' . request('midwife_page', 1) }}">{{ $page }}</a>
-                                                </li>
-                                            @endforeach
-
-                                            {{-- Next Page Link --}}
-                                            <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                                <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->nextPageUrl() . '&user_page=' . ($users->currentPage() + 1) }}" aria-label="Next">
-                                                    <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
+        <!-- Pasien Content -->
+        <div class="tab-pane fade" id="pasien-content" role="tabpanel" aria-labelledby="pasien-tab">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
                     </div>
+
+                    @if(session('user_success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('user_success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone Number</th>
+                                    <th>Address</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($users as $user)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-primary">{{ substr($user->name, 0, 2) }}</div>
+                                                <span class="ms-2">{{ $user->name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $user->email }}</td>
+                                        <td>{{ $user->phone_number }}</td>
+                                        <td>{{ $user->address }}</td>
+
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Tidak ada data pasien</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination for Users -->
+                    @if($users->hasPages())
+                    <div class="mt-3">
+                        <nav aria-label="Page navigation for users">
+                            <ul class="pagination justify-content-center">
+                                {{-- Previous Page Link --}}
+                                <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->previousPageUrl() }}" aria-label="Previous">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                    </a>
+                                </li>
+
+                                {{-- Pagination Elements --}}
+                                @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                                    <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->url($page) }}">{{ $page }}</a>
+                                    </li>
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->nextPageUrl() }}" aria-label="Next">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Pregnancies Content -->
+        <div class="tab-pane fade" id="pregnancies-content" role="tabpanel" aria-labelledby="pregnancies-tab">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title fw-bold">Tabel Data Kehamilan</h5>
+                    </div>
+
+                    @if(session('pregnancy_success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('pregnancy_success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Pasien</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Perkiraan Kelahiran</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pregnancies ?? [] as $pregnancy)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-primary">{{ substr($pregnancy->user->name ?? '', 0, 2) }}</div>
+                                                <span class="ms-2">{{ $pregnancy->user->name ?? 'Unknown' }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $pregnancy->start_date ? date('d M Y', strtotime($pregnancy->start_date)) : '-' }}</td>
+                                        <td>{{ $pregnancy->due_date ? date('d M Y', strtotime($pregnancy->due_date)) : '-' }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $pregnancy->status == 'active' ? 'success' : ($pregnancy->status == 'completed' ? 'info' : 'warning') }}">
+                                                {{ ucfirst($pregnancy->status ?? 'unknown') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ route('pregnancies.show', $pregnancy->id) }}" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('pregnancies.edit', $pregnancy->id) }}" class="btn btn-sm btn-outline-primary ms-1">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('pregnancies.destroy', $pregnancy->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Apakah Anda yakin ingin menghapus data kehamilan ini?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Tidak ada data kehamilan</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination for Pregnancies -->
+                    @if(isset($pregnancies) && $pregnancies->hasPages())
+                    <div class="mt-3">
+                        <nav aria-label="Page navigation for pregnancies">
+                            <ul class="pagination justify-content-center">
+                                {{-- Previous Page Link --}}
+                                <li class="page-item {{ $pregnancies->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $pregnancies->appends(['midwife_page' => request('midwife_page', 1), 'user_page' => request('user_page', 1)])->previousPageUrl() }}" aria-label="Previous">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                    </a>
+                                </li>
+
+                                {{-- Pagination Elements --}}
+                                @foreach($pregnancies->getUrlRange(1, $pregnancies->lastPage()) as $page => $url)
+                                    <li class="page-item {{ $pregnancies->currentPage() == $page ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $pregnancies->appends(['midwife_page' => request('midwife_page', 1), 'user_page' => request('user_page', 1)])->url($page) }}">{{ $page }}</a>
+                                    </li>
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                <li class="page-item {{ $pregnancies->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" href="{{ $pregnancies->appends(['midwife_page' => request('midwife_page', 1), 'user_page' => request('user_page', 1)])->nextPageUrl() }}" aria-label="Next">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

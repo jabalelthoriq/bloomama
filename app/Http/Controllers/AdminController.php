@@ -3,6 +3,14 @@
 namespace App\Http\Controllers;
 use App\Models\Midwive;
 use Illuminate\Http\Request;
+use App\Models\Appointment;
+use App\Models\User;
+use App\Models\UserPregnant;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\DB;
+
+
 
 class AdminController extends Controller
 {
@@ -14,16 +22,47 @@ class AdminController extends Controller
 
     public function menu1()
     {
-        return view('admin/menu1');
+        $appointments = Appointment::orderBy('date_time', 'asc')->paginate(5);
+        $totalAppointment = Appointment::count();
+        $totalUsers = User::count();
+        $totalPregnant = UserPregnant::count();
+
+        $monthlyData = DB::table('user_pregnancies')
+            ->selectRaw('MONTH(start_date) as month, YEAR(start_date) as year, COUNT(*) as count')
+            ->whereNotNull('start_date')
+            ->where('start_date', '>=', now()->subYear())
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get()
+            ->map(function($item) {
+                // Create a Carbon date to get the month name
+                $date = Carbon::createFromDate($item->year, $item->month, 1);
+                $item->month_name = $date->format('M');
+                $item->month_year = $date->format('M Y');
+                return $item;
+            });
+
+            $midwives = Midwive::paginate(5, ['*'], 'midwife_page');
+             $users = User::paginate(5, ['*'], 'user_page');
+        return view('admin/menu1',compact('users', 'midwives'), [
+            'totalUsers' => $totalUsers,
+            'totalPregnant' => $totalPregnant,
+            'totalAppointment' => $totalAppointment,
+            'appointments' => $appointments,
+            'activePage' => 'admin/menu1'
+        ]);
     }
     public function showUsersAndMidwives()
     {
         $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
-        return view('admin/menu2', compact( 'midwives'));
+    $users = User::paginate(10, ['*'], 'user_page');
+    return view('admin/menu2', compact('users', 'midwives'));
     }
     public function menu3()
     {
-        return view('admin/menu3');
+        $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
+        return view('admin/menu3', compact( 'midwives'));
     }
 
     /**

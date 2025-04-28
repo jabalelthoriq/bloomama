@@ -175,6 +175,68 @@
 
        transition: all 0.2s ease;
    }
+   .card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+        height: 100%;
+    }
+
+    .stats-card {
+        height: 140px;
+        display: flex;
+        align-items: center;
+    }
+
+    .mb-5 {
+        margin-bottom: 3rem !important;
+    }
+
+    .pagination {
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 0px;
+    }
+
+    .pagination .page-item .page-link {
+        color: #D21F3C;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #D21F3C;
+        border-color: #D21F3C;
+        color: white;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table>:not(caption)>*>* {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: 12px;
+        font-size: 14px;
+    }
+
+    .action-icon {
+        cursor: pointer;
+        color: #6c757d;
+        margin-left: 12px;
+        font-size: 16px;
+    }
    </style>
 <body>
     <div class="vertical-navbar">
@@ -202,6 +264,113 @@
         <div class="nav-icon logout" onclick="handleLogout()">
             <i class="fas fa-sign-out-alt"></i>
         </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header-container">
+            <h2 class="fs-3 fw-bold m-0">Content</h2>
+        </div>
+
+        <!-- Bidan Content -->
+        <div class="tab-pane fade show active" id="bidan-content" role="tabpanel" aria-labelledby="bidan-tab">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="card-title fw-bold">Tabel Data Content</h5>
+                                <a href="#" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus me-1"></i> Tambah Content
+                                </a>
+                            </div>
+
+                            @if(session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone number</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($midwives as $midwive)
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar bg-primary">{{ substr($midwive->name, 0, 2) }}</div>
+                                                        <span>{{ $midwive->name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>{{ $midwive->email }}</td>
+                                                <td>{{ $midwive->phone_number }}</td>
+                                                <td>
+                                                    <span class="badge bg-success">Active</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <a href="{{ route('midwives.edit', $midwive->id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form action="{{ route('midwives.destroy', $midwive->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center">Tidak ada data bidan</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Pagination for Midwives with separate query parameter -->
+                            @if($midwives->hasPages())
+                            <nav aria-label="Page navigation for midwives">
+                                <ul class="pagination">
+                                    {{-- Previous Page Link --}}
+                                    <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
+                                        <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() . '&midwife_page=' . ($midwives->currentPage() - 1) }}" aria-label="Previous">
+                                            <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                        </a>
+                                    </li>
+
+                                    {{-- Pagination Elements --}}
+                                    @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
+                                        <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
+                                            <a class="page-link" href="{{ $url . '&midwife_page=' . $page . '&user_page=' . request('user_page', 1) }}">{{ $page }}</a>
+                                        </li>
+                                    @endforeach
+
+                                    {{-- Next Page Link --}}
+                                    <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
+                                        <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() . '&midwife_page=' . ($midwives->currentPage() + 1) }}" aria-label="Next">
+                                            <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 

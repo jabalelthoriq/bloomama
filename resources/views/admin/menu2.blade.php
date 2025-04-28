@@ -19,7 +19,6 @@
        overflow-x: hidden;
    }
 
-
    .vertical-navbar {
        position: fixed;
        top: 0;
@@ -88,7 +87,6 @@
        color: #f44336;
    }
 
-
    .main-content {
        margin-left: 80px;
        padding-left: 5rem;
@@ -106,137 +104,148 @@
    }
 
    .search-container {
-            position: relative;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        position: relative;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-container input {
+        padding-left: 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-container i {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+        .vertical-navbar {
+            width: 60px;
         }
 
-        .search-container input {
-            padding-left: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        .main-content {
+            margin-left: 60px;
+            width: calc(100% - 60px);
+            padding: 1rem;
         }
 
-        .search-container i {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-        }
-        .search-container {
-            position: relative;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .search-container input {
-            padding-left: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .search-container i {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-        }
-
-        @media (max-width: 768px) {
-            .vertical-navbar {
-                width: 60px;
-            }
-
-            .main-content {
-                margin-left: 60px;
-                width: calc(100% - 60px);
-                padding: 1rem;
-            }
-
-            .nav-icon {
-                width: 40px;
-                height: 40px;
-            }
-        }
-         .nav-logo {
-       width: 48px;
-       height: 48px;
-       margin: 12px 0;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       border-radius: 8px;
-       color: #777;
-       font-size: 20px;
-
-       transition: all 0.2s ease;
-         }
-         .card {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 24px;
-            height: 100%;
-        }
-
-        .stats-card {
-            height: 140px;
-            display: flex;
-            align-items: center;
-        }
-
-        .mb-5 {
-            margin-bottom: 3rem !important;
-        }
-
-        .pagination {
-            justify-content: center;
-            margin-top: 20px;
-            margin-bottom: 0px;
-        }
-
-        .pagination .page-item .page-link {
-            color: #D21F3C;
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #D21F3C;
-            border-color: #D21F3C;
-            color: white;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .table>:not(caption)>*>* {
-            padding: 1rem 1.25rem;
-            vertical-align: middle;
-        }
-        .avatar {
+        .nav-icon {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 12px;
-            font-size: 14px;
         }
+    }
 
-        .action-icon {
-            cursor: pointer;
-            color: #6c757d;
-            margin-left: 12px;
-            font-size: 16px;
-        }
-   </style>
+    .nav-logo {
+        width: 48px;
+        height: 48px;
+        margin: 12px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #777;
+        font-size: 20px;
+        transition: all 0.2s ease;
+    }
+
+    .card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+        height: 100%;
+    }
+
+    .stats-card {
+        height: 140px;
+        display: flex;
+        align-items: center;
+    }
+
+    .mb-5 {
+        margin-bottom: 3rem !important;
+    }
+
+    .pagination {
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 0px;
+    }
+
+    .pagination .page-item .page-link {
+        color: #D21F3C;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #D21F3C;
+        border-color: #D21F3C;
+        color: white;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table>:not(caption)>*>* {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: 12px;
+        font-size: 14px;
+    }
+
+    .action-icon {
+        cursor: pointer;
+        color: #6c757d;
+        margin-left: 12px;
+        font-size: 16px;
+    }
+
+    /* Tab styles */
+    .nav-tabs {
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 20px;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #777;
+        font-weight: 600;
+        padding: 12px 20px;
+        margin-right: 5px;
+        border-radius: 0;
+    }
+
+    .nav-tabs .nav-link.active {
+        border-bottom: 3px solid #D21F3C;
+        color: #D21F3C;
+        background-color: transparent;
+    }
+
+    .nav-tabs .nav-link:hover:not(.active) {
+        border-bottom: 3px solid #f0f0f0;
+    }
+
+    .tab-content {
+        padding: 20px 0;
+    }
+</style>
 <body>
     <div class="vertical-navbar">
         <div class="nav-logo" >
@@ -264,106 +273,217 @@
         </div>
     </div>
 
-
-     <!-- Main Content -->
-     <div class="main-content">
+    <!-- Main Content -->
+    <div class="main-content">
         <div class="header-container">
             <h2 class="fs-3 fw-bold m-0">Users</h2>
         </div>
 
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
-                        </div>
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs" id="userTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="bidan-tab" data-bs-toggle="tab" data-bs-target="#bidan-content" type="button" role="tab" aria-controls="bidan-content" aria-selected="true">
+                    <i class="fas fa-user-md me-2"></i>Bidan
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pasien-tab" data-bs-toggle="tab" data-bs-target="#pasien-content" type="button" role="tab" aria-controls="pasien-content" aria-selected="false">
+                    <i class="fas fa-user me-2"></i>Pasien
+                </button>
+            </li>
+        </ul>
 
-                        @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
+        <!-- Tab content -->
+        <div class="tab-content" id="userTabsContent">
+            <!-- Bidan Content -->
+            <div class="tab-pane fade show active" id="bidan-content" role="tabpanel" aria-labelledby="bidan-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
+                                    <a href="#" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus me-1"></i> Tambah Bidan
+                                    </a>
+                                </div>
+
+                                @if(session('success'))
+                                    <div class="alert alert-success">
+                                        {{ session('success') }}
+                                    </div>
+                                @endif
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Phone number</th>
+                                                <th>Status</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($midwives as $midwive)
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar bg-primary">{{ substr($midwive->name, 0, 2) }}</div>
+                                                            <span>{{ $midwive->name }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{ $midwive->email }}</td>
+                                                    <td>{{ $midwive->phone_number }}</td>
+                                                    <td>
+                                                        <span class="badge bg-success">Active</span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <a href="{{ route('midwives.edit', $midwive->id) }}" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('midwives.destroy', $midwive->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center">Tidak ada data bidan</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Pagination for Midwives with separate query parameter -->
+                                @if($midwives->hasPages())
+                                <nav aria-label="Page navigation for midwives">
+                                    <ul class="pagination">
+                                        {{-- Previous Page Link --}}
+                                        <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
+                                            <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() . '&midwife_page=' . ($midwives->currentPage() - 1) }}" aria-label="Previous">
+                                                <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                            </a>
+                                        </li>
+
+                                        {{-- Pagination Elements --}}
+                                        @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
+                                            <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
+                                                <a class="page-link" href="{{ $url . '&midwife_page=' . $page . '&user_page=' . request('user_page', 1) }}">{{ $page }}</a>
+                                            </li>
+                                        @endforeach
+
+                                        {{-- Next Page Link --}}
+                                        <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
+                                            <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() . '&midwife_page=' . ($midwives->currentPage() + 1) }}" aria-label="Next">
+                                                <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                                @endif
                             </div>
-                        @endif
-
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone number</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($midwives as $midwive)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar bg-primary">{{ substr($midwive->name, 0, 2) }}</div>
-                                                    <span>{{ $midwive->name }}</span>
-                                                </div>
-                                            </td>
-                                            <td>{{ $midwive->email }}</td>
-                                            <td>{{ $midwive->phone_number }}</td>
-                                            <td>
-                                                <span class="badge bg-success">Active</span>
-                                            </td>
-                                            <td class="text-end">
-                                                <a href="{{ route('midwives.edit', $midwive->id) }}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route('midwives.destroy', $midwive->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center">Tidak ada data bidan</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Pagination for Midwives with separate query parameter -->
-                        @if($midwives->hasPages())
-                        <nav aria-label="Page navigation for midwives">
-                            <ul class="pagination">
-                                {{-- Previous Page Link --}}
-                                <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() . '&midwife_page=' . ($midwives->currentPage() - 1) }}" aria-label="Previous">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-                                    </a>
-                                </li>
+            <!-- Pasien Content -->
+            <div class="tab-pane fade" id="pasien-content" role="tabpanel" aria-labelledby="pasien-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
+                                </div>
 
-                                {{-- Pagination Elements --}}
-                                @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
-                                    <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $url . '&midwife_page=' . $page . '&user_page=' . request('user_page', 1) }}">{{ $page }}</a>
-                                    </li>
-                                @endforeach
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Phone Number</th>
+                                                <th>Address</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($users as $user)
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar bg-primary">{{ substr($user->name, 0, 2) }}</div>
+                                                            <span>{{ $user->name }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{ $user->email }}</td>
+                                                    <td>{{ $user->phone_number }}</td>
+                                                    <td>{{ $user->address }}</td>
+                                                    <td class="text-end">
+                                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteUser(event, this)">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center">Tidak ada data pasien</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                                {{-- Next Page Link --}}
-                                <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() . '&midwife_page=' . ($midwives->currentPage() + 1) }}" aria-label="Next">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                        @endif
+                                <!-- Pagination for Users with separate query parameter -->
+                                @if($users->hasPages())
+                                <nav aria-label="Page navigation for users">
+                                    <ul class="pagination">
+                                        {{-- Previous Page Link --}}
+                                        <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
+                                            <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->previousPageUrl() . '&user_page=' . ($users->currentPage() - 1) }}" aria-label="Previous">
+                                                <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                            </a>
+                                        </li>
+
+                                        {{-- Pagination Elements --}}
+                                        @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                                            <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
+                                                <a class="page-link" href="{{ $url . '&user_page=' . $page . '&midwife_page=' . request('midwife_page', 1) }}">{{ $page }}</a>
+                                            </li>
+                                        @endforeach
+
+                                        {{-- Next Page Link --}}
+                                        <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
+                                            <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->nextPageUrl() . '&user_page=' . ($users->currentPage() + 1) }}" aria-label="Next">
+                                                <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-     </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function handleLogout() {
@@ -381,6 +501,40 @@
                     localStorage.removeItem('token');
                     sessionStorage.clear();
                     window.location.href = '/';
+                }
+            });
+        }
+
+        function confirmDelete(event, button) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.closest('form').submit();
+                }
+            });
+        }
+
+        function confirmDeleteUser(event, button) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.closest('form').submit();
                 }
             });
         }

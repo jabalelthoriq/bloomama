@@ -11,14 +11,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-         body {
+        body {
             margin: 0;
             padding: 0;
             background-color: #F6F8FB;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow-x: hidden;
         }
-
 
         .vertical-navbar {
             position: fixed;
@@ -88,7 +87,6 @@
             color: #f44336;
         }
 
-
         .main-content {
             margin-left: 80px;
             padding-left: 5rem;
@@ -104,7 +102,6 @@
             margin-bottom: 24px;
             align-items: center;
         }
-
 
         .icon-container {
             width: 60px;
@@ -193,7 +190,6 @@
             font-size: 16px;
         }
 
-
         @media (max-width: 768px) {
             .vertical-navbar {
                 width: 60px;
@@ -224,61 +220,165 @@
             display: flex;
             align-items: center;
         }
+
         .mb-5 {
             margin-bottom: 3rem !important;
         }
 
-        .bi-pencil, .bi-trash {
-        cursor: pointer;
+        .bi-pencil,
+        .bi-trash {
+            cursor: pointer;
         }
+
         .nav-logo {
-       width: 48px;
-       height: 48px;
-       margin: 12px 0;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       border-radius: 8px;
-       color: #777;
-       font-size: 20px;
-       transition: all 0.2s ease;
-   }
+            width: 48px;
+            height: 48px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            color: #777;
+            font-size: 20px;
+            transition: all 0.2s ease;
+        }
 
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
 
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: #fff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.4s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #343a40;
+        }
+
+        .btn-add-event {
+            background-color: #00b8d4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+           justify-content: space-between;
+           margin-left: auto;
+            gap: 0.5rem;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn-add-event:hover {
+            background-color: #0097a7;
+            transform: translateY(-2px);
+        }
+
+        .btn-add-event:active {
+            transform: translateY(0);
+        }
+        .space{
+            display: flex;
+            justify-content: flex-start; /* Mengubah dari space-between menjadi flex-start */
+            align-items: center;
+            padding :1rem;
+            border-bottom: 1px solid #e9ecef;
+            gap: 1rem;
+        }
     </style>
 </head>
+
 <body>
     <div class="vertical-navbar">
-        <div class="nav-logo" >
+        <div class="nav-logo">
             <img src="{{ asset('image/logo.png') }}" alt="Logo">
         </div>
         <div class="nav-icon">
             <a href="dashboard">
-                <i class="fas fa-th-large" ></i>
+                <i class="fas fa-th-large"></i>
             </a>
         </div>
 
         <div class="nav-icon active">
             <a href="acara">
-            <i class="far fa-calendar-alt"></i>
+                <i class="far fa-calendar-alt"></i>
             </a>
         </div>
 
         <div class="nav-icon">
             <a href="chat">
-            <i class="far fa-comment-alt"></i>
+                <i class="far fa-comment-alt"></i>
             </a>
         </div>
 
         <div class="nav-icon">
             <a href="user">
-            <i class="far fa-clock"></i>
+                <i class="far fa-clock"></i>
             </a>
         </div>
 
         <div class="nav-icon">
             <a href="setting">
-            <i class="fas fa-cog"></i>
+                <i class="fas fa-cog"></i>
             </a>
         </div>
         <div class="nav-icon logout" onclick="handleLogout()">
@@ -290,55 +390,60 @@
     <div class="main-content">
         <div class="header-container">
             <h2 class="fs-3 fw-bold m-0">Event</h2>
+
         </div>
 
-        <!-- Input Event Form -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4 fw-bold">Input Event</h5>
-                        <form action="{{ route('acara') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="title" class="form-label">Nama Acara</label>
-                                <input type="text" class="form-control" id="title" name="title" placeholder="Masukkan nama acara">
-                            </div>
-                            <div class="mb-3">
-                                <label for="start_date_time" class="form-label">Tanggal Dimulai</label>
-                                <input type="datetime-local" class="form-control" id="start_date_time" name="start_date_time">
-                            </div>
-                            <div class="mb-3">
-                                <label for="end_date_time" class="form-label">Tanggal Selesai</label>
-                                <input type="datetime-local" class="form-control" id="end_date_time" name="end_date_time">
-                            </div>
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Deskripsi</label>
-                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Masukkan deskripsi acara"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100" style="background-color: #00b3db">Submit</button>
-                        </form>
-                    </div>
+        <!-- Modal Event Form -->
+        <div class="modal-overlay" id="eventModal">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h5 class="fw-bold m-0">Input Event Baru</h5>
+                    <button class="close-modal" id="closeModalBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('acara') }}" method="POST" id="eventForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Nama Acara</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Masukkan nama acara">
+                        </div>
+                        <div class="mb-3">
+                            <label for="start_date_time" class="form-label">Tanggal Dimulai</label>
+                            <input type="datetime-local" class="form-control" id="start_date_time" name="start_date_time">
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date_time" class="form-label">Tanggal Selesai</label>
+                            <input type="datetime-local" class="form-control" id="end_date_time" name="end_date_time">
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Masukkan deskripsi acara"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
+                    <button type="button" class="btn btn-primary" id="submitBtn" style="background-color: #00b8d4">Submit</button>
                 </div>
             </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="row">
-            <div class="col-12">
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" class="form-control" placeholder="Cari acara...">
-                </div>
-            </div>
-        </div>
+
 
         <!-- Event Table -->
         <div class="row" id="events-table">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title mb-4 fw-bold">Upcoming Event</h5>
+                        <div class="space">
+                            <h5 class="card-title mb-4 fw-bold">Upcoming Event</h5>
+                            <button class="btn-add-event" id="openModalBtn">
+                                <i class="fas fa-plus"></i>
+                                <span>Tambah Event</span>
+                            </button>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>
@@ -368,12 +473,10 @@
                                                 {{ $event->status }}
                                             </span>
                                         </td>
-                                        <th >
+                                        <th>
                                             <a href="{{ route('event.edit', ['id' => $event->id]) }}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-
-
 
                                             <form action="{{ route('event.destroy', ['id' => $event->id]) }}" method="POST" class="d-inline">
                                                 @csrf
@@ -386,7 +489,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="5" class="text-center">Tidak ada acara yang tersedia</td>
+                                        <td colspan="6" class="text-center">Tidak ada acara yang tersedia</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
@@ -405,9 +508,9 @@
 
                                 {{-- Pagination Elements --}}
                                 @foreach($events->getUrlRange(1, $events->lastPage()) as $page => $url)
-                                    <li class="page-item {{ $events->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                                    </li>
+                                <li class="page-item {{ $events->currentPage() == $page ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                </li>
                                 @endforeach
 
                                 {{-- Next Page Link --}}
@@ -446,8 +549,44 @@
             });
         }
 
-        // Add navbar animation code
+        // Modal functionality
         document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('eventModal');
+            const openModalBtn = document.getElementById('openModalBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const eventForm = document.getElementById('eventForm');
+
+            // Open modal
+            openModalBtn.addEventListener('click', function() {
+                modal.classList.add('active');
+                // Add animation class to body to prevent scrolling
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close modal functions
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Submit form
+            submitBtn.addEventListener('click', function() {
+                eventForm.submit();
+            });
+
+            // Add navbar animation code
             // Get all nav icons except logo and logout
             const navIcons = document.querySelectorAll('.nav-icon:not(:first-child):not(.logout)');
 
@@ -527,27 +666,27 @@
             }
         });
 
-        // Add this to your existing script section
-function confirmDelete(event, button) {
-    event.preventDefault();
+        // Delete confirmation
+        function confirmDelete(event, button) {
+            event.preventDefault();
 
-    Swal.fire({
-        title: 'Konfirmasi Hapus',
-        text: 'Apakah Anda yakin ingin menghapus acara ini?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            button.closest('form').submit();
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Apakah Anda yakin ingin menghapus acara ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.closest('form').submit();
+                }
+            });
         }
-    });
-}
-    </script>
-    <script>
+
+        // Save & restore scroll position for pagination
         document.addEventListener('DOMContentLoaded', function() {
             // Save the scroll position before page reload for events pagination
             const eventPaginationLinks = document.querySelectorAll('nav[aria-label="Page navigation"] .page-link');
