@@ -54,16 +54,12 @@ class AdminController extends Controller
         ]);
     }
     public function showUsersAndMidwives()
-    {
-        $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
+{
+    $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
     $users = User::paginate(10, ['*'], 'user_page');
     return view('admin/menu2', compact('users', 'midwives'));
-    }
-    public function menu3()
-    {
-        $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
-        return view('admin/menu3', compact( 'midwives'));
-    }
+}
+
 
     /**
      * Show the form for creating a new resource.

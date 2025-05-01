@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Content;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+class ContentController extends Controller
+{
+    /**
+     * Display a listing of the content.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function index()
+    {
+        $contents = Content::latest()->paginate(10);
+        return view('admin/menu3', compact('contents'));
+    }
+
+    /**
+     * Store a newly created content in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|max:255',
+            'url' => 'required|url',
+            'category' => 'required|in:nutrition,exercise,health_tips',
+            'description' => 'required',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+            $filename = 'content-' . time() . '.' . $thumbnail->getClientOriginalExtension();
+            $path = $thumbnail->storeAs('content-thumbnails', $filename, 'public');
+            $validatedData['thumbnail'] = $path;
+        }
+
+        Content::create($validatedData);
+
+        return redirect()->route('content.index')
+            ->with('success', 'Content created successfully.');
+    }
+
+    /**
+     * Update the specified content in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|max:255',
+            'url' => 'required|url',
+            'category' => 'required|in:nutrition,exercise,health_tips',
+            'description' => 'required',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $content = Content::findOrFail($id);
+
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail')) {
+            // Delete old thumbnail if exists
+            if ($content->thumbnail && Storage::disk('public')->exists($content->thumbnail)) {
+                Storage::disk('public')->delete($content->thumbnail);
+            }
+            
+            // Store new thumbnail
+            $thumbnail = $request->file('thumbnail');
+            $filename = 'content-' . time() . '.' . $thumbnail->getClientOriginalExtension();
+            $path = $thumbnail->storeAs('content-thumbnails', $filename, 'public');
+            $validatedData['thumbnail'] = $path;
+        }
+        
+        $content->update($validatedData);
+
+        return redirect()->route('content.index')
+            ->with('success', 'Content updated successfully.');
+    }
+
+    /**
+     * Remove the specified content from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id)
+    {
+        $content = Content::findOrFail($id);
+        
+        // Delete thumbnail if exists
+        if ($content->thumbnail && Storage::disk('public')->exists($content->thumbnail)) {
+            Storage::disk('public')->delete($content->thumbnail);
+        }
+        
+        $content->delete();
+
+        return back()->with('success', 'Content deleted successfully.');
+    }
+}

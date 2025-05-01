@@ -6,6 +6,9 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Flasher\Prime\FlasherInterface;
+use Illuminate\Http\RedirectResponse;
+
 
 class EventController extends Controller
 {
@@ -25,13 +28,13 @@ class EventController extends Controller
     public function showevent()
     {
         $events = Event::orderBy('start_date_time', 'asc')->paginate(10);
-        return view('acara', compact('events'));
+        return view('admin/acara', compact('events'));
     }
 
     /**
      * Add a new event
      */
-    public function addEvent(Request $request)
+    public function addEvent(Request $request, FlasherInterface $flasher)
     {
         // Validate the request data
         $validator = Validator::make($request->all(), $this->rules);
@@ -67,8 +70,10 @@ class EventController extends Controller
                     'event' => $event
                 ]);
             }
+            flash('Your changes have been saved!');
 
-            return redirect()->route('acara')->with('success', 'Event berhasil ditambahkan');
+
+            return redirect()->back();
 
         } catch (\Exception $e) {
             Log::error("Error creating event: " . $e->getMessage());
@@ -81,8 +86,10 @@ class EventController extends Controller
                 ], 500);
             }
 
+            // Add Flasher notification for error
+            $flasher->addError('Gagal menambahkan event: ' . $e->getMessage());
+
             return redirect()->back()
-                ->with('error', 'Failed to create event: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -90,22 +97,22 @@ class EventController extends Controller
     /**
      * Show edit event form
      */
-    public function editEvent($id)
+    public function editEvent($id, FlasherInterface $flasher)
     {
         try {
             $event = Event::findOrFail($id);
             return view('event.edit', compact('event'));
         } catch (\Exception $e) {
             Log::error("Error finding event: " . $e->getMessage());
-            return redirect()->route('acara')
-                ->with('error', 'Event tidak ditemukan');
+            $flasher->addError('Event tidak ditemukan');
+            return redirect()->route('acara');
         }
     }
 
     /**
      * Update an existing event
      */
-    public function updateEvent(Request $request, $id)
+    public function updateEvent(Request $request, $id, FlasherInterface $flasher)
     {
         // Validate the request data
         $validator = Validator::make($request->all(), $this->rules);
@@ -144,9 +151,11 @@ class EventController extends Controller
                 ]);
             }
 
+            // Add Flasher notification
+            $flasher->addSuccess('Event berhasil diperbarui');
+
             // Redirect with success message
-            return redirect()->route('acara')
-                ->with('success', 'Event berhasil diperbarui');
+            return redirect()->route('acara');
         } catch (\Exception $e) {
             // Log the error
             Log::error("Error updating event: " . $e->getMessage());
@@ -159,8 +168,10 @@ class EventController extends Controller
                 ], 500);
             }
 
+            // Add Flasher notification for error
+            $flasher->addError('Gagal memperbarui event: ' . $e->getMessage());
+
             return redirect()->back()
-                ->with('error', 'Gagal memperbarui event')
                 ->withInput();
         }
     }
@@ -168,23 +179,25 @@ class EventController extends Controller
     /**
      * Delete an event
      */
-    public function destroyEvent($id)
+    public function destroyEvent($id, FlasherInterface $flasher)
     {
         try {
             $event = Event::findOrFail($id);
             $event->delete();
 
-            return redirect()->route('acara')->with('success', 'Event berhasil dihapus');
+            $flasher->addSuccess('Event berhasil dihapus');
+            return redirect()->route('acara');
         } catch (\Exception $e) {
             Log::error("Error deleting event: " . $e->getMessage());
-            return redirect()->route('acara')->with('error', 'Gagal menghapus event');
+            $flasher->addError('Gagal menghapus event: ' . $e->getMessage());
+            return redirect()->route('acara');
         }
     }
 
     /**
      * Update event status
      */
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id, FlasherInterface $flasher)
     {
         // Validate status
         $validator = Validator::make($request->all(), [
@@ -202,10 +215,12 @@ class EventController extends Controller
             $event->status = $request->status;
             $event->save();
 
-            return redirect()->back()->with('success', 'Status event berhasil diperbarui');
+            $flasher->addSuccess('Status event berhasil diperbarui');
+            return redirect()->back();
         } catch (\Exception $e) {
             Log::error("Error updating event status: " . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal memperbarui status event');
+            $flasher->addError('Gagal memperbarui status event: ' . $e->getMessage());
+            return redirect()->back();
         }
     }
 }

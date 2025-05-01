@@ -249,7 +249,7 @@
        border-radius: 8px;
        color: #777;
        font-size: 20px;
-     
+
        transition: all 0.2s ease;
    }
    </style>
@@ -265,12 +265,6 @@
         </div>
 
         <div class="nav-icon">
-            <a href="acara">
-            <i class="far fa-calendar-alt"></i>
-            </a>
-        </div>
-
-        <div class="nav-icon">
             <a href="chat">
             <i class="far fa-comment-alt"></i>
             </a>
@@ -278,7 +272,7 @@
 
         <div class="nav-icon">
             <a href="user">
-            <i class="far fa-clock"></i>
+            <i class="far fa-user"></i>
             </a>
         </div>
 
@@ -413,21 +407,46 @@
         });
 
         function handleLogout() {
-            Swal.fire({
-                title: 'Logout Confirmation',
-                text: 'Are you sure you want to logout?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Logout',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/';
+    Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Remove token and clear session
+            localStorage.removeItem('token');
+            sessionStorage.clear();
+
+            // Create a flash message about successful logout
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             });
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Logged out successfully!'
+            });
+
+            // Allow the notification to be seen before redirecting
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
         }
+    });
+}
 
         // Add navbar animation code
         document.addEventListener('DOMContentLoaded', function() {

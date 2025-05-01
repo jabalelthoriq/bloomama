@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@flasher/flasher@1.2.4/dist/flasher.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@flasher/flasher@1.2.4/dist/flasher.min.css">
     <style>
         body {
             margin: 0;
@@ -51,7 +53,7 @@
             left: 0;
             width: 4px;
             height: 48px;
-            background-color: #00b8d4;
+            background-color: #D21F3C;
             border-radius: 0 4px 4px 0;
             transition: top 0.3s ease;
             pointer-events: none;
@@ -77,7 +79,7 @@
         }
 
         .nav-icon.active {
-            background-color: #00b8d4;
+            background-color: #D21F3C;
             color: white;
             transition: background-color 1s ease;
         }
@@ -131,12 +133,12 @@
         }
 
         .pagination .page-item .page-link {
-            color: #00b8d4;
+            color: #D21F3C;
         }
 
         .pagination .page-item.active .page-link {
-            background-color: #00b8d4;
-            border-color: #00b8d4;
+            background-color: #D21F3C;
+            border-color: #D21F3C;
             color: white;
         }
 
@@ -314,7 +316,7 @@
         }
 
         .btn-add-event {
-            background-color: #00b8d4;
+            background-color: #D21F3C;
             color: white;
             border: none;
             border-radius: 8px;
@@ -329,7 +331,7 @@
         }
 
         .btn-add-event:hover {
-            background-color: #0097a7;
+            background-color: #D21F3C;
             transform: translateY(-2px);
         }
 
@@ -338,23 +340,34 @@
         }
         .space{
             display: flex;
-            justify-content: flex-start; /* Mengubah dari space-between menjadi flex-start */
+            justify-content: flex-start;
             align-items: center;
             padding :1rem;
             border-bottom: 1px solid #e9ecef;
             gap: 1rem;
         }
+
+
     </style>
 </head>
 
 <body>
+
+
+
     <div class="vertical-navbar">
-        <div class="nav-logo">
-            <img src="{{ asset('image/logo.png') }}" alt="Logo">
+        <div class="nav-logo" >
+            <img src="{{ asset('image/logo2.png') }}" alt="Logo">
         </div>
         <div class="nav-icon">
-            <a href="dashboard">
-                <i class="fas fa-th-large"></i>
+            <a href="menu1">
+                <i class="fas fa-th-large" ></i>
+            </a>
+        </div>
+
+        <div class="nav-icon">
+            <a href="menu2">
+            <i class="far fa-user"></i>
             </a>
         </div>
 
@@ -365,20 +378,8 @@
         </div>
 
         <div class="nav-icon">
-            <a href="chat">
-                <i class="far fa-comment-alt"></i>
-            </a>
-        </div>
-
-        <div class="nav-icon">
-            <a href="user">
-                <i class="far fa-clock"></i>
-            </a>
-        </div>
-
-        <div class="nav-icon">
-            <a href="setting">
-                <i class="fas fa-cog"></i>
+            <a href="content">
+            <i class="fas fa-photo-video"></i>
             </a>
         </div>
         <div class="nav-icon logout" onclick="handleLogout()">
@@ -390,7 +391,6 @@
     <div class="main-content">
         <div class="header-container">
             <h2 class="fs-3 fw-bold m-0">Event</h2>
-
         </div>
 
         <!-- Modal Event Form -->
@@ -403,7 +403,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('acara') }}" method="POST" id="eventForm">
+                    <form action="{{ route('add.event') }}" method="POST" id="eventForm">
                         @csrf
                         <div class="mb-3">
                             <label for="title" class="form-label">Nama Acara</label>
@@ -425,12 +425,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
-                    <button type="button" class="btn btn-primary" id="submitBtn" style="background-color: #00b8d4">Submit</button>
+                    <button type="button" class="btn btn-primary" id="submitBtn" style="background-color: #0700d4">Submit</button>
                 </div>
             </div>
         </div>
-
-
 
         <!-- Event Table -->
         <div class="row" id="events-table">
@@ -530,24 +528,52 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Inisialisasi Flasher
+        document.addEventListener('DOMContentLoaded', function() {
+            window.flasher = new Flasher();
+        });
+
         function handleLogout() {
-            Swal.fire({
-                title: 'Logout Confirmation',
-                text: 'Are you sure you want to logout?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Logout',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('token');
-                    sessionStorage.clear();
-                    window.location.href = '/';
+    Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Remove token and clear session
+            localStorage.removeItem('token');
+            sessionStorage.clear();
+
+            // Create a flash message about successful logout
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             });
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Logged out successfully!'
+            });
+
+            // Allow the notification to be seen before redirecting
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
         }
+    });
+}
 
         // Modal functionality
         document.addEventListener('DOMContentLoaded', function() {

@@ -237,6 +237,117 @@
         margin-left: 12px;
         font-size: 16px;
     }
+
+
+     /* Modal styling */
+     .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: #fff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.4s ease;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            margin: auto;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            flex-shrink: 0;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #343a40;
+        }
+
+        .btn-add-event {
+            background-color: #D21F3C;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn-add-event:hover {
+            background-color: #a00922;
+            transform: translateY(-2px);
+        }
+
+        .btn-add-event:active {
+            transform: translateY(0);
+        }
+
+        .header-with-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
    </style>
 <body>
     <div class="vertical-navbar">
@@ -251,13 +362,19 @@
 
         <div class="nav-icon">
             <a href="menu2">
-            <i class="far fa-calendar-alt"></i>
+            <i class="far fa-user"></i>
+            </a>
+        </div>
+
+        <div class="nav-icon">
+            <a href="acara">
+                <i class="far fa-calendar-alt"></i>
             </a>
         </div>
 
         <div class="nav-icon active">
-            <a href="menu3">
-            <i class="far fa-clock"></i>
+            <a href="content">
+            <i class="fas fa-photo-video"></i>
             </a>
         </div>
 
@@ -272,17 +389,152 @@
             <h2 class="fs-3 fw-bold m-0">Content</h2>
         </div>
 
-        <!-- Bidan Content -->
+        <!-- Modal Event Form -->
+        <div class="modal-overlay" id="eventModal">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h5 class="fw-bold m-0">Input Content Baru</h5>
+                    <button class="close-modal" id="closeModalBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('add.event') }}" method="POST" id="eventForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Judul Content</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Masukkan judul content">
+                        </div>
+                        <div class="mb-3">
+                            <label for="url" class="form-label">Media Url</label>
+                            <input type="url" class="form-control" id="url" name="url" placeholder="Masukkan media url">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-control" id="category" name="category">
+                                <option value="" selected disabled>Select a category </option>
+                                <option value="nutrition">Nutrition</option>
+                                <option value="exercise">Exercise</option>
+                                <option value="health_tips">Health Tips</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Masukkan deskripsi content"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="thumbnail" class="form-label">Thumbnail</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+                                <label class="input-group-text" for="thumbnail">
+                                    <i class="fas fa-upload"></i>
+                                </label>
+                            </div>
+                            <small class="text-muted">Upload image thumbnail (Max: 2MB, Format: JPG, PNG)</small>
+                            <div id="thumbnailPreview" class="mt-2 d-none">
+                                <div class="position-relative" style="max-width: 200px;">
+                                    <img src="" alt="Thumbnail Preview" class="img-thumbnail">
+                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" id="removeThumbnail">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
+                    <button type="button" class="btn btn-primary" id="submitBtn" style="background-color: #0400d4">Submit</button>
+                </div>
+            </div>
+        </div>
+
+
+      <!-- Modal Edit Content Form -->
+<div class="modal-overlay" id="editContentModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Edit Content</h5>
+            <button class="close-modal" id="closeEditModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="editContentForm" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="editContentId" name="content_id">
+                <div class="mb-3">
+                    <label for="editTitle" class="form-label">Judul Content</label>
+                    <input type="text" class="form-control" id="editTitle" name="title" placeholder="Masukkan judul content">
+                </div>
+                <div class="mb-3">
+                    <label for="editUrl" class="form-label">Media Url</label>
+                    <input type="url" class="form-control" id="editUrl" name="url" placeholder="Masukkan media url">
+                </div>
+
+                <div class="mb-3">
+                    <label for="editCategory" class="form-label">Category</label>
+                    <select class="form-control" id="editCategory" name="category">
+                        <option value="" selected disabled>Select a category </option>
+                        <option value="nutrition">Nutrition</option>
+                        <option value="exercise">Exercise</option>
+                        <option value="health_tips">Health Tips</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editDescription" class="form-label">Deskripsi</label>
+                    <textarea class="form-control" id="editDescription" name="description" rows="3" placeholder="Masukkan deskripsi content"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="editThumbnail" class="form-label">Thumbnail</label>
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="editThumbnail" name="thumbnail" accept="image/*">
+                        <label class="input-group-text" for="editThumbnail">
+                            <i class="fas fa-upload"></i>
+                        </label>
+                    </div>
+                    <small class="text-muted">Upload image thumbnail (Max: 2MB, Format: JPG, PNG)</small>
+                    <div class="d-flex align-items-center mt-2">
+                        <div id="currentThumbnailContainer" class="me-3">
+                            <p class="mb-1">Current thumbnail:</p>
+                            <img id="currentThumbnail" src="" alt="Current Thumbnail" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        </div>
+                        <div id="editThumbnailPreview" class="d-none">
+                            <div class="position-relative" style="max-width: 100px;">
+                                <p class="mb-1">New thumbnail:</p>
+                                <img src="" alt="Thumbnail Preview" class="img-thumbnail">
+                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" id="removeEditThumbnail">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn">Batal</button>
+            <button type="button" class="btn btn-primary" id="updateBtn" style="background-color: #0400d4">Update</button>
+        </div>
+    </div>
+</div>
+
+
+
+        <!-- Content Table -->
         <div class="tab-pane fade show active" id="bidan-content" role="tabpanel" aria-labelledby="bidan-tab">
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="header-with-actions">
                                 <h5 class="card-title fw-bold">Tabel Data Content</h5>
-                                <a href="#" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus me-1"></i> Tambah Content
-                                </a>
+                                <button class="btn-add-event" id="openModalBtn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Tambah Content</span>
+                                </button>
                             </div>
 
                             @if(session('success'))
@@ -291,80 +543,96 @@
                                 </div>
                             @endif
 
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Phone number</th>
-                                            <th>Status</th>
-                                            <th class="text-end">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($midwives as $midwive)
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar bg-primary">{{ substr($midwive->name, 0, 2) }}</div>
-                                                        <span>{{ $midwive->name }}</span>
-                                                    </div>
-                                                </td>
-                                                <td>{{ $midwive->email }}</td>
-                                                <td>{{ $midwive->phone_number }}</td>
-                                                <td>
-                                                    <span class="badge bg-success">Active</span>
-                                                </td>
-                                                <td class="text-end">
-                                                    <a href="{{ route('midwives.edit', $midwive->id) }}" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <form action="{{ route('midwives.destroy', $midwive->id) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="5" class="text-center">Tidak ada data bidan</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                            
+<div class="table-responsive">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Url</th>
+                <th>Category</th>
+                <th>Thumbnail</th>
+                <th>Created At</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($contents as $content)
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span>{{ $content->title }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span>{{ $content->url }}</span>
+                        </div>
+                    </td>
+                    <td>{{ ucfirst(str_replace('_', ' ', $content->category)) }}</td>
+                    <td>
+                        @if($content->thumbnail)
+                            <img src="{{ asset('storage/' . $content->thumbnail) }}" alt="Thumbnail" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                        @else
+                            <span class="badge bg-secondary">No image</span>
+                        @endif
+                    </td>
+                    <td>{{ $content->created_at->format('M d, Y') }}</td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-primary edit-content-btn"
+                            data-id="{{ $content->id }}"
+                            data-title="{{ $content->title }}"
+                            data-url="{{ $content->url }}"
+                            data-category="{{ $content->category }}"
+                            data-description="{{ $content->description }}"
+                            data-thumbnail="{{ $content->thumbnail ? asset('storage/' . $content->thumbnail) : '' }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <form action="{{ route('content.destroy', $content->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Are you sure you want to delete this content?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">No content available</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+    
+    <!-- Pagination for Contents -->
+    @if($contents->hasPages())
+    <nav aria-label="Page navigation for contents">
+        <ul class="pagination">
+            {{-- Previous Page Link --}}
+            <li class="page-item {{ $contents->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $contents->previousPageUrl() }}" aria-label="Previous">
+                    <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                </a>
+            </li>
 
-                            <!-- Pagination for Midwives with separate query parameter -->
-                            @if($midwives->hasPages())
-                            <nav aria-label="Page navigation for midwives">
-                                <ul class="pagination">
-                                    {{-- Previous Page Link --}}
-                                    <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
-                                        <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() . '&midwife_page=' . ($midwives->currentPage() - 1) }}" aria-label="Previous">
-                                            <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-                                        </a>
-                                    </li>
+            {{-- Pagination Elements --}}
+            @foreach($contents->getUrlRange(1, $contents->lastPage()) as $page => $url)
+                <li class="page-item {{ $contents->currentPage() == $page ? 'active' : '' }}">
+                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                </li>
+            @endforeach
 
-                                    {{-- Pagination Elements --}}
-                                    @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
-                                        <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
-                                            <a class="page-link" href="{{ $url . '&midwife_page=' . $page . '&user_page=' . request('user_page', 1) }}">{{ $page }}</a>
-                                        </li>
-                                    @endforeach
-
-                                    {{-- Next Page Link --}}
-                                    <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
-                                        <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() . '&midwife_page=' . ($midwives->currentPage() + 1) }}" aria-label="Next">
-                                            <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                            @endif
+            {{-- Next Page Link --}}
+            <li class="page-item {{ $contents->hasMorePages() ? '' : 'disabled' }}">
+                <a class="page-link" href="{{ $contents->nextPageUrl() }}" aria-label="Next">
+                    <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    @endif
+</div>
                         </div>
                     </div>
                 </div>
@@ -380,23 +648,46 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function handleLogout() {
-            Swal.fire({
-                title: 'Logout Confirmation',
-                text: 'Are you sure you want to logout?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Logout',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('token');
-                    sessionStorage.clear();
-                    window.location.href = '/';
+    Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Remove token and clear session
+            localStorage.removeItem('token');
+            sessionStorage.clear();
+
+            // Create a flash message about successful logout
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             });
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Logged out successfully!'
+            });
+
+            // Allow the notification to be seen before redirecting
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
         }
+    });
+}
 
         // Add navbar animation code
         document.addEventListener('DOMContentLoaded', function() {
@@ -478,6 +769,211 @@
                 indicator.style.top = top + 'px';
             }
         });
+
+
+
+        // Modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('eventModal');
+            const openModalBtn = document.getElementById('openModalBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const eventForm = document.getElementById('eventForm');
+
+            // Open modal
+            openModalBtn.addEventListener('click', function() {
+                modal.classList.add('active');
+                // Add animation class to body to prevent scrolling
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close modal functions
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Submit form
+            submitBtn.addEventListener('click', function() {
+                eventForm.submit();
+            });
+        });
+
+
+        // Edit Content Modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Edit Content Modal functionality
+    const editModal = document.getElementById('editContentModal');
+    const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const updateBtn = document.getElementById('updateBtn');
+    const editContentForm = document.getElementById('editContentForm');
+
+    // Edit thumbnail preview functionality
+    const editThumbnailInput = document.getElementById('editThumbnail');
+    const editThumbnailPreview = document.getElementById('editThumbnailPreview');
+    const editThumbnailImage = editThumbnailPreview.querySelector('img');
+    const removeEditThumbnailBtn = document.getElementById('removeEditThumbnail');
+    const currentThumbnailContainer = document.getElementById('currentThumbnailContainer');
+
+    // Close edit modal functions
+    function closeEditModal() {
+        editModal.classList.remove('active');
+        document.body.style.overflow = '';
+        // Reset form
+        editContentForm.reset();
+        editThumbnailPreview.classList.add('d-none');
+    }
+
+    closeEditModalBtn.addEventListener('click', closeEditModal);
+    cancelEditBtn.addEventListener('click', closeEditModal);
+
+    // Close modal when clicking outside
+    editModal.addEventListener('click', function(e) {
+        if (e.target === editModal) {
+            closeEditModal();
+        }
+    });
+
+    // Show edit modal when edit button is clicked
+    document.querySelectorAll('.edit-content-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Get content data from data attributes
+            const contentId = this.getAttribute('data-id');
+            const title = this.getAttribute('data-title');
+            const url = this.getAttribute('data-url');
+            const category = this.getAttribute('data-category');
+            const description = this.getAttribute('data-description');
+            const thumbnailUrl = this.getAttribute('data-thumbnail');
+
+            // Populate form fields
+            document.getElementById('editContentId').value = contentId;
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editUrl').value = url;
+            document.getElementById('editCategory').value = category;
+            document.getElementById('editDescription').value = description;
+
+            // Show current thumbnail if exists
+            if (thumbnailUrl && thumbnailUrl !== '') {
+                document.getElementById('currentThumbnail').src = thumbnailUrl;
+                currentThumbnailContainer.classList.remove('d-none');
+            } else {
+                currentThumbnailContainer.classList.add('d-none');
+            }
+
+            // Update form action to include the content ID
+            editContentForm.action = `/content/${contentId}`;
+
+            // Open modal
+            editModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    // Edit thumbnail preview when file is selected
+    editThumbnailInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+
+            // Check file type
+            if (!file.type.match('image.*')) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please select an image file (JPG, PNG)',
+                    icon: 'error'
+                });
+                this.value = '';
+                return;
+            }
+
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Image size should be less than 2MB',
+                    icon: 'error'
+                });
+                this.value = '';
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                editThumbnailImage.src = e.target.result;
+                editThumbnailPreview.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Remove edit thumbnail
+    removeEditThumbnailBtn.addEventListener('click', function() {
+        editThumbnailInput.value = '';
+        editThumbnailPreview.classList.add('d-none');
+        editThumbnailImage.src = '';
+    });
+
+    // Submit edit form
+    updateBtn.addEventListener('click', function() {
+        const contentId = document.getElementById('editContentId').value;
+        
+        // Use FormData to handle file uploads
+        const formData = new FormData(editContentForm);
+        
+        // Add method spoofing for Laravel since fetch doesn't support PUT natively
+        formData.append('_method', 'PUT');
+        
+        // Send AJAX request
+        fetch(`/content/${contentId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Content updated successfully',
+                icon: 'success'
+            });
+            closeEditModal();
+            
+            // Reload page to show updated content
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update content',
+                icon: 'error'
+            });
+            console.error('Error:', error);
+        });
+    });
+});
     </script>
 </body>
 </html>

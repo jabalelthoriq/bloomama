@@ -263,11 +263,7 @@
             </a>
         </div>
 
-        <div class="nav-icon">
-            <a href="{{ route('acara') }}">
-            <i class="far fa-calendar-alt"></i>
-            </a>
-        </div>
+
 
         <div class="nav-icon">
             <a href="/chat">
@@ -277,7 +273,7 @@
 
         <div class="nav-icon active">
             <a href="{{ route('user') }}">
-            <i class="far fa-clock"></i>
+            <i class="far fa-user"></i>
             </a>
         </div>
 
@@ -323,7 +319,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
-                        
+
                     </div>
 
                     @if(session('success'))
@@ -591,23 +587,46 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function handleLogout() {
-            Swal.fire({
-                title: 'Logout Confirmation',
-                text: 'Are you sure you want to logout?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Logout',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('token');
-                    sessionStorage.clear();
-                    window.location.href = '/';
+    Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Remove token and clear session
+            localStorage.removeItem('token');
+            sessionStorage.clear();
+
+            // Create a flash message about successful logout
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             });
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Logged out successfully!'
+            });
+
+            // Allow the notification to be seen before redirecting
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
         }
+    });
+}
 
         // Add navbar animation code
         document.addEventListener('DOMContentLoaded', function() {
