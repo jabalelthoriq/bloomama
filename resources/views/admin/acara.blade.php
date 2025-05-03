@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Manajemen Acara</title>
+    <title>Event</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -394,6 +394,45 @@
             <h2 class="fs-3 fw-bold m-0">Event</h2>
         </div>
 
+        <!-- Modal Edit Event Form -->
+<div class="modal-overlay" id="editEventModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Edit Event</h5>
+            <button class="close-modal" id="closeEditEventModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="editEventForm">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="editEventId" name="event_id">
+                <div class="mb-3">
+                    <label for="editEventTitle" class="form-label">Nama Acara</label>
+                    <input type="text" class="form-control" id="editEventTitle" name="title" placeholder="Masukkan nama acara">
+                </div>
+                <div class="mb-3">
+                    <label for="editStartDateTime" class="form-label">Tanggal Dimulai</label>
+                    <input type="datetime-local" class="form-control" id="editStartDateTime" name="start_date_time">
+                </div>
+                <div class="mb-3">
+                    <label for="editEndDateTime" class="form-label">Tanggal Selesai</label>
+                    <input type="datetime-local" class="form-control" id="editEndDateTime" name="end_date_time">
+                </div>
+                <div class="mb-3">
+                    <label for="editEventDescription" class="form-label">Deskripsi</label>
+                    <textarea class="form-control" id="editEventDescription" name="description" rows="3" placeholder="Masukkan deskripsi acara"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelEditEventBtn">Batal</button>
+            <button type="button" class="btn btn-primary" id="updateEventBtn" style="background-color: #0400d4">Update</button>
+        </div>
+    </div>
+</div>
+
         <!-- Modal Event Form -->
         <div class="modal-overlay" id="eventModal">
             <div class="modal-container">
@@ -473,10 +512,10 @@
                                             </span>
                                         </td>
                                         <th>
-                                            <a href="{{ route('event.edit', ['id' => $event->id]) }}" class="btn btn-sm btn-outline-primary">
+                                             <button type="button" class="btn btn-sm btn-outline-primary edit-event-btn" 
+                                                data-id="{{ $event->id }}">
                                                 <i class="bi bi-pencil"></i>
-                                            </a>
-
+                                            </button>
                                             <form action="{{ route('event.destroy', ['id' => $event->id]) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -776,6 +815,120 @@
                 window.scrollTo(0, parseInt(sessionStorage.getItem('eventScrollPosition')));
             }
         });
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // Edit Event Modal functionality
+    const editEventModal = document.getElementById('editEventModal');
+    const closeEditEventModalBtn = document.getElementById('closeEditEventModalBtn');
+    const cancelEditEventBtn = document.getElementById('cancelEditEventBtn');
+    const updateEventBtn = document.getElementById('updateEventBtn');
+    const editEventForm = document.getElementById('editEventForm');
+
+    // Close edit modal functions
+    function closeEditEventModal() {
+        editEventModal.classList.remove('active');
+        document.body.style.overflow = '';
+        // Reset form
+        editEventForm.reset();
+    }
+
+    closeEditEventModalBtn.addEventListener('click', closeEditEventModal);
+    cancelEditEventBtn.addEventListener('click', closeEditEventModal);
+
+    // Close modal when clicking outside
+    editEventModal.addEventListener('click', function(e) {
+        if (e.target === editEventModal) {
+            closeEditEventModal();
+        }
+    });
+
+    // Show edit modal when edit button is clicked
+    document.querySelectorAll('.edit-event-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Get event data from data attributes or from the row
+            const eventId = this.getAttribute('data-id');
+            const eventTitle = this.closest('tr').querySelector('td:nth-child(1) span').textContent;
+            const startDateTime = this.closest('tr').querySelector('td:nth-child(2)').textContent;
+            const endDateTime = this.closest('tr').querySelector('td:nth-child(3)').textContent;
+            const description = this.closest('tr').querySelector('td:nth-child(4)').textContent;
+
+            // Format dates for datetime-local input
+            const formatForDateTimeInput = (dateString) => {
+                const date = new Date(dateString);
+                const pad = (num) => num.toString().padStart(2, '0');
+                return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+            };
+
+            // Populate form fields
+            document.getElementById('editEventId').value = eventId;
+            document.getElementById('editEventTitle').value = eventTitle;
+            document.getElementById('editStartDateTime').value = formatForDateTimeInput(startDateTime);
+            document.getElementById('editEndDateTime').value = formatForDateTimeInput(endDateTime);
+            document.getElementById('editEventDescription').value = description.trim();
+
+            // Update form action to include the event ID
+            editEventForm.action = `/event/${eventId}`;
+
+            // Open modal
+            editEventModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    // Submit edit form
+    updateEventBtn.addEventListener('click', function() {
+        const eventId = document.getElementById('editEventId').value;
+        const formData = new FormData(editEventForm);
+
+        // Add method spoofing for Laravel since fetch doesn't support PUT natively
+        formData.append('_method', 'PUT');
+
+        // Send AJAX request
+        fetch(`/event/${eventId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Event updated successfully',
+                icon: 'success'
+            });
+            closeEditEventModal();
+
+            // Reload page to show updated content
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update event',
+                icon: 'error'
+            });
+            console.error('Error:', error);
+        });
+    });
+
+    
+});
     </script>
 </body>
 </html>

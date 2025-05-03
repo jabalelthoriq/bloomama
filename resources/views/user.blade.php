@@ -303,6 +303,49 @@
     margin-top: 20px;
     gap: 10px;
 }
+
+.tab-content .table-container {
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-content .table-loading {
+            opacity: 0.5;
+        }
+
+        /* Pagination styling */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination .page-item .page-link {
+            color: #00b8d4;
+            border: 1px solid #dee2e6;
+            margin: 0 2px;
+            border-radius: 4px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #00b8d4;
+            border-color: #00b8d4;
+            color: white;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .loading-spinner.active {
+            display: block;
+        }
    </style>
 <body>
     <div class="vertical-navbar">
@@ -381,7 +424,7 @@
                         </div>
                     @endif
 
-                    <div class="table-responsive">
+                    <div class="table-responsive table-container" id="bidan-table-container">
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
@@ -421,26 +464,36 @@
 
                     <!-- Pagination for Midwives -->
                     @if($midwives->hasPages())
-                    <div class="mt-3">
+                    <div class="pagination-container">
                         <nav aria-label="Page navigation for midwives">
-                            <ul class="pagination justify-content-center">
+                            <ul class="pagination">
                                 {{-- Previous Page Link --}}
                                 <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->previousPageUrl() }}" aria-label="Previous">
+                                    <a class="page-link" 
+                                       href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->previousPageUrl() }}#bidan-content" 
+                                       aria-label="Previous"
+                                       onclick="handlePagination(event, this, 'bidan')">
                                         <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                     </a>
                                 </li>
-
+    
                                 {{-- Pagination Elements --}}
                                 @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
                                     <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->url($page) }}">{{ $page }}</a>
+                                        <a class="page-link" 
+                                           href="{{ $url }}#bidan-content"
+                                           onclick="handlePagination(event, this, 'bidan')">
+                                            {{ $page }}
+                                        </a>
                                     </li>
                                 @endforeach
-
+    
                                 {{-- Next Page Link --}}
                                 <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->nextPageUrl() }}" aria-label="Next">
+                                    <a class="page-link" 
+                                       href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->nextPageUrl() }}#bidan-content" 
+                                       aria-label="Next"
+                                       onclick="handlePagination(event, this, 'bidan')">
                                         <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
                                     </a>
                                 </li>
@@ -467,7 +520,7 @@
                         </div>
                     @endif
 
-                    <div class="table-responsive">
+                    <div class="table-responsive table-container" id="pasien-table-container">
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
@@ -503,33 +556,43 @@
 
                     <!-- Pagination for Users -->
                     @if($users->hasPages())
-                    <div class="mt-3">
-                        <nav aria-label="Page navigation for users">
-                            <ul class="pagination justify-content-center">
-                                {{-- Previous Page Link --}}
-                                <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->previousPageUrl() }}" aria-label="Previous">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                <div class="pagination-container">
+                    <nav aria-label="Page navigation for users">
+                        <ul class="pagination">
+                            {{-- Previous Page Link --}}
+                            <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link" 
+                                   href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->previousPageUrl() }}#pasien-content" 
+                                   aria-label="Previous"
+                                   onclick="handlePagination(event, this, 'pasien')">
+                                    <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                </a>
+                            </li>
+
+                            {{-- Pagination Elements --}}
+                            @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                                <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
+                                    <a class="page-link" 
+                                       href="{{ $url }}#pasien-content"
+                                       onclick="handlePagination(event, this, 'pasien')">
+                                        {{ $page }}
                                     </a>
                                 </li>
+                            @endforeach
 
-                                {{-- Pagination Elements --}}
-                                @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
-                                    <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->url($page) }}">{{ $page }}</a>
-                                    </li>
-                                @endforeach
-
-                                {{-- Next Page Link --}}
-                                <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->nextPageUrl() }}" aria-label="Next">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                    @endif
+                            {{-- Next Page Link --}}
+                            <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
+                                <a class="page-link" 
+                                   href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->nextPageUrl() }}#pasien-content" 
+                                   aria-label="Next"
+                                   onclick="handlePagination(event, this, 'pasien')">
+                                    <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                @endif
                 </div>
             </div>
         </div>
@@ -549,7 +612,7 @@
                         </div>
                     @endif
 
-                    <div class="table-responsive">
+                    <div class="table-responsive table-container" id="pregnancies-table-container">
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
@@ -578,13 +641,17 @@
                                             <div class="d-flex flex-column align-items-center">
                                                 <div class="d-flex justify-content-center">
                                                     <button type="button" class="btn btn-sm btn-outline-warning ms-1 view-pregnancy-btn"
-                                                        data-patient="{{ $userPregnancy->user->name ?? 'Unknown User' }}"
-                                                        data-start-date="{{ $userPregnancy->start_date ? date('d M Y', strtotime($userPregnancy->start_date)) : '-' }}"
-                                                        data-pregnancy-week="{{ $userPregnancy->pregnancy_week ?? '-' }}"
-                                                        data-last-check="{{ $userPregnancy->last_check_date ? date('d M Y', strtotime($userPregnancy->last_check_date)) : '-' }}"
-                                                        data-notes="{{ $userPregnancy->notes ?? '-' }}">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
+                                                    data-patient="{{ $userPregnancy->user->name ?? 'Unknown User' }}"
+                                                    data-gravida="{{ $userPregnancy->gravida ?? '-' }}"
+                                                    data-para="{{ $userPregnancy->para ?? '-' }}"
+                                                    data-abortus="{{ $userPregnancy->abortus ?? '-' }}"
+                                                    data-start-date="{{ $userPregnancy->start_date ? date('d M Y', strtotime($userPregnancy->start_date)) : '-' }}"
+                                                    data-due-date="{{ $userPregnancy->due_date ? date('d M Y', strtotime($userPregnancy->due_date)) : '-' }}"
+                                                    data-pregnancy-week="{{ $userPregnancy->pregnancy_week ?? '-' }}"
+                                                    data-last-check="{{ $userPregnancy->last_check_date ? date('d M Y', strtotime($userPregnancy->last_check_date)) : '-' }}"
+                                                    data-notes="{{ $userPregnancy->notes ?? '-' }}">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
                                                     <button type="button" class="btn btn-sm btn-outline-primary ms-1 edit-pregnancy-btn"
                                                         data-id="{{ $userPregnancy->id }}"
                                                         data-patient-id="{{ $userPregnancy->user_id ?? '' }}"
@@ -618,10 +685,39 @@
 
                     <!-- Pagination for User Pregnancies -->
                     @if($userPregnancies->hasPages())
-                    <div class="mt-3">
-                        <nav aria-label="Page navigation for user pregnancies">
-                            <ul class="pagination justify-content-center">
-                                {{ $userPregnancies->links() }}
+                    <div class="pagination-container">
+                        <nav aria-label="Page navigation for pregnancies">
+                            <ul class="pagination">
+                                {{-- Previous Page Link --}}
+                                <li class="page-item {{ $userPregnancies->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" 
+                                       href="{{ $userPregnancies->previousPageUrl() }}#pregnancies-content" 
+                                       aria-label="Previous"
+                                       onclick="handlePagination(event, this, 'pregnancies')">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                    </a>
+                                </li>
+    
+                                {{-- Pagination Elements --}}
+                                @foreach($userPregnancies->getUrlRange(1, $userPregnancies->lastPage()) as $page => $url)
+                                    <li class="page-item {{ $userPregnancies->currentPage() == $page ? 'active' : '' }}">
+                                        <a class="page-link" 
+                                           href="{{ $url }}#pregnancies-content"
+                                           onclick="handlePagination(event, this, 'pregnancies')">
+                                            {{ $page }}
+                                        </a>
+                                    </li>
+                                @endforeach
+    
+                                {{-- Next Page Link --}}
+                                <li class="page-item {{ $userPregnancies->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" 
+                                       href="{{ $userPregnancies->nextPageUrl() }}#pregnancies-content" 
+                                       aria-label="Next"
+                                       onclick="handlePagination(event, this, 'pregnancies')">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                    </a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
@@ -646,9 +742,21 @@
                 <label class="form-label fw-bold">Pasien</label>
                 <p id="viewPatientName" class="form-control-static"></p>
             </div>
+            <div class="mb-3" >
+                <label class="form-label fw-bold" >GPA</label>
+                <div style="display: flex;">
+                    <p id="G" class="form-control-static"></p>/
+                    <p id="P" class="form-control-static"></p>/
+                    <p id="A" class="form-control-static"></p>
+                  </div>
+            </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Tanggal Mulai</label>
                 <p id="viewStartDate" class="form-control-static"></p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Tanggal Berakhir</label>
+                <p id="viewDuetDate" class="form-control-static"></p>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Minggu Kehamilan</label>
@@ -919,32 +1027,7 @@ function confirmDeleteUser(event, button) {
 }
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Save the scroll position before page reload
-            const userPaginationLinks = document.querySelectorAll('nav[aria-label="Page navigation for users"] .page-link');
-
-            userPaginationLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-
-                    // Store current scroll position in sessionStorage
-                    sessionStorage.setItem('scrollPosition', window.pageYOffset);
-
-                    // Add a hash to the URL to identify the users table section
-                    const url = new URL(this.href);
-                    url.hash = 'users-table';
-
-                    // Navigate to the modified URL
-                    window.location.href = url.toString();
-                });
-            });
-
-            // Restore scroll position after page load if we're coming back from pagination
-            if (window.location.hash === '#users-table' && sessionStorage.getItem('scrollPosition')) {
-                window.scrollTo(0, parseInt(sessionStorage.getItem('scrollPosition')));
-            }
-        });
-
+       
 
 
 
@@ -957,19 +1040,23 @@ function confirmDeleteUser(event, button) {
 
     // Open view modal
     document.querySelectorAll('.view-pregnancy-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Get data from button attributes
-            document.getElementById('viewPatientName').textContent = this.dataset.patient;
-            document.getElementById('viewStartDate').textContent = this.dataset.startDate;
-            document.getElementById('viewPregnancyWeek').textContent = this.dataset.pregnancyWeek;
-            document.getElementById('viewLastCheckDate').textContent = this.dataset.lastCheck;
-            document.getElementById('viewNotes').textContent = this.dataset.notes;
+    btn.addEventListener('click', function() {
+        // Get data from button attributes
+        document.getElementById('viewPatientName').textContent = this.dataset.patient;
+        document.getElementById('G').textContent = this.dataset.gravida;
+        document.getElementById('P').textContent = this.dataset.para;
+        document.getElementById('A').textContent = this.dataset.abortus;
+        document.getElementById('viewStartDate').textContent = this.dataset.startDate;
+        document.getElementById('viewDuetDate').textContent = this.dataset.dueDate;
+        document.getElementById('viewPregnancyWeek').textContent = this.dataset.pregnancyWeek;
+        document.getElementById('viewLastCheckDate').textContent = this.dataset.lastCheck;
+        document.getElementById('viewNotes').textContent = this.dataset.notes;
 
-            // Show modal
-            viewModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        });
+        // Show modal
+        viewModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     });
+});
 
     // Close view modal
     function closeViewModal() {
@@ -1024,38 +1111,141 @@ document.querySelectorAll('.edit-pregnancy-btn').forEach(btn => {
     });
 
     // Form submission
-    updatePregnancyBtn.addEventListener('click', function() {
-        const formData = new FormData(editPregnancyForm);
-        formData.append('_method', 'PUT');
+updatePregnancyBtn.addEventListener('click', function() {
+    const formData = new FormData(editPregnancyForm);
+    formData.append('_method', 'PUT');
 
-        fetch(editPregnancyForm.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            Swal.fire({
-                title: 'Berhasil!',
-                text: 'Data kehamilan berhasil diperbarui',
-                icon: 'success'
-            });
-            closeEditPregnancyModal();
-            setTimeout(() => window.location.reload(), 1500);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: 'Gagal memperbarui data kehamilan',
-                icon: 'error'
-            });
+    fetch(editPregnancyForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        Swal.fire({  // Perbaikan di sini - tambahkan Swal
+            title: 'Berhasil!',
+            text: 'Data kehamilan berhasil diperbarui',
+            icon: 'success'
+        });
+        closeEditPregnancyModal();
+        setTimeout(() => window.location.reload(), 1500);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Gagal memperbarui data kehamilan',
+            icon: 'error'
         });
     });
 });
+});
+    </script>
+    <script>
+        // Global function to handle pagination
+        function handlePagination(event, element, tabType) {
+            event.preventDefault();
+            
+            // Show loading state
+            const container = document.getElementById(`${tabType}-table-container`);
+            container.classList.add('table-loading');
+            
+            // Get the URL and tab to activate
+            const url = element.getAttribute('href').split('#')[0];
+            
+            // Store current scroll position
+            const scrollPosition = window.scrollY;
+            
+            // Fetch the new page
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Create a temporary DOM element to parse the response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Extract the table content
+                const newContent = doc.querySelector(`#${tabType}-content`).innerHTML;
+                
+                // Update the content
+                document.getElementById(`${tabType}-content`).innerHTML = newContent;
+                
+                // Reinitialize event listeners for the new content
+                initializeEventListeners();
+                
+                // Remove loading state
+                container.classList.remove('table-loading');
+                
+                // Activate the correct tab
+                document.getElementById(`${tabType}-tab`).click();
+                
+                // Restore scroll position
+                window.scrollTo(0, scrollPosition);
+                
+                // Update browser history
+                history.pushState(null, null, url + `#${tabType}-content`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.classList.remove('table-loading');
+                window.location.href = url + `#${tabType}-content`;
+            });
+        }
+
+        // Function to initialize all event listeners
+        function initializeEventListeners() {
+            // Reinitialize all buttons and event listeners
+            // (include all your existing button initialization code here)
+            
+            // Reinitialize pagination click handlers
+            document.querySelectorAll('.page-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href.includes('#bidan-content')) {
+                    link.onclick = (e) => handlePagination(e, link, 'bidan');
+                } else if (href.includes('#pasien-content')) {
+                    link.onclick = (e) => handlePagination(e, link, 'pasien');
+                } else if (href.includes('#pregnancies-content')) {
+                    link.onclick = (e) => handlePagination(e, link, 'pregnancies');
+                }
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check URL hash on page load
+            if (window.location.hash) {
+                const tabId = window.location.hash.substring(1);
+                if (tabId === 'pasien-content') {
+                    document.getElementById('pasien-tab').click();
+                } else if (tabId === 'pregnancies-content') {
+                    document.getElementById('pregnancies-tab').click();
+                }
+            }
+            
+            // Initialize all event listeners
+            initializeEventListeners();
+        });
+
+        // Handle back/forward navigation
+        window.addEventListener('popstate', function() {
+            if (window.location.hash) {
+                const tabId = window.location.hash.substring(1);
+                if (tabId === 'pasien-content') {
+                    document.getElementById('pasien-tab').click();
+                } else if (tabId === 'pregnancies-content') {
+                    document.getElementById('pregnancies-tab').click();
+                } else {
+                    document.getElementById('bidan-tab').click();
+                }
+            }
+        });
     </script>
 </body>
 </html>

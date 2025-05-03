@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Chatting</title>
+    <title>Users</title>
 </head>
 <style>
     body {
@@ -191,8 +191,35 @@
 
     .table-responsive {
         overflow-x: auto;
+        transition: opacity 0.3s ease;
     }
 
+    .table-loading {
+        opacity: 0.5;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(210, 31, 60, 0.05);
+    }
+
+    /* Smooth transition for tab content */
+    .tab-content > .tab-pane {
+        transition: opacity 0.3s ease;
+    }
+
+    .tab-content > .tab-pane:not(.active) {
+        display: none;
+        opacity: 0;
+    }
+
+    .tab-content > .tab-pane.active {
+        display: block;
+        opacity: 1;
+    }
     .table>:not(caption)>*>* {
         padding: 1rem 1.25rem;
         vertical-align: middle;
@@ -394,6 +421,77 @@
     <div class="main-content">
         <div class="header-container">
             <h2 class="fs-3 fw-bold m-0">Users</h2>
+        </div>
+        <!-- Modal Edit Pasien Form -->
+        <div class="modal-overlay" id="editPasienModal">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h5 class="fw-bold m-0">Edit Pasien</h5>
+                    <button class="close-modal" id="closeEditPasienModalBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPasienForm" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="editPasienId" name="user_id">
+                        <div class="mb-3">
+                            <label for="editPasienName" class="form-label">Nama Pasien</label>
+                            <input type="text" class="form-control" id="editPasienName" name="name" placeholder="Masukkan nama pasien">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPasienEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editPasienEmail" name="email" placeholder="Masukkan email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPasienPhoneNumber" class="form-label">Nomor Telepon</label>
+                            <input type="text" class="form-control" id="editPasienPhoneNumber" name="phone_number" placeholder="Masukkan nomor telepon">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPasienAddress" class="form-label">Alamat</label>
+                            <textarea class="form-control" id="editPasienAddress" name="address" placeholder="Masukkan alamat"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPasienPassword" class="form-label">Password (Kosongkan jika tidak ingin mengubah)</label>
+                            <input type="password" class="form-control" id="editPasienPassword" name="password" placeholder="Masukkan password baru">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPasienPasswordConfirmation" class="form-label">Konfirmasi Password</label>
+                            <input type="password" class="form-control" id="editPasienPasswordConfirmation" name="password_confirmation" placeholder="Konfirmasi password baru">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPasienPhoto" class="form-label">Foto Profil</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="editPasienPhoto" name="photo" accept="image/*">
+                                <label class="input-group-text" for="editPasienPhoto">
+                                    <i class="fas fa-upload"></i>
+                                </label>
+                            </div>
+                            <small class="text-muted">Upload foto profil (Max: 2MB, Format: JPG, PNG)</small>
+                            <div class="d-flex align-items-center mt-2">
+                                <div id="currentPasienPhotoContainer" class="me-3">
+                                    <p class="mb-1">Foto saat ini:</p>
+                                    <img id="currentPasienPhoto" src="" alt="Current Photo" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                </div>
+                                <div id="editPasienPhotoPreview" class="d-none">
+                                    <div class="position-relative" style="max-width: 100px;">
+                                        <p class="mb-1">Foto baru:</p>
+                                        <img src="" alt="Photo Preview" class="img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" id="removeEditPasienPhoto">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelEditPasienBtn">Batal</button>
+                    <button type="button" class="btn btn-primary" id="updatePasienBtn" style="background-color: #0400d4">Update</button>
+                </div>
+            </div>
         </div>
 
         <!-- Modal Input Bidan Form -->
@@ -604,7 +702,10 @@
                                     <ul class="pagination">
                                         {{-- Previous Page Link --}}
                                         <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
-                                            <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() }}" aria-label="Previous">
+                                            <a class="page-link" 
+                                            href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() }}#bidan-content" 
+                                            aria-label="Previous"
+                                            onclick="handlePaginationClick(event, this, 'bidan-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                             </a>
                                         </li>
@@ -612,13 +713,20 @@
                                         {{-- Pagination Elements --}}
                                         @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
                                             <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
-                                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                                <a class="page-link" 
+                                                href="{{ $url }}#bidan-content"
+                                                onclick="handlePaginationClick(event, this, 'bidan-content')">
+                                                    {{ $page }}
+                                                </a>
                                             </li>
                                         @endforeach
 
                                         {{-- Next Page Link --}}
                                         <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
-                                            <a class="page-link" href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() }}" aria-label="Next">
+                                            <a class="page-link" 
+                                            href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() }}#bidan-content" 
+                                            aria-label="Next"
+                                            onclick="handlePaginationClick(event, this, 'bidan-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
                                             </a>
                                         </li>
@@ -665,9 +773,15 @@
                                                     <td>{{ $user->phone_number }}</td>
                                                     <td>{{ $user->address }}</td>
                                                     <td class="text-end">
-                                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-pasien-btn"
+                                                        data-id="{{ $user->id }}"
+                                                        data-name="{{ $user->name }}"
+                                                        data-email="{{ $user->email }}"
+                                                        data-phone-number="{{ $user->phone_number }}"
+                                                        data-address="{{ $user->address }}"
+                                                        data-photo="{{ $user->photo ? asset('storage/' . $user->photo) : '' }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
                                                         <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
@@ -692,7 +806,10 @@
                                     <ul class="pagination">
                                         {{-- Previous Page Link --}}
                                         <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                            <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->previousPageUrl() }}" aria-label="Previous">
+                                            <a class="page-link" 
+                                            href="{{ $users->appends(['midwife_page' => request('midwife_page')])->previousPageUrl() }}#pasien-content" 
+                                            aria-label="Previous"
+                                            onclick="handlePaginationClick(event, this, 'pasien-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                             </a>
                                         </li>
@@ -700,13 +817,20 @@
                                         {{-- Pagination Elements --}}
                                         @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
                                             <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
-                                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                                <a class="page-link" 
+                                                href="{{ $url }}#pasien-content"
+                                                onclick="handlePaginationClick(event, this, 'pasien-content')">
+                                                    {{ $page }}
+                                                </a>
                                             </li>
                                         @endforeach
 
                                         {{-- Next Page Link --}}
                                         <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                            <a class="page-link" href="{{ $users->appends(['midwife_page' => request('midwife_page')])->nextPageUrl() }}" aria-label="Next">
+                                            <a class="page-link" 
+                                            href="{{ $users->appends(['midwife_page' => request('midwife_page')])->nextPageUrl() }}#pasien-content" 
+                                            aria-label="Next"
+                                            onclick="handlePaginationClick(event, this, 'pasien-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
                                             </a>
                                         </li>
@@ -1081,6 +1205,288 @@
         });
     });
 });
+
+
+// === EDIT PASIEN MODAL ===
+const editPasienModal = document.getElementById('editPasienModal');
+const closeEditPasienModalBtn = document.getElementById('closeEditPasienModalBtn');
+const cancelEditPasienBtn = document.getElementById('cancelEditPasienBtn');
+const editPasienForm = document.getElementById('editPasienForm');
+const editPasienPhoto = document.getElementById('editPasienPhoto');
+const editPasienPhotoPreview = document.getElementById('editPasienPhotoPreview');
+const removeEditPasienPhoto = document.getElementById('removeEditPasienPhoto');
+const currentPasienPhoto = document.getElementById('currentPasienPhoto');
+const currentPasienPhotoContainer = document.getElementById('currentPasienPhotoContainer');
+const updatePasienBtn = document.getElementById('updatePasienBtn');
+
+// Function to handle edit buttons for patients
+document.querySelectorAll('.edit-pasien-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const id = this.dataset.id;
+        const name = this.dataset.name;
+        const email = this.dataset.email;
+        const phoneNumber = this.dataset.phoneNumber;
+        const address = this.dataset.address;
+        const photoUrl = this.dataset.photo;
+
+        // Populate the form fields
+        document.getElementById('editPasienId').value = id;
+        document.getElementById('editPasienName').value = name;
+        document.getElementById('editPasienEmail').value = email;
+        document.getElementById('editPasienPhoneNumber').value = phoneNumber;
+        document.getElementById('editPasienAddress').value = address;
+        document.getElementById('editPasienPassword').value = '';
+        document.getElementById('editPasienPasswordConfirmation').value = '';
+
+        // Handle photo preview
+        if (photoUrl && photoUrl !== '') {
+            currentPasienPhoto.src = photoUrl;
+            currentPasienPhotoContainer.classList.remove('d-none');
+        } else {
+            currentPasienPhotoContainer.classList.add('d-none');
+        }
+
+        // Reset new photo preview
+        editPasienPhotoPreview.classList.add('d-none');
+        editPasienPhoto.value = '';
+
+        // Show modal
+        editPasienModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Close edit modal functions
+function closeEditPasienModal() {
+    editPasienModal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+closeEditPasienModalBtn.addEventListener('click', closeEditPasienModal);
+cancelEditPasienBtn.addEventListener('click', closeEditPasienModal);
+
+// Close edit modal when clicking outside
+editPasienModal.addEventListener('click', function(e) {
+    if (e.target === editPasienModal) {
+        closeEditPasienModal();
+    }
+});
+
+// Handle photo preview
+editPasienPhoto.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            editPasienPhotoPreview.querySelector('img').src = e.target.result;
+            editPasienPhotoPreview.classList.remove('d-none');
+        };
+        reader.readAsDataURL(this.files[0]);
+    }
+});
+
+// Remove selected new photo
+removeEditPasienPhoto.addEventListener('click', function() {
+    editPasienPhoto.value = '';
+    editPasienPhotoPreview.classList.add('d-none');
+});
+
+// Handle form submission
+updatePasienBtn.addEventListener('click', function() {
+    const formData = new FormData(editPasienForm);
+    const pasienId = document.getElementById('editPasienId').value;
+
+    // Add the _method field for Laravel to recognize this as a PUT request
+    formData.append('_method', 'PUT');
+
+    fetch(`/users/${pasienId}`, {
+        method: 'POST', // Still using POST but Laravel will treat it as PUT
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            // Handle errors
+            console.error('Error updating pasien:', data.message);
+            alert('Error updating pasien: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the pasien.');
+    });
+});
+
+
+// New function to handle pagination clicks
+function handlePaginationClick(event, element, tabId) {
+            event.preventDefault();
+            
+            // Show loading state
+            const tableContainer = document.querySelector(`#${tabId} .table-responsive`);
+            tableContainer.classList.add('table-loading');
+            
+            // Get the URL and tab to activate
+            const url = element.getAttribute('href').split('#')[0];
+            const tabToActivate = tabId;
+            
+            // Store current scroll position
+            const scrollPosition = window.scrollY;
+            
+            // Fetch the new page
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Create a temporary DOM element to parse the response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Extract the table content
+                const newTableContent = doc.querySelector(`#${tabId}`).innerHTML;
+                
+                // Update the content
+                document.getElementById(tabId).innerHTML = newTableContent;
+                
+                // Reinitialize event listeners for the new content
+                initializeEditButtons();
+                
+                // Remove loading state
+                tableContainer.classList.remove('table-loading');
+                
+                // Activate the correct tab
+                if (tabId === 'bidan-content') {
+                    document.getElementById('bidan-tab').click();
+                } else {
+                    document.getElementById('pasien-tab').click();
+                }
+                
+                // Restore scroll position
+                window.scrollTo(0, scrollPosition);
+                
+                // Update browser history
+                history.pushState(null, null, url + `#${tabId}`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tableContainer.classList.remove('table-loading');
+                window.location.href = url + `#${tabId}`;
+            });
+        }
+
+        // Function to initialize edit buttons after content load
+        function initializeEditButtons() {
+            // Reinitialize bidan edit buttons
+            document.querySelectorAll('.edit-bidan-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    const email = this.dataset.email;
+                    const phoneNumber = this.dataset.phoneNumber;
+                    const status = this.dataset.status;
+                    const photoUrl = this.dataset.photo;
+
+                    // Populate the form fields
+                    document.getElementById('editBidanId').value = id;
+                    document.getElementById('editName').value = name;
+                    document.getElementById('editEmail').value = email;
+                    document.getElementById('editPhoneNumber').value = phoneNumber;
+                    document.getElementById('editStatus').value = status;
+                    document.getElementById('editPassword').value = '';
+                    document.getElementById('editPasswordConfirmation').value = '';
+
+                    // Handle photo preview
+                    if (photoUrl && photoUrl !== '') {
+                        currentPhoto.src = photoUrl;
+                        currentPhotoContainer.classList.remove('d-none');
+                    } else {
+                        currentPhotoContainer.classList.add('d-none');
+                    }
+
+                    // Reset new photo preview
+                    editPhotoPreview.classList.add('d-none');
+                    editPhoto.value = '';
+
+                    // Show modal
+                    editBidanModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            // Reinitialize pasien edit buttons
+            document.querySelectorAll('.edit-pasien-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    const email = this.dataset.email;
+                    const phoneNumber = this.dataset.phoneNumber;
+                    const address = this.dataset.address;
+                    const photoUrl = this.dataset.photo;
+
+                    // Populate the form fields
+                    document.getElementById('editPasienId').value = id;
+                    document.getElementById('editPasienName').value = name;
+                    document.getElementById('editPasienEmail').value = email;
+                    document.getElementById('editPasienPhoneNumber').value = phoneNumber;
+                    document.getElementById('editPasienAddress').value = address;
+                    document.getElementById('editPasienPassword').value = '';
+                    document.getElementById('editPasienPasswordConfirmation').value = '';
+
+                    // Handle photo preview
+                    if (photoUrl && photoUrl !== '') {
+                        currentPasienPhoto.src = photoUrl;
+                        currentPasienPhotoContainer.classList.remove('d-none');
+                    } else {
+                        currentPasienPhotoContainer.classList.add('d-none');
+                    }
+
+                    // Reset new photo preview
+                    editPasienPhotoPreview.classList.add('d-none');
+                    editPasienPhoto.value = '';
+
+                    // Show modal
+                    editPasienModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // ... (keep all existing DOMContentLoaded code) ...
+            
+            // Check URL hash on page load
+            if (window.location.hash) {
+                const tabId = window.location.hash.substring(1);
+                if (tabId === 'pasien-content') {
+                    document.getElementById('pasien-tab').click();
+                }
+            }
+            
+            // Initialize all buttons
+            initializeEditButtons();
+        });
+
+        // Handle back/forward navigation
+        window.addEventListener('popstate', function() {
+            if (window.location.hash) {
+                const tabId = window.location.hash.substring(1);
+                if (tabId === 'pasien-content') {
+                    document.getElementById('pasien-tab').click();
+                } else {
+                    document.getElementById('bidan-tab').click();
+                }
+            }
+        });
+        
     </script>
 </body>
 </html>
