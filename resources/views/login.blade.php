@@ -176,9 +176,9 @@
                         </div>
                         <button type="submit" class="btn-login">Login</button>
                         <div class="signup-text">
-                            <p>Don't have an account?
+                            {{-- <p>Don't have an account?
                                 <a href="register" class="create-account">Create account</a>
-                            </p>
+                            </p> --}}
                         </div>
                     </form>
                 </div>

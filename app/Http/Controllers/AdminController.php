@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Midwive;
 use Illuminate\Http\Request;
 use App\Models\Appointment;
@@ -9,17 +10,39 @@ use App\Models\UserPregnant;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
-
-
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
     /**
+     * Constructor to check admin role for all methods
+     */
+    public function __construct()
+    {
+        $this->checkAdminAccess();
+    }
+
+    /**
+     * Check if the authenticated user is a midwife with admin role
+     */
+    private function checkAdminAccess()
+    {
+        // Check if user is authenticated as midwife
+        if (!Auth::guard('midwife')->check()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Check if midwife has admin role
+        $midwife = Auth::guard('midwife')->user();
+
+        // Check if role field exists, is not null, and is set to 'admin'
+        if (!isset($midwife->role) || $midwife->role === null || empty($midwife->role) || $midwife->role !== 'admin') {
+            abort(403, 'Admin access required');
+        }
+    }
+    /**
      * Display a listing of the resource.
      */
-
-
-
     public function menu1()
     {
         $appointments = Appointment::orderBy('date_time', 'asc')->paginate(5);
@@ -43,8 +66,9 @@ class AdminController extends Controller
                 return $item;
             });
 
-            $midwives = Midwive::paginate(5, ['*'], 'midwife_page');
-             $users = User::paginate(5, ['*'], 'user_page');
+        $midwives = Midwive::paginate(5, ['*'], 'midwife_page');
+
+        $users = User::paginate(5, ['*'], 'user_page');
         return view('admin/menu1',compact('users', 'midwives'), [
             'totalUsers' => $totalUsers,
             'totalPregnant' => $totalPregnant,
@@ -53,13 +77,13 @@ class AdminController extends Controller
             'activePage' => 'admin/menu1'
         ]);
     }
-    public function showUsersAndMidwives()
-{
-    $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
-    $users = User::paginate(10, ['*'], 'user_page');
-    return view('admin/menu2', compact('users', 'midwives'));
-}
 
+    public function showUsersAndMidwives()
+    {
+        $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
+        $users = User::paginate(10, ['*'], 'user_page');
+        return view('admin/menu2', compact('users', 'midwives'));
+    }
 
     /**
      * Show the form for creating a new resource.

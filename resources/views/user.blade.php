@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -251,6 +252,57 @@
     .tab-content {
         padding: 20px 0;
     }
+
+    .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 10px;
+}
    </style>
 <body>
     <div class="vertical-navbar">
@@ -503,77 +555,73 @@
                                 <tr>
                                     <th>Pasien</th>
                                     <th>Tanggal Mulai</th>
-                                    <th>Perkiraan Kelahiran</th>
-                                    <th>Status</th>
-                                    <th class="text-end">Actions</th>
+                                    <th>Minggu Kehamilan</th>
+                                    <th>Tanggal Cek Terakhir</th>
+                                    <th>Catatan</th>
+                                    <th class="text-center" colspan="4">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($pregnancies ?? [] as $pregnancy)
+                                @forelse($userPregnancies as $userPregnancy)
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="avatar bg-primary">{{ substr($pregnancy->user->name ?? '', 0, 2) }}</div>
-                                                <span class="ms-2">{{ $pregnancy->user->name ?? 'Unknown' }}</span>
+                                                <div class="avatar bg-primary">{{ substr($userPregnancy->user->name ?? '??', 0, 2) }}</div>
+                                                <span class="ms-2">{{ $userPregnancy->user->name ?? 'Unknown User' }}</span>
                                             </div>
                                         </td>
-                                        <td>{{ $pregnancy->start_date ? date('d M Y', strtotime($pregnancy->start_date)) : '-' }}</td>
-                                        <td>{{ $pregnancy->due_date ? date('d M Y', strtotime($pregnancy->due_date)) : '-' }}</td>
+                                        <td>{{ $userPregnancy->start_date ? date('d M Y', strtotime($userPregnancy->start_date)) : '-' }}</td>
+                                        <td>{{ $userPregnancy->pregnancy_week ?? '-' }}</td>
+                                        <td>{{ $userPregnancy->last_check_date ? date('d M Y', strtotime($userPregnancy->last_check_date)) : '-' }}</td>
+                                        <td>{{ $userPregnancy->notes ?? '-' }}</td>
                                         <td>
-                                            <span class="badge bg-{{ $pregnancy->status == 'active' ? 'success' : ($pregnancy->status == 'completed' ? 'info' : 'warning') }}">
-                                                {{ ucfirst($pregnancy->status ?? 'unknown') }}
-                                            </span>
-                                        </td>
-                                        <td class="text-end">
-                                            <a href="{{ route('pregnancies.show', $pregnancy->id) }}" class="btn btn-sm btn-outline-info">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('pregnancies.edit', $pregnancy->id) }}" class="btn btn-sm btn-outline-primary ms-1">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('pregnancies.destroy', $pregnancy->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Apakah Anda yakin ingin menghapus data kehamilan ini?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <div class="d-flex flex-column align-items-center">
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-warning ms-1 view-pregnancy-btn"
+                                                        data-patient="{{ $userPregnancy->user->name ?? 'Unknown User' }}"
+                                                        data-start-date="{{ $userPregnancy->start_date ? date('d M Y', strtotime($userPregnancy->start_date)) : '-' }}"
+                                                        data-pregnancy-week="{{ $userPregnancy->pregnancy_week ?? '-' }}"
+                                                        data-last-check="{{ $userPregnancy->last_check_date ? date('d M Y', strtotime($userPregnancy->last_check_date)) : '-' }}"
+                                                        data-notes="{{ $userPregnancy->notes ?? '-' }}">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary ms-1 edit-pregnancy-btn"
+                                                        data-id="{{ $userPregnancy->id }}"
+                                                        data-patient-id="{{ $userPregnancy->user_id ?? '' }}"
+                                                        data-patient-name="{{ $userPregnancy->user->name ?? 'Unknown User' }}"
+                                                        data-start-date="{{ $userPregnancy->start_date ?? '' }}"
+                                                        data-pregnancy-week="{{ $userPregnancy->pregnancy_week ?? '' }}"
+                                                        data-last-check="{{ $userPregnancy->last_check_date ?? '' }}"
+                                                        data-notes="{{ $userPregnancy->notes ?? '' }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-success ms-1 health-tracking-btn"
+                                                        data-id="{{ $userPregnancy->id }}" title="Health Tracking">
+                                                        <i class="fas fa-heartbeat"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary ms-1 live-chat-btn"
+                                                        data-id="{{ $userPregnancy->id }}" title="Live Chat">
+                                                        <i class="fas fa-comment-dots"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center">Tidak ada data kehamilan</td>
+                                        <td colspan="6" class="text-center">Tidak ada data kehamilan</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Pagination for Pregnancies -->
-                    @if(isset($pregnancies) && $pregnancies->hasPages())
+                    <!-- Pagination for User Pregnancies -->
+                    @if($userPregnancies->hasPages())
                     <div class="mt-3">
-                        <nav aria-label="Page navigation for pregnancies">
+                        <nav aria-label="Page navigation for user pregnancies">
                             <ul class="pagination justify-content-center">
-                                {{-- Previous Page Link --}}
-                                <li class="page-item {{ $pregnancies->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $pregnancies->appends(['midwife_page' => request('midwife_page', 1), 'user_page' => request('user_page', 1)])->previousPageUrl() }}" aria-label="Previous">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-                                    </a>
-                                </li>
-
-                                {{-- Pagination Elements --}}
-                                @foreach($pregnancies->getUrlRange(1, $pregnancies->lastPage()) as $page => $url)
-                                    <li class="page-item {{ $pregnancies->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $pregnancies->appends(['midwife_page' => request('midwife_page', 1), 'user_page' => request('user_page', 1)])->url($page) }}">{{ $page }}</a>
-                                    </li>
-                                @endforeach
-
-                                {{-- Next Page Link --}}
-                                <li class="page-item {{ $pregnancies->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="{{ $pregnancies->appends(['midwife_page' => request('midwife_page', 1), 'user_page' => request('user_page', 1)])->nextPageUrl() }}" aria-label="Next">
-                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-                                    </a>
-                                </li>
+                                {{ $userPregnancies->links() }}
                             </ul>
                         </nav>
                     </div>
@@ -584,9 +632,95 @@
     </div>
 </div>
 
+<!-- View Pregnancy Details Modal -->
+<div class="modal-overlay" id="viewPregnancyModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Detail Kehamilan</h5>
+            <button class="close-modal" id="closeViewModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Pasien</label>
+                <p id="viewPatientName" class="form-control-static"></p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Tanggal Mulai</label>
+                <p id="viewStartDate" class="form-control-static"></p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Minggu Kehamilan</label>
+                <p id="viewPregnancyWeek" class="form-control-static"></p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Tanggal Cek Terakhir</label>
+                <p id="viewLastCheckDate" class="form-control-static"></p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Catatan</label>
+                <p id="viewNotes" class="form-control-static"></p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="closeViewBtn">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Pregnancy Modal -->
+<div class="modal-overlay" id="editPregnancyModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Edit Data Kehamilan</h5>
+            <button class="close-modal" id="closeEditPregnancyModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="editPregnancyForm">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="editPregnancyId" name="pregnancy_id">
+
+                <div class="mb-3">
+                    <label for="editPregnancyPatient" class="form-label">Pasien</label>
+                    <input type="text" class="form-control" id="editPregnancyPatientDisplay" value="" readonly>
+                    <input type="hidden" id="editPregnancyPatient" name="user_id" value="">
+                </div>
+
+                <div class="mb-3">
+                    <label for="editPregnancyStartDate" class="form-label">Tanggal Mulai</label>
+                    <input type="date" class="form-control" id="editPregnancyStartDate" name="start_date" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="editPregnancyWeek" class="form-label">Minggu Kehamilan</label>
+                    <input type="number" class="form-control" id="editPregnancyWeek" name="pregnancy_week" min="1" max="42" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="editPregnancyLastCheck" class="form-label">Tanggal Cek Terakhir</label>
+                    <input type="date" class="form-control" id="editPregnancyLastCheck" name="last_check_date">
+                </div>
+
+                <div class="mb-3">
+                    <label for="editPregnancyNotes" class="form-label">Catatan</label>
+                    <textarea class="form-control" id="editPregnancyNotes" name="notes" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelEditPregnancyBtn">Batal</button>
+            <button type="button" class="btn btn-primary" id="updatePregnancyBtn">Simpan Perubahan</button>
+        </div>
+    </div>
+</div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function handleLogout() {
+       function handleLogout() {
     Swal.fire({
         title: 'Logout Confirmation',
         text: 'Are you sure you want to logout?',
@@ -598,32 +732,69 @@
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Remove token and clear session
-            localStorage.removeItem('token');
-            sessionStorage.clear();
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            // Create a flash message about successful logout
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+            // Create form data instead of JSON
+            const formData = new FormData();
+            formData.append('_token', csrfToken);
+
+            // Send logout request to server
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    // Don't set Content-Type to let browser set it with boundary for FormData
+                },
+                body: formData,
+                credentials: 'same-origin' // Include cookies in the request
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json().catch(() => {
+                        // If not JSON, treat as successful anyway
+                        return { success: true };
+                    });
+                } else {
+                    throw new Error('Server returned ' + response.status);
                 }
-            });
+            })
+            .then(data => {
+                // Clear client-side storage
+                localStorage.removeItem('token');
+                sessionStorage.clear();
 
-            Toast.fire({
-                icon: 'success',
-                title: 'Logged out successfully!'
-            });
+                // Show success message
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
 
-            // Allow the notification to be seen before redirecting
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
+                swal.fire({
+                    icon: 'success',
+                    title: 'Logged out successfully!'
+                });
+
+                // Allow notification to be seen before redirecting
+                setTimeout(() => {
+                    window.location.href = '/'; // Redirect to login page
+                }, 1000);
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Logout Failed',
+                    text: 'There was an issue connecting to the server. Please try again.'
+                });
+            });
         }
     });
 }
@@ -773,6 +944,118 @@ function confirmDeleteUser(event, button) {
                 window.scrollTo(0, parseInt(sessionStorage.getItem('scrollPosition')));
             }
         });
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // View Pregnancy Modal
+    const viewModal = document.getElementById('viewPregnancyModal');
+    const closeViewModalBtn = document.getElementById('closeViewModalBtn');
+    const closeViewBtn = document.getElementById('closeViewBtn');
+
+    // Open view modal
+    document.querySelectorAll('.view-pregnancy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Get data from button attributes
+            document.getElementById('viewPatientName').textContent = this.dataset.patient;
+            document.getElementById('viewStartDate').textContent = this.dataset.startDate;
+            document.getElementById('viewPregnancyWeek').textContent = this.dataset.pregnancyWeek;
+            document.getElementById('viewLastCheckDate').textContent = this.dataset.lastCheck;
+            document.getElementById('viewNotes').textContent = this.dataset.notes;
+
+            // Show modal
+            viewModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    // Close view modal
+    function closeViewModal() {
+        viewModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    closeViewModalBtn.addEventListener('click', closeViewModal);
+    closeViewBtn.addEventListener('click', closeViewModal);
+    viewModal.addEventListener('click', function(e) {
+        if (e.target === viewModal) closeViewModal();
+    });
+
+    // Edit Pregnancy Modal
+    const editPregnancyModal = document.getElementById('editPregnancyModal');
+    const closeEditPregnancyModalBtn = document.getElementById('closeEditPregnancyModalBtn');
+    const cancelEditPregnancyBtn = document.getElementById('cancelEditPregnancyBtn');
+    const updatePregnancyBtn = document.getElementById('updatePregnancyBtn');
+    const editPregnancyForm = document.getElementById('editPregnancyForm');
+
+    // Open edit modal
+document.querySelectorAll('.edit-pregnancy-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Set form action
+        editPregnancyForm.action = `/user-pregnancies/${this.dataset.id}`;
+        document.getElementById('editPregnancyId').value = this.dataset.id;
+
+        // Set patient name display and hidden ID
+        document.getElementById('editPregnancyPatientDisplay').value = this.dataset.patientName;
+        document.getElementById('editPregnancyPatient').value = this.dataset.patientId;
+
+        // Set other fields
+        document.getElementById('editPregnancyStartDate').value = this.dataset.startDate || '';
+        document.getElementById('editPregnancyWeek').value = this.dataset.pregnancyWeek || '';
+        document.getElementById('editPregnancyLastCheck').value = this.dataset.lastCheck || '';
+        document.getElementById('editPregnancyNotes').value = this.dataset.notes || '';
+
+        // Show modal
+        editPregnancyModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+    // Close edit modal
+    function closeEditPregnancyModal() {
+        editPregnancyModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    closeEditPregnancyModalBtn.addEventListener('click', closeEditPregnancyModal);
+    cancelEditPregnancyBtn.addEventListener('click', closeEditPregnancyModal);
+    editPregnancyModal.addEventListener('click', function(e) {
+        if (e.target === editPregnancyModal) closeEditPregnancyModal();
+    });
+
+    // Form submission
+    updatePregnancyBtn.addEventListener('click', function() {
+        const formData = new FormData(editPregnancyForm);
+        formData.append('_method', 'PUT');
+
+        fetch(editPregnancyForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Data kehamilan berhasil diperbarui',
+                icon: 'success'
+            });
+            closeEditPregnancyModal();
+            setTimeout(() => window.location.reload(), 1500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Gagal memperbarui data kehamilan',
+                icon: 'error'
+            });
+        });
+    });
+});
     </script>
 </body>
 </html>

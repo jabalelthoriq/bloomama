@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -543,7 +544,7 @@
                                 </div>
                             @endif
 
-                            
+
 <div class="table-responsive">
     <table class="table table-hover mb-0">
         <thead>
@@ -604,7 +605,7 @@
             @endforelse
         </tbody>
     </table>
-    
+
     <!-- Pagination for Contents -->
     @if($contents->hasPages())
     <nav aria-label="Page navigation for contents">
@@ -659,32 +660,69 @@
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Remove token and clear session
-            localStorage.removeItem('token');
-            sessionStorage.clear();
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            // Create a flash message about successful logout
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+            // Create form data instead of JSON
+            const formData = new FormData();
+            formData.append('_token', csrfToken);
+
+            // Send logout request to server
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    // Don't set Content-Type to let browser set it with boundary for FormData
+                },
+                body: formData,
+                credentials: 'same-origin' // Include cookies in the request
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json().catch(() => {
+                        // If not JSON, treat as successful anyway
+                        return { success: true };
+                    });
+                } else {
+                    throw new Error('Server returned ' + response.status);
                 }
-            });
+            })
+            .then(data => {
+                // Clear client-side storage
+                localStorage.removeItem('token');
+                sessionStorage.clear();
 
-            Toast.fire({
-                icon: 'success',
-                title: 'Logged out successfully!'
-            });
+                // Show success message
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
 
-            // Allow the notification to be seen before redirecting
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
+                swal.fire({
+                    icon: 'success',
+                    title: 'Logged out successfully!'
+                });
+
+                // Allow notification to be seen before redirecting
+                setTimeout(() => {
+                    window.location.href = '/'; // Redirect to login page
+                }, 1000);
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Logout Failed',
+                    text: 'There was an issue connecting to the server. Please try again.'
+                });
+            });
         }
     });
 }
@@ -930,13 +968,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Submit edit form
     updateBtn.addEventListener('click', function() {
         const contentId = document.getElementById('editContentId').value;
-        
+
         // Use FormData to handle file uploads
         const formData = new FormData(editContentForm);
-        
+
         // Add method spoofing for Laravel since fetch doesn't support PUT natively
         formData.append('_method', 'PUT');
-        
+
         // Send AJAX request
         fetch(`/content/${contentId}`, {
             method: 'POST',
@@ -958,7 +996,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'success'
             });
             closeEditModal();
-            
+
             // Reload page to show updated content
             setTimeout(() => {
                 window.location.reload();

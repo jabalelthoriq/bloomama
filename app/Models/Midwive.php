@@ -37,8 +37,12 @@ class Midwive extends Authenticatable
         'phone_number',
         'password',
         'username',
-        'bio',
-        'profile_picture'
+        'status',
+        'profile_picture',
+        'available_day',
+        'start_time',
+        'end_time',
+        'role'
     ];
 
     /**
