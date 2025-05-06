@@ -9,9 +9,10 @@ class UserPregnant extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'user_id';
-
+    protected $primaryKey = 'pregnancy_id';
     protected $table = 'user_pregnancies';
+    public $incrementing = true;
+    protected $keyType = 'bigint';
 
     protected $fillable = [
         'user_id',
@@ -25,11 +26,25 @@ class UserPregnant extends Model
         'notes',
     ];
 
-    /**
-     * Get the user that owns the pregnancy record.
-     */
+    protected $casts = [
+        'start_date' => 'date',
+        'due_date' => 'date',
+        'last_check_date' => 'date',
+        'gravida' => 'integer',
+        'para' => 'integer',
+        'abortus' => 'integer',
+        'pregnancy_week' => 'integer'
+    ];
+
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
+
+    public function healthTrackings()
+{
+    return $this->hasMany(HealthTracking::class, 'pregnancy_id', 'pregnancy_id')
+        ->orderBy('date_recorded', 'desc');
+}
 }

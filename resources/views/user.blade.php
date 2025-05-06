@@ -346,6 +346,81 @@
         .loading-spinner.active {
             display: block;
         }
+
+        /* Health Tracking Modal Styles */
+.vital-stats-card {
+    border-radius: 10px;
+    border-left: 4px solid #00b8d4;
+    transition: transform 0.2s;
+    height: 100%;
+}
+
+.vital-stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 184, 212, 0.2);
+}
+
+.health-stat-value {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.health-stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 3px;
+}
+
+.health-stat-unit {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+#healthTrackingTable tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#healthTrackingTable tbody tr:hover {
+    background-color: rgba(0, 184, 212, 0.05);
+}
+
+/* Timeline style for health tracking */
+.health-timeline {
+    position: relative;
+    padding-left: 30px;
+    margin-top: 20px;
+}
+
+.health-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #00b8d4;
+}
+
+.health-timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.health-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -30px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #00b8d4;
+    border: 2px solid white;
+}
    </style>
 <body>
     <div class="vertical-navbar">
@@ -469,29 +544,29 @@
                             <ul class="pagination">
                                 {{-- Previous Page Link --}}
                                 <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" 
-                                       href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->previousPageUrl() }}#bidan-content" 
+                                    <a class="page-link"
+                                       href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->previousPageUrl() }}#bidan-content"
                                        aria-label="Previous"
                                        onclick="handlePagination(event, this, 'bidan')">
                                         <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                     </a>
                                 </li>
-    
+
                                 {{-- Pagination Elements --}}
                                 @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
                                     <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" 
+                                        <a class="page-link"
                                            href="{{ $url }}#bidan-content"
                                            onclick="handlePagination(event, this, 'bidan')">
                                             {{ $page }}
                                         </a>
                                     </li>
                                 @endforeach
-    
+
                                 {{-- Next Page Link --}}
                                 <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" 
-                                       href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->nextPageUrl() }}#bidan-content" 
+                                    <a class="page-link"
+                                       href="{{ $midwives->appends(['user_page' => request('user_page', 1)])->nextPageUrl() }}#bidan-content"
                                        aria-label="Next"
                                        onclick="handlePagination(event, this, 'bidan')">
                                         <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
@@ -561,8 +636,8 @@
                         <ul class="pagination">
                             {{-- Previous Page Link --}}
                             <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                <a class="page-link" 
-                                   href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->previousPageUrl() }}#pasien-content" 
+                                <a class="page-link"
+                                   href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->previousPageUrl() }}#pasien-content"
                                    aria-label="Previous"
                                    onclick="handlePagination(event, this, 'pasien')">
                                     <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
@@ -572,7 +647,7 @@
                             {{-- Pagination Elements --}}
                             @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
                                 <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
-                                    <a class="page-link" 
+                                    <a class="page-link"
                                        href="{{ $url }}#pasien-content"
                                        onclick="handlePagination(event, this, 'pasien')">
                                         {{ $page }}
@@ -582,8 +657,8 @@
 
                             {{-- Next Page Link --}}
                             <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                <a class="page-link" 
-                                   href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->nextPageUrl() }}#pasien-content" 
+                                <a class="page-link"
+                                   href="{{ $users->appends(['midwife_page' => request('midwife_page', 1)])->nextPageUrl() }}#pasien-content"
                                    aria-label="Next"
                                    onclick="handlePagination(event, this, 'pasien')">
                                     <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
@@ -620,7 +695,6 @@
                                     <th>Tanggal Mulai</th>
                                     <th>Minggu Kehamilan</th>
                                     <th>Tanggal Cek Terakhir</th>
-                                    <th>Catatan</th>
                                     <th class="text-center" colspan="4">Actions</th>
                                 </tr>
                             </thead>
@@ -636,7 +710,7 @@
                                         <td>{{ $userPregnancy->start_date ? date('d M Y', strtotime($userPregnancy->start_date)) : '-' }}</td>
                                         <td>{{ $userPregnancy->pregnancy_week ?? '-' }}</td>
                                         <td>{{ $userPregnancy->last_check_date ? date('d M Y', strtotime($userPregnancy->last_check_date)) : '-' }}</td>
-                                        <td>{{ $userPregnancy->notes ?? '-' }}</td>
+
                                         <td>
                                             <div class="d-flex flex-column align-items-center">
                                                 <div class="d-flex justify-content-center">
@@ -690,29 +764,29 @@
                             <ul class="pagination">
                                 {{-- Previous Page Link --}}
                                 <li class="page-item {{ $userPregnancies->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" 
-                                       href="{{ $userPregnancies->previousPageUrl() }}#pregnancies-content" 
+                                    <a class="page-link"
+                                       href="{{ $userPregnancies->previousPageUrl() }}#pregnancies-content"
                                        aria-label="Previous"
                                        onclick="handlePagination(event, this, 'pregnancies')">
                                         <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
                                     </a>
                                 </li>
-    
+
                                 {{-- Pagination Elements --}}
                                 @foreach($userPregnancies->getUrlRange(1, $userPregnancies->lastPage()) as $page => $url)
                                     <li class="page-item {{ $userPregnancies->currentPage() == $page ? 'active' : '' }}">
-                                        <a class="page-link" 
+                                        <a class="page-link"
                                            href="{{ $url }}#pregnancies-content"
                                            onclick="handlePagination(event, this, 'pregnancies')">
                                             {{ $page }}
                                         </a>
                                     </li>
                                 @endforeach
-    
+
                                 {{-- Next Page Link --}}
                                 <li class="page-item {{ $userPregnancies->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" 
-                                       href="{{ $userPregnancies->nextPageUrl() }}#pregnancies-content" 
+                                    <a class="page-link"
+                                       href="{{ $userPregnancies->nextPageUrl() }}#pregnancies-content"
                                        aria-label="Next"
                                        onclick="handlePagination(event, this, 'pregnancies')">
                                         <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
@@ -724,6 +798,156 @@
                     @endif
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Health Tracking Modal -->
+<div class="modal-overlay" id="healthTrackingModal">
+    <div class="modal-container" style="max-width: 800px;">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Health Tracking</h5>
+            <button class="close-modal" id="closeHealthTrackingModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+
+        </div>
+        <div class="modal-body">
+            <!-- Header Info -->
+            <div class="d-flex justify-content-between mb-4">
+                <div>
+                    <h6 class="text-muted">Pasien</h6>
+                    <h5 id="htPatientName">-</h5>
+                </div>
+                <div>
+                    <h6 class="text-muted">Minggu Kehamilan</h6>
+                    <h5 id="htPregnancyWeek">-</h5>
+                </div>
+                <div>
+                    <h6 class="text-muted">Tanggal Terakhir Diperbarui</h6>
+                    <h5 id="htLastUpdated">-</h5>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card vital-stats-card">
+                        <div class="card-body text-center">
+                            <div class="health-stat-value" id="htWeight">-</div>
+                            <div class="health-stat-label">Berat Badan</div>
+                            <div class="health-stat-unit">kg</div>
+                            <small class="text-muted" id="htWeightDate"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card vital-stats-card">
+                        <div class="card-body text-center">
+                            <div class="health-stat-value" id="htBloodPressure">-</div>
+                            <div class="health-stat-label">Tekanan Darah</div>
+                            <div class="health-stat-unit">mmHg</div>
+                            <small class="text-muted" id="htBloodPressureDate"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card vital-stats-card">
+                        <div class="card-body text-center">
+                            <div class="health-stat-value" id="htHeartRate">-</div>
+                            <div class="health-stat-label">Denyut Jantung</div>
+                            <div class="health-stat-unit">bpm</div>
+                            <small class="text-muted" id="htHeartRateDate"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-4">
+                <h6 class="text-muted mb-3">Catatan Kesehatan</h6>
+                <div class="card">
+                    <div class="card-body">
+                        <p id="htNotes" class="mb-0">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="m-0">Riwayat Pemeriksaan</h6>
+                <button class="btn btn-sm btn-primary" id="addNewTrackingBtn">
+                    <i class="fas fa-plus me-1"></i> Tambah Data
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" id="healthTrackingTable">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Berat (kg)</th>
+                            <th>Tekanan Darah</th>
+                            <th>Denyut Jantung</th>
+                            <th class="text-end">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="healthTrackingTableBody">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="closeHealthTrackingBtn">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Health Tracking Form Modal -->
+<div class="modal-overlay" id="healthTrackingFormModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0" id="healthTrackingFormTitle">Tambah Data Health Tracking</h5>
+            <button class="close-modal" id="closeHealthTrackingFormModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="healthTrackingForm">
+                @csrf
+                <input type="hidden" id="htFormTrackingId" name="tracking_id">
+                <input type="hidden" id="htFormPregnancyId" name="pregnancy_id">
+
+                <div class="mb-3">
+                    <label for="htFormDateRecorded" class="form-label">Tanggal Pencatatan*</label>
+                    <input type="date" class="form-control" id="htFormDateRecorded" name="date_recorded" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="htFormWeight" class="form-label">Berat Badan (kg)</label>
+                        <input type="number" step="0.01" class="form-control" id="htFormWeight" name="weight" placeholder="50.5">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="htFormBloodPressure" class="form-label">Tekanan Darah</label>
+                        <input type="text" class="form-control" id="htFormBloodPressure" name="blood_pressure" placeholder="120/80">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="htFormHeartRate" class="form-label">Denyut Jantung (bpm)</label>
+                        <input type="number" class="form-control" id="htFormHeartRate" name="heart_rate" placeholder="72">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="htFormNotes" class="form-label">Catatan</label>
+                    <textarea class="form-control" id="htFormNotes" name="notes" rows="3" placeholder="Masukkan catatan kesehatan..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelHealthTrackingFormBtn">Batal</button>
+            <button type="button" class="btn btn-primary" id="submitHealthTrackingFormBtn">Simpan</button>
         </div>
     </div>
 </div>
@@ -1027,7 +1251,7 @@ function confirmDeleteUser(event, button) {
 }
     </script>
     <script>
-       
+
 
 
 
@@ -1148,17 +1372,17 @@ updatePregnancyBtn.addEventListener('click', function() {
         // Global function to handle pagination
         function handlePagination(event, element, tabType) {
             event.preventDefault();
-            
+
             // Show loading state
             const container = document.getElementById(`${tabType}-table-container`);
             container.classList.add('table-loading');
-            
+
             // Get the URL and tab to activate
             const url = element.getAttribute('href').split('#')[0];
-            
+
             // Store current scroll position
             const scrollPosition = window.scrollY;
-            
+
             // Fetch the new page
             fetch(url, {
                 headers: {
@@ -1170,25 +1394,25 @@ updatePregnancyBtn.addEventListener('click', function() {
                 // Create a temporary DOM element to parse the response
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                
+
                 // Extract the table content
                 const newContent = doc.querySelector(`#${tabType}-content`).innerHTML;
-                
+
                 // Update the content
                 document.getElementById(`${tabType}-content`).innerHTML = newContent;
-                
+
                 // Reinitialize event listeners for the new content
                 initializeEventListeners();
-                
+
                 // Remove loading state
                 container.classList.remove('table-loading');
-                
+
                 // Activate the correct tab
                 document.getElementById(`${tabType}-tab`).click();
-                
+
                 // Restore scroll position
                 window.scrollTo(0, scrollPosition);
-                
+
                 // Update browser history
                 history.pushState(null, null, url + `#${tabType}-content`);
             })
@@ -1203,7 +1427,7 @@ updatePregnancyBtn.addEventListener('click', function() {
         function initializeEventListeners() {
             // Reinitialize all buttons and event listeners
             // (include all your existing button initialization code here)
-            
+
             // Reinitialize pagination click handlers
             document.querySelectorAll('.page-link').forEach(link => {
                 const href = link.getAttribute('href');
@@ -1228,7 +1452,7 @@ updatePregnancyBtn.addEventListener('click', function() {
                     document.getElementById('pregnancies-tab').click();
                 }
             }
-            
+
             // Initialize all event listeners
             initializeEventListeners();
         });
@@ -1246,6 +1470,357 @@ updatePregnancyBtn.addEventListener('click', function() {
                 }
             }
         });
+
+
     </script>
+    <script>
+      // Health Tracking Modal
+const healthTrackingModal = document.getElementById('healthTrackingModal');
+const closeHealthTrackingModalBtn = document.getElementById('closeHealthTrackingModalBtn');
+const closeHealthTrackingBtn = document.getElementById('closeHealthTrackingBtn');
+const healthTrackingFormModal = document.getElementById('healthTrackingFormModal');
+const closeHealthTrackingFormModalBtn = document.getElementById('closeHealthTrackingFormModalBtn');
+const cancelHealthTrackingFormBtn = document.getElementById('cancelHealthTrackingFormBtn');
+const submitHealthTrackingFormBtn = document.getElementById('submitHealthTrackingFormBtn');
+const addNewTrackingBtn = document.getElementById('addNewTrackingBtn');
+const healthTrackingForm = document.getElementById('healthTrackingForm');
+const healthTrackingTableBody = document.getElementById('healthTrackingTableBody');
+
+let currentPregnancyId = null;
+let currentTrackingData = [];
+
+function loadHealthTrackingData(pregnancyId) {
+    // Show loading state
+    document.getElementById('healthTrackingTableBody').innerHTML = '<tr><td colspan="5">Memuat data...</td></tr>';
+
+    // Reset cards to loading state
+    showTrackingDetails({
+        weight: null,
+        blood_pressure: null,
+        heart_rate: null,
+        notes: 'Memuat data...',
+        date_recorded: null
+    });
+
+    fetch(`/api/health-tracking/${pregnancyId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.data) {
+                currentTrackingData = data.data.trackings || [];
+                renderHealthTrackingTable(currentTrackingData);
+
+                // Update patient info
+                document.getElementById('htPatientName').textContent = data.data.patient || 'Unknown';
+                document.getElementById('htPregnancyWeek').textContent = data.data.pregnancy_week || '-';
+                document.getElementById('htLastUpdated').textContent = data.data.last_updated ? formatDate(data.data.last_updated) : '-';
+
+                // Show data in cards
+                if (currentTrackingData.length > 0) {
+                    // Show latest tracking data
+                    showTrackingDetails(currentTrackingData[0]);
+                } else if (data.data.weight || data.data.blood_pressure || data.data.heart_rate) {
+                    // Show pregnancy data if no tracking data exists
+                    showTrackingDetails({
+                        weight: data.data.weight,
+                        blood_pressure: data.data.blood_pressure,
+                        heart_rate: data.data.heart_rate,
+                        notes: data.data.notes || 'Tidak ada catatan',
+                        date_recorded: data.data.last_updated
+                    });
+                } else {
+                    // No data available
+                    showTrackingDetails({
+                        weight: null,
+                        blood_pressure: null,
+                        heart_rate: null,
+                        notes: 'Tidak ada data kesehatan',
+                        date_recorded: null
+                    });
+                }
+            } else {
+                throw new Error(data.message || 'Invalid data format');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading health tracking data:', error);
+            healthTrackingTableBody.innerHTML = `<tr><td colspan="5">Gagal memuat data: ${error.message}</td></tr>`;
+
+            // Show error in cards
+            showTrackingDetails({
+                weight: null,
+                blood_pressure: null,
+                heart_rate: null,
+                notes: 'Gagal memuat data kesehatan',
+                date_recorded: null
+            });
+        });
+}
+
+// Function to render health tracking table
+function renderHealthTrackingTable(data) {
+    if (data.length === 0) {
+        healthTrackingTableBody.innerHTML = '<tr><td colspan="5">Tidak ada data kesehatan</td></tr>';
+        return;
+    }
+
+    healthTrackingTableBody.innerHTML = data.map(tracking => `
+        <tr>
+            <td>${formatDate(tracking.date_recorded)}</td>
+            <td>${tracking.weight || '-'}</td>
+            <td>${tracking.blood_pressure || '-'}</td>
+            <td>${tracking.heart_rate || '-'}</td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary edit-tracking-btn" data-id="${tracking.tracking_id}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger delete-tracking-btn" data-id="${tracking.tracking_id}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+
+    // Add event listeners to buttons in the table
+    addHealthTrackingTableEventListeners();
+}
+
+// Add event listeners to table buttons
+function addHealthTrackingTableEventListeners() {
+    // Add event listeners to edit buttons
+    document.querySelectorAll('.edit-tracking-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const trackingId = this.dataset.id;
+            const tracking = currentTrackingData.find(t => t.tracking_id == trackingId);
+            openHealthTrackingFormModal(tracking);
+        });
+    });
+
+    // Add event listeners to delete buttons
+    document.querySelectorAll('.delete-tracking-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const trackingId = this.dataset.id;
+            confirmDeleteTracking(trackingId);
+        });
+    });
+
+    // Add click event to rows to view details
+    document.querySelectorAll('#healthTrackingTable tbody tr').forEach(row => {
+        row.addEventListener('click', function() {
+            const trackingId = this.querySelector('.edit-tracking-btn')?.dataset.id;
+            if (trackingId) {
+                const tracking = currentTrackingData.find(t => t.tracking_id == trackingId);
+                showTrackingDetails(tracking);
+            }
+        });
+    });
+}
+
+function showTrackingDetails(tracking) {
+    if (!tracking) {
+        tracking = {
+            weight: null,
+            blood_pressure: null,
+            heart_rate: null,
+            notes: 'Tidak ada data',
+            date_recorded: null
+        };
+    }
+
+    // Weight card
+    const weight = tracking.weight !== null && tracking.weight !== undefined ? tracking.weight : '-';
+    document.getElementById('htWeight').textContent = weight;
+    document.getElementById('htWeightDate').textContent = tracking.date_recorded ? formatDate(tracking.date_recorded) : '';
+
+    // Blood pressure card
+    const bloodPressure = tracking.blood_pressure || '-';
+    document.getElementById('htBloodPressure').textContent = bloodPressure;
+    document.getElementById('htBloodPressureDate').textContent = tracking.date_recorded ? formatDate(tracking.date_recorded) : '';
+
+    // Heart rate card
+    const heartRate = tracking.heart_rate || '-';
+    document.getElementById('htHeartRate').textContent = heartRate;
+    document.getElementById('htHeartRateDate').textContent = tracking.date_recorded ? formatDate(tracking.date_recorded) : '';
+
+    // Notes
+    document.getElementById('htNotes').textContent = tracking.notes || 'Tidak ada catatan';
+}
+
+// Open health tracking modal
+document.querySelectorAll('.health-tracking-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        currentPregnancyId = this.dataset.id;
+
+        // Set patient info in modal
+        const patientName = this.closest('tr').querySelector('td:first-child span').textContent;
+        const pregnancyWeek = this.closest('tr').querySelector('td:nth-child(3)').textContent;
+
+        document.getElementById('htPatientName').textContent = patientName;
+        document.getElementById('htPregnancyWeek').textContent = pregnancyWeek;
+
+        // Load data
+        loadHealthTrackingData(currentPregnancyId);
+
+        // Show modal
+        healthTrackingModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Open form modal for adding/editing
+function openHealthTrackingFormModal(tracking = null) {
+    document.getElementById('healthTrackingFormTitle').textContent = tracking ? 'Edit Data Kesehatan' : 'Tambah Data Kesehatan';
+    document.getElementById('htFormPregnancyId').value = currentPregnancyId;
+
+    if (tracking) {
+        document.getElementById('htFormTrackingId').value = tracking.tracking_id;
+        document.getElementById('htFormDateRecorded').value = tracking.date_recorded;
+        document.getElementById('htFormWeight').value = tracking.weight || '';
+        document.getElementById('htFormBloodPressure').value = tracking.blood_pressure || '';
+        document.getElementById('htFormHeartRate').value = tracking.heart_rate || '';
+        document.getElementById('htFormNotes').value = tracking.notes || '';
+    } else {
+        document.getElementById('htFormTrackingId').value = '';
+        document.getElementById('htFormDateRecorded').value = '';
+        document.getElementById('htFormWeight').value = '';
+        document.getElementById('htFormBloodPressure').value = '';
+        document.getElementById('htFormHeartRate').value = '';
+        document.getElementById('htFormNotes').value = '';
+    }
+
+    healthTrackingFormModal.style.display = 'flex';
+}
+
+// Close health tracking modal
+function closeHealthTrackingModal() {
+    healthTrackingModal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// Close form modal
+function closeHealthTrackingFormModal() {
+    healthTrackingFormModal.style.display = 'none';
+}
+
+// Submit health tracking form
+function submitHealthTrackingForm() {
+    const formData = new FormData(healthTrackingForm);
+    const trackingId = document.getElementById('htFormTrackingId').value;
+    const method = trackingId ? 'PUT' : 'POST';
+    const url = trackingId ? `/api/health-tracking/${trackingId}` : '/api/health-tracking';
+
+    fetch(url, {
+        method: method,
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Data kesehatan berhasil disimpan'
+        });
+        closeHealthTrackingFormModal();
+        loadHealthTrackingData(currentPregnancyId);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal menyimpan',
+            text: 'Terjadi kesalahan saat menyimpan data kesehatan'
+        });
+    });
+}
+
+// Confirm delete tracking
+function confirmDeleteTracking(trackingId) {
+    Swal.fire({
+        title: 'Hapus Data Kesehatan?',
+        text: "Anda tidak akan dapat mengembalikan data ini!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/api/health-tracking/${trackingId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire(
+                    'Terhapus!',
+                    'Data kesehatan telah dihapus.',
+                    'success'
+                );
+                loadHealthTrackingData(currentPregnancyId);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal menghapus',
+                    text: 'Terjadi kesalahan saat menghapus data kesehatan'
+                });
+            });
+        }
+    });
+}
+
+// Format date to DD MMM YYYY
+function formatDate(dateString) {
+    if (!dateString) return '';
+
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            // Handle if dateString is already in the correct format
+            return dateString;
+        }
+
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return date.toLocaleDateString('id-ID', options);
+    } catch (e) {
+        console.error('Error formatting date:', e);
+        return dateString; // Return original if can't format
+    }
+}
+
+// Event listeners
+closeHealthTrackingModalBtn.addEventListener('click', closeHealthTrackingModal);
+closeHealthTrackingBtn.addEventListener('click', closeHealthTrackingModal);
+healthTrackingModal.addEventListener('click', function(e) {
+    if (e.target === healthTrackingModal) closeHealthTrackingModal();
+});
+
+closeHealthTrackingFormModalBtn.addEventListener('click', closeHealthTrackingFormModal);
+cancelHealthTrackingFormBtn.addEventListener('click', closeHealthTrackingFormModal);
+healthTrackingFormModal.addEventListener('click', function(e) {
+    if (e.target === healthTrackingFormModal) closeHealthTrackingFormModal();
+});
+
+addNewTrackingBtn.addEventListener('click', function() {
+    openHealthTrackingFormModal();
+});
+
+submitHealthTrackingFormBtn.addEventListener('click', submitHealthTrackingForm);
+        </script>
 </body>
 </html>

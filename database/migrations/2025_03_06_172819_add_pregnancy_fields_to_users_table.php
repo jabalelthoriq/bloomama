@@ -12,19 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_pregnancies', function (Blueprint $table) {
-            $table->id('pregnancy_id');
-            $table->unsignedBigInteger('user_id');
+            $table->bigIncrements('pregnancy_id');
+            $table->unsignedBigInteger('user_id'); // foreign key
             $table->date('start_date');
-            $table->date('due_date')->nullable();
-            $table->integer('gravida')->comment('Number of pregnancies');
-            $table->integer('para')->comment('Number of births');
-            $table->integer('abortus')->comment('Number of miscarriages');
-            $table->integer('pregnancy_week')->nullable();
+            $table->date('due_date');
+            $table->integer('gravida');
+            $table->integer('para');
+            $table->integer('abortus');
+            $table->integer('pregnancy_week');
             $table->date('last_check_date')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // Foreign key constraint
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 
