@@ -341,13 +341,36 @@
         }
         .space{
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
             padding :1rem;
             border-bottom: 1px solid #e9ecef;
             gap: 1rem;
         }
 
+        .search-container {
+    position: relative;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-container input {
+    padding-left: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dee2e6;
+    height: 38px;
+    width: 100%;
+}
+
+.search-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 1;
+}
 
     </style>
 </head>
@@ -475,13 +498,19 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="space">
-                            <h5 class="card-title mb-4 fw-bold">Upcoming Event</h5>
+                    <div class="space">
+                        <h5 class="card-title mb-4 fw-bold">Upcoming Event</h5>
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="search-container" style="width: 250px;">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" id="searchEvent" placeholder="Cari event...">
+                            </div>
                             <button class="btn-add-event" id="openModalBtn">
                                 <i class="fas fa-plus"></i>
                                 <span>Tambah Event</span>
                             </button>
                         </div>
+                    </div>
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>
@@ -512,7 +541,7 @@
                                             </span>
                                         </td>
                                         <th>
-                                             <button type="button" class="btn btn-sm btn-outline-primary edit-event-btn" 
+                                             <button type="button" class="btn btn-sm btn-outline-primary edit-event-btn"
                                                 data-id="{{ $event->id }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
@@ -927,7 +956,38 @@
         });
     });
 
-    
+
+});
+
+
+
+// Search functionality for Event table
+document.addEventListener('DOMContentLoaded', function() {
+    const searchEvent = document.getElementById('searchEvent');
+    if (searchEvent) {
+        searchEvent.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#events-table tbody tr');
+
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const startDate = row.cells[1].textContent.toLowerCase();
+                const endDate = row.cells[2].textContent.toLowerCase();
+                const description = row.cells[3].textContent.toLowerCase();
+                const status = row.cells[4].textContent.toLowerCase();
+
+                if (name.includes(searchTerm) ||
+                    startDate.includes(searchTerm) ||
+                    endDate.includes(searchTerm) ||
+                    description.includes(searchTerm) ||
+                    status.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
 });
     </script>
 </body>

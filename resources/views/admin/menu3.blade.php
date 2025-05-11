@@ -349,6 +349,31 @@
             padding: 1rem;
             border-bottom: 1px solid #e9ecef;
         }
+       
+
+        .search-container {
+    position: relative;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-container input {
+    padding-left: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dee2e6;
+    height: 38px;
+    width: 100%;
+}
+
+.search-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 1;
+}
    </style>
 <body>
     <div class="vertical-navbar">
@@ -456,6 +481,7 @@
 <div class="modal-overlay" id="editContentModal">
     <div class="modal-container">
         <div class="modal-header">
+            
             <h5 class="fw-bold m-0">Edit Content</h5>
             <button class="close-modal" id="closeEditModalBtn">
                 <i class="fas fa-times"></i>
@@ -530,12 +556,19 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
+
                             <div class="header-with-actions">
                                 <h5 class="card-title fw-bold">Tabel Data Content</h5>
-                                <button class="btn-add-event" id="openModalBtn">
-                                    <i class="fas fa-plus"></i>
-                                    <span>Tambah Content</span>
-                                </button>
+                                <div class="d-flex align-items-center">
+                                    <div class="search-container me-3" style="width: 250px;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" class="form-control" id="contentSearch" placeholder="Search content...">
+                                    </div>
+                                    <button class="btn-add-event" id="openModalBtn">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Tambah Content</span>
+                                    </button>
+                                </div>
                             </div>
 
                             @if(session('success'))
@@ -1009,6 +1042,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'error'
             });
             console.error('Error:', error);
+        });
+    });
+});
+
+// Add this inside your existing DOMContentLoaded event listener or create a new one
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality for content table
+    const searchInput = document.getElementById('contentSearch');
+    const contentTable = document.querySelector('.table');
+    const contentRows = contentTable.querySelectorAll('tbody tr');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        contentRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            let rowMatches = false;
+            
+            // Skip the last cell (actions column)
+            for (let i = 0; i < cells.length - 1; i++) {
+                const cellText = cells[i].textContent.toLowerCase();
+                if (cellText.includes(searchTerm)) {
+                    rowMatches = true;
+                    break;
+                }
+            }
+            
+            row.style.display = rowMatches ? '' : 'none';
         });
     });
 });

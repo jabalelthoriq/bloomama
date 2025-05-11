@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -50,11 +50,16 @@ class EventController extends Controller
     /**
      * Show events list
      */
-    public function showevent()
-    {
-        $events = Event::orderBy('start_date_time', 'asc')->paginate(10);
-        return view('admin/acara', compact('events'));
-    }
+      public function showevent()
+{
+    $now = Carbon::now();
+
+    $events = Event::orderByRaw("CASE WHEN status = 'event end' THEN 1 ELSE 0 END")
+             ->orderBy('start_date_time', 'ASC')
+             ->paginate(10);
+
+    return view('admin/acara', compact('events'));
+}
 
     /**
      * Add a new event

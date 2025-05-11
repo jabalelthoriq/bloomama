@@ -36,7 +36,6 @@ class Midwive extends Authenticatable
         'email',
         'phone_number',
         'password',
-        'username',
         'status',
         'profile_picture',
         'available_day',

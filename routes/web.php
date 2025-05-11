@@ -54,7 +54,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     // Admin routes
     // Route::middleware('role:admin')->group(function () {
         Route::get('/menu1', [AdminController::class, 'menu1'])->name('menu1');
+
+        //menu2
         Route::get('/menu2', [AdminController::class, 'showUsersAndMidwives'])->name('admin.user');
+        Route::post('/midwives', [AdminController::class, 'storeMidwife'])->name('store.midwife');
 
         // Event routes
         Route::get('/acara', [EventController::class, 'showevent'])->name('acara');
@@ -63,8 +66,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::put('/acara/update', [EventController::class, 'updateEvent'])->name('event.update');
         Route::delete('/acara/destroy', [EventController::class, 'destroyEvent'])->name('event.destroy');
 
-        // Midwife management routes
-        Route::post('/midwives', [MidwiveController::class, 'store'])->name('midwives.store');
+
 
         // Content management routes
         Route::get('/content', [ContentController::class, 'index'])->name('content.index');

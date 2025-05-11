@@ -40,10 +40,11 @@ class ContentController extends Controller
      * @return \Illuminate\Contracts\View\View
      */
     public function index()
-    {
-        $contents = Content::latest()->paginate(10);
-        return view('admin/menu3', compact('contents'));
-    }
+{
+    $contents = Content::orderBy('created_at', 'desc')->paginate(10);
+    return view('admin.menu3', compact('contents'));
+}
+
 
     /**
      * Store a newly created content in storage.

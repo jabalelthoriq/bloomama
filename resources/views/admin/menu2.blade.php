@@ -382,7 +382,33 @@
             align-items: center;
             padding: 1rem;
             border-bottom: 1px solid #e9ecef;
+
         }
+
+
+        .search-container {
+    position: relative;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-container input {
+    padding-left: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dee2e6;
+    height: 38px;
+    width: 100%;
+}
+
+.search-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 1;
+}
 </style>
 <body>
     <div class="vertical-navbar">
@@ -495,41 +521,69 @@
         </div>
 
         <!-- Modal Input Bidan Form -->
-        <div class="modal-overlay" id="eventModal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h5 class="fw-bold m-0">Input Bidan Baru</h5>
-                    <button class="close-modal" id="closeModalBtn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ route('midwives.store') }}" method="POST" id="eventForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nama Bidan</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama bidan" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Bidan</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email bidan" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone_number" class="form-label">Nomor Telepon</label>
-                            <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Masukkan nomor telepon" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
-                    <button type="button" class="btn btn-primary" id="submitBtn" style="background-color: #0400d4">Submit</button>
-                </div>
-            </div>
+<div class="modal-overlay" id="eventModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Input Bidan Baru</h5>
+            <button class="close-modal" id="closeModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
+        <div class="modal-body">
+            <form action="{{ route('store.midwife') }}" method="POST" id="eventForm">
+                @csrf
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nama Bidan</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama bidan" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Bidan</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email bidan" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone_number" class="form-label">Nomor Telepon</label>
+                    <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Masukkan nomor telepon" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-select" id="role" name="role">
+                        <option value="midwife" selected>Bidan</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="active" selected>Aktif</option>
+                        <option value="inactive">Tidak Aktif</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="available_day" class="form-label">Hari Kerja</label>
+                    <input type="text" class="form-control" id="available_day" name="available_day" placeholder="Contoh: Senin-Jumat">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="start_time" class="form-label">Jam Mulai</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
+            <button type="submit" form="eventForm" class="btn btn-primary" style="background-color: #0400d4">Submit</button>
+        </div>
+    </div>
+</div>
 
 
         <!-- Modal Edit Bidan Form -->
@@ -630,12 +684,18 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="header-with-actions">
-                                    <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
+                                <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="search-container me-3" style="width: 250px;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" class="form-control" id="searchBidan" placeholder="Cari bidan...">
+                                    </div>
                                     <button class="btn-add-event" id="openModalBtn">
                                         <i class="fas fa-plus"></i>
                                         <span>Tambah Bidan</span>
                                     </button>
                                 </div>
+                            </div>
 
                                 @if(session('success'))
                                     <div class="alert alert-success">
@@ -702,8 +762,8 @@
                                     <ul class="pagination">
                                         {{-- Previous Page Link --}}
                                         <li class="page-item {{ $midwives->onFirstPage() ? 'disabled' : '' }}">
-                                            <a class="page-link" 
-                                            href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() }}#bidan-content" 
+                                            <a class="page-link"
+                                            href="{{ $midwives->appends(['user_page' => request('user_page')])->previousPageUrl() }}#bidan-content"
                                             aria-label="Previous"
                                             onclick="handlePaginationClick(event, this, 'bidan-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
@@ -713,7 +773,7 @@
                                         {{-- Pagination Elements --}}
                                         @foreach($midwives->getUrlRange(1, $midwives->lastPage()) as $page => $url)
                                             <li class="page-item {{ $midwives->currentPage() == $page ? 'active' : '' }}">
-                                                <a class="page-link" 
+                                                <a class="page-link"
                                                 href="{{ $url }}#bidan-content"
                                                 onclick="handlePaginationClick(event, this, 'bidan-content')">
                                                     {{ $page }}
@@ -723,8 +783,8 @@
 
                                         {{-- Next Page Link --}}
                                         <li class="page-item {{ $midwives->hasMorePages() ? '' : 'disabled' }}">
-                                            <a class="page-link" 
-                                            href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() }}#bidan-content" 
+                                            <a class="page-link"
+                                            href="{{ $midwives->appends(['user_page' => request('user_page')])->nextPageUrl() }}#bidan-content"
                                             aria-label="Next"
                                             onclick="handlePaginationClick(event, this, 'bidan-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
@@ -746,8 +806,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
+                                <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
+                                <div class="search-container" style="width: 250px;">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" id="searchPasien" placeholder="Cari pasien...">
                                 </div>
+                            </div>
 
                                 <div class="table-responsive">
                                     <table class="table table-hover mb-0">
@@ -806,8 +870,8 @@
                                     <ul class="pagination">
                                         {{-- Previous Page Link --}}
                                         <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                            <a class="page-link" 
-                                            href="{{ $users->appends(['midwife_page' => request('midwife_page')])->previousPageUrl() }}#pasien-content" 
+                                            <a class="page-link"
+                                            href="{{ $users->appends(['midwife_page' => request('midwife_page')])->previousPageUrl() }}#pasien-content"
                                             aria-label="Previous"
                                             onclick="handlePaginationClick(event, this, 'pasien-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
@@ -817,7 +881,7 @@
                                         {{-- Pagination Elements --}}
                                         @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
                                             <li class="page-item {{ $users->currentPage() == $page ? 'active' : '' }}">
-                                                <a class="page-link" 
+                                                <a class="page-link"
                                                 href="{{ $url }}#pasien-content"
                                                 onclick="handlePaginationClick(event, this, 'pasien-content')">
                                                     {{ $page }}
@@ -827,8 +891,8 @@
 
                                         {{-- Next Page Link --}}
                                         <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                            <a class="page-link" 
-                                            href="{{ $users->appends(['midwife_page' => request('midwife_page')])->nextPageUrl() }}#pasien-content" 
+                                            <a class="page-link"
+                                            href="{{ $users->appends(['midwife_page' => request('midwife_page')])->nextPageUrl() }}#pasien-content"
                                             aria-label="Next"
                                             onclick="handlePaginationClick(event, this, 'pasien-content')">
                                                 <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
@@ -1085,10 +1149,7 @@
         }
     });
 
-    // Submit form
-    submitBtn.addEventListener('click', function() {
-        eventForm.submit();
-    });
+    ;
 
     // === EDIT BIDAN MODAL ===
     const editBidanModal = document.getElementById('editBidanModal');
@@ -1326,18 +1387,18 @@ updatePasienBtn.addEventListener('click', function() {
 // New function to handle pagination clicks
 function handlePaginationClick(event, element, tabId) {
             event.preventDefault();
-            
+
             // Show loading state
             const tableContainer = document.querySelector(`#${tabId} .table-responsive`);
             tableContainer.classList.add('table-loading');
-            
+
             // Get the URL and tab to activate
             const url = element.getAttribute('href').split('#')[0];
             const tabToActivate = tabId;
-            
+
             // Store current scroll position
             const scrollPosition = window.scrollY;
-            
+
             // Fetch the new page
             fetch(url, {
                 headers: {
@@ -1349,29 +1410,29 @@ function handlePaginationClick(event, element, tabId) {
                 // Create a temporary DOM element to parse the response
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                
+
                 // Extract the table content
                 const newTableContent = doc.querySelector(`#${tabId}`).innerHTML;
-                
+
                 // Update the content
                 document.getElementById(tabId).innerHTML = newTableContent;
-                
+
                 // Reinitialize event listeners for the new content
                 initializeEditButtons();
-                
+
                 // Remove loading state
                 tableContainer.classList.remove('table-loading');
-                
+
                 // Activate the correct tab
                 if (tabId === 'bidan-content') {
                     document.getElementById('bidan-tab').click();
                 } else {
                     document.getElementById('pasien-tab').click();
                 }
-                
+
                 // Restore scroll position
                 window.scrollTo(0, scrollPosition);
-                
+
                 // Update browser history
                 history.pushState(null, null, url + `#${tabId}`);
             })
@@ -1462,7 +1523,7 @@ function handlePaginationClick(event, element, tabId) {
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             // ... (keep all existing DOMContentLoaded code) ...
-            
+
             // Check URL hash on page load
             if (window.location.hash) {
                 const tabId = window.location.hash.substring(1);
@@ -1470,7 +1531,7 @@ function handlePaginationClick(event, element, tabId) {
                     document.getElementById('pasien-tab').click();
                 }
             }
-            
+
             // Initialize all buttons
             initializeEditButtons();
         });
@@ -1486,7 +1547,58 @@ function handlePaginationClick(event, element, tabId) {
                 }
             }
         });
-        
+
+
+
+        // Search functionality for Bidan table
+const searchBidan = document.getElementById('searchBidan');
+if (searchBidan) {
+    searchBidan.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#bidan-content tbody tr');
+
+        rows.forEach(row => {
+            const name = row.cells[0].textContent.toLowerCase();
+            const email = row.cells[1].textContent.toLowerCase();
+            const phone = row.cells[2].textContent.toLowerCase();
+            const status = row.cells[3].textContent.toLowerCase();
+
+            if (name.includes(searchTerm) ||
+                email.includes(searchTerm) ||
+                phone.includes(searchTerm) ||
+                status.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+}
+
+// Search functionality for Pasien table
+const searchPasien = document.getElementById('searchPasien');
+if (searchPasien) {
+    searchPasien.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#pasien-content tbody tr');
+
+        rows.forEach(row => {
+            const name = row.cells[0].textContent.toLowerCase();
+            const email = row.cells[1].textContent.toLowerCase();
+            const phone = row.cells[2].textContent.toLowerCase();
+            const address = row.cells[3].textContent.toLowerCase();
+
+            if (name.includes(searchTerm) ||
+                email.includes(searchTerm) ||
+                phone.includes(searchTerm) ||
+                address.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+}
     </script>
 </body>
 </html>

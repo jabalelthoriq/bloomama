@@ -421,6 +421,29 @@
     background-color: #00b8d4;
     border: 2px solid white;
 }
+ .search-container {
+    position: relative;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-container input {
+    padding-left: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dee2e6;
+    height: 38px;
+    width: 100%;
+}
+
+.search-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 1;
+}
    </style>
 <body>
     <div class="vertical-navbar">
@@ -488,9 +511,12 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
-
+                    <h5 class="card-title fw-bold">Tabel Data Bidan</h5>
+                    <div class="search-container" style="width: 250px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="searchBidan" placeholder="Cari bidan...">
                     </div>
+                </div>
 
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -500,7 +526,7 @@
                     @endif
 
                     <div class="table-responsive table-container" id="bidan-table-container">
-                        <table class="table table-hover mb-0">
+                        <table class="table table-hover mb-0" id="bidanTable">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -585,8 +611,12 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
+                    <h5 class="card-title fw-bold">Tabel Data Pasien</h5>
+                    <div class="search-container" style="width: 250px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="searchPasien" placeholder="Cari pasien...">
                     </div>
+                </div>
 
                     @if(session('user_success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -596,7 +626,7 @@
                     @endif
 
                     <div class="table-responsive table-container" id="pasien-table-container">
-                        <table class="table table-hover mb-0">
+                        <table class="table table-hover mb-0" id="pasienTable">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -677,8 +707,12 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title fw-bold">Tabel Data Kehamilan</h5>
+                    <h5 class="card-title fw-bold">Tabel Data Kehamilan</h5>
+                    <div class="search-container" style="width: 250px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="searchPregnancy" placeholder="Cari kehamilan...">
                     </div>
+                </div>
 
                     @if(session('pregnancy_success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -688,7 +722,7 @@
                     @endif
 
                     <div class="table-responsive table-container" id="pregnancies-table-container">
-                        <table class="table table-hover mb-0">
+                        <table class="table table-hover mb-0" id="pregnanciesTable">
                             <thead>
                                 <tr>
                                     <th>Pasien</th>
@@ -1821,6 +1855,88 @@ addNewTrackingBtn.addEventListener('click', function() {
 });
 
 submitHealthTrackingFormBtn.addEventListener('click', submitHealthTrackingForm);
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality for Bidan table
+    const searchBidan = document.getElementById('searchBidan');
+    if (searchBidan) {
+        searchBidan.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#bidanTable tbody tr');
+
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const email = row.cells[1].textContent.toLowerCase();
+                const phone = row.cells[2].textContent.toLowerCase();
+                const status = row.cells[3].textContent.toLowerCase();
+
+                if (name.includes(searchTerm) ||
+                    email.includes(searchTerm) ||
+                    phone.includes(searchTerm) ||
+                    status.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Search functionality for Pasien table
+    const searchPasien = document.getElementById('searchPasien');
+    if (searchPasien) {
+        searchPasien.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#pasienTable tbody tr');
+
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const email = row.cells[1].textContent.toLowerCase();
+                const phone = row.cells[2].textContent.toLowerCase();
+                const address = row.cells[3].textContent.toLowerCase();
+
+                if (name.includes(searchTerm) ||
+                    email.includes(searchTerm) ||
+                    phone.includes(searchTerm) ||
+                    address.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Search functionality for Pregnancies table
+    const searchPregnancy = document.getElementById('searchPregnancy');
+    if (searchPregnancy) {
+        searchPregnancy.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#pregnanciesTable tbody tr');
+
+            rows.forEach(row => {
+                const patient = row.cells[0].textContent.toLowerCase();
+                const startDate = row.cells[1].textContent.toLowerCase();
+                const pregnancyWeek = row.cells[2].textContent.toLowerCase();
+                const lastCheck = row.cells[3].textContent.toLowerCase();
+
+                if (patient.includes(searchTerm) ||
+                    startDate.includes(searchTerm) ||
+                    pregnancyWeek.includes(searchTerm) ||
+                    lastCheck.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+
         </script>
 </body>
 </html>

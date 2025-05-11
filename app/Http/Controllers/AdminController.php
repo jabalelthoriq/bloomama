@@ -11,7 +11,11 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Flasher\Prime\FlasherInterface;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 class AdminController extends Controller
 {
     /**
@@ -66,9 +70,9 @@ class AdminController extends Controller
                 return $item;
             });
 
-        $midwives = Midwive::paginate(5, ['*'], 'midwife_page');
+       $midwives = Midwive::orderBy('created_at', 'desc')->paginate(5, ['*'], 'midwife_page');
 
-        $users = User::paginate(5, ['*'], 'user_page');
+         $users = User::orderBy('created_at', 'desc')->paginate(5, ['*'], 'user_page');
         return view('admin/menu1',compact('users', 'midwives'), [
             'totalUsers' => $totalUsers,
             'totalPregnant' => $totalPregnant,
@@ -80,18 +84,42 @@ class AdminController extends Controller
 
     public function showUsersAndMidwives()
     {
-        $midwives = Midwive::paginate(10, ['*'], 'midwife_page');
-        $users = User::paginate(10, ['*'], 'user_page');
+        // In your controller
+        $midwives = Midwive::orderBy('created_at', 'desc')->paginate(10, ['*'], 'midwife_page');
+        $users = User::orderBy('created_at', 'desc')->paginate(10, ['*'], 'user_page');
         return view('admin/menu2', compact('users', 'midwives'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+ public function storeMidwife(Request $request) {
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:midwives',
+        'password' => 'required|string|min:8|confirmed',
+        'phone_number' => 'required|string|max:15',
+        'role' => 'nullable|string|in:admin,midwife',
+        'status' => 'nullable|string|in:active,inactive',
+        'available_day' => 'nullable|string',
+        'start_time' => 'nullable|string',
+    ]);
+
+    try {
+        Midwive::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'phone_number' => $validated['phone_number'],
+            'role' => $validated['role'] ?? 'midwife',
+            'status' => $validated['status'] ?? 'active',
+            'available_day' => $validated['available_day'] ?? null,
+            'start_time' => $validated['start_time'] ?? null,
+        ]);
+
+        return redirect()->route('admin.user')->with('success', 'Bidan berhasil ditambahkan.');
+    } catch (\Exception $e) {
+        Log::error("Error creating midwife: " . $e->getMessage());
+        return back()->withInput()->with('error', 'Gagal menambahkan bidan');
     }
+}
 
     /**
      * Store a newly created resource in storage.

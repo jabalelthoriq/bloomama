@@ -782,8 +782,8 @@
                 <h1>Temani Perjalanan <span>Kehamilan Anda</span> Dengan Informasi Terpercaya</h1>
                 <p>Bloomama hadir sebagai sahabat terpercaya untuk ibu hamil, memberikan informasi terkini, tips kesehatan, dan dukungan selama masa kehamilan hingga persalinan.</p>
                 <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary">Mulai Sekarang</a>
-                    <a href="#" class="btn btn-outline">Konsultasi Dokter</a>
+                    <a href="#" class="btn btn-primary">Unduh Aplikasi</a>
+
                 </div>
             </div>
             <div class="hero-image">
