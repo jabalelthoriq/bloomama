@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
     <title>Chatting</title>
 </head>
 <style>
@@ -19,7 +20,6 @@
        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
        overflow-x: hidden;
    }
-
 
    .vertical-navbar {
        position: fixed;
@@ -88,7 +88,6 @@
        margin-top: auto;
        color: #f44336;
    }
-
 
    .main-content {
        margin-left: 140px;
@@ -291,34 +290,42 @@
     }
 
     .chat-messages {
-        flex-grow: 1;
-        padding: 20px;
-        overflow-y: auto;
-        background-color: #f9fafb;
-    }
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f9fafb;
+    /* Ensure messages take up available space */
+    display: flex;
+    flex-direction: column;
+}
 
-    .message {
-        margin-bottom: 15px;
-        display: flex;
-        flex-direction: column;
-        max-width: 70%;
-    }
+   .message {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    max-width: 70%;
+    width: 100%; /* Add this to ensure full width control */
+}
 
-    .message.received {
-        align-items: flex-start;
-    }
+.message.received {
+    align-items: flex-start;
+    margin-right: auto; /* Push received messages to left */
+}
 
-    .message.sent {
-        align-items: flex-end;
-        align-self: flex-end;
-    }
+.message.sent {
+    align-items: flex-end;
+    margin-left: auto; /* Push sent messages to right */
+    text-align: right; /* Align text to right */
+}
 
-    .message-content {
-        padding: 12px 15px;
-        border-radius: 18px;
-        margin-bottom: 5px;
-        position: relative;
-    }
+.message-content {
+    padding: 12px 15px;
+    border-radius: 18px;
+    margin-bottom: 5px;
+    position: relative;
+    word-wrap: break-word;
+    max-width: 100%;
+}
 
     .received .message-content {
         background-color: #ffffff;
@@ -340,18 +347,23 @@
     }
 
     .sent .message-meta {
-        text-align: right;
-    }
+    display: flex;
+    justify-content: flex-end; /* Align timestamp to right */
+}
 
     .message-time {
         margin-left: 5px;
     }
 
     .chat-input {
-        padding: 15px 20px;
-        border-top: 1px solid #eaeaea;
-        background-color: #fff;
-    }
+    padding: 10px 15px;
+    border-top: 1px solid #eaeaea;
+    background-color: #fff;
+    position: sticky; /* This keeps it at bottom */
+    bottom: 0;
+    width: 100%;
+    z-index: 10; /* Ensure it stays above messages */
+}
 
     .input-container {
         display: flex;
@@ -383,6 +395,7 @@
         background: transparent;
         outline: none;
         padding: 8px;
+        width: calc(100% - 80px);
     }
 
     .send-button {
@@ -401,6 +414,43 @@
 
     .send-button:hover {
         background-color: #008ba3;
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+        display: flex;
+        padding: 10px 15px;
+        background-color: #fff;
+        border-radius: 18px;
+        margin-bottom: 15px;
+        width: fit-content;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #aaa;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typingAnimation {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-5px); }
     }
 
     /* Responsive styles */
@@ -449,8 +499,14 @@
         }
 
         .chat-container {
-            flex-direction: column;
+            display: flex;
             height: calc(100vh - 80px);
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative; /* Add this */
+
         }
 
         .chat-sidebar {
@@ -461,7 +517,10 @@
         }
 
         .chat-main {
-            height: calc(100vh - 350px - 80px);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Add this */
         }
     }
 </style>
@@ -499,14 +558,6 @@
     </div>
 
     <div class="main-content">
-        <div class="header-container">
-            <h2>Live Chat</h2>
-            <div class="search-container">
-                <i class="fas fa-search"></i>
-                <input type="text" class="form-control" placeholder="Search messages...">
-            </div>
-        </div>
-
         <div class="chat-container">
             <!-- Chat Sidebar -->
             <div class="chat-sidebar">
@@ -515,71 +566,29 @@
                 </div>
                 <div class="chat-list">
                     <!-- Active chat -->
-                    <div class="chat-item active">
+                    <div class="chat-item active" data-user-id="user2">
                         <div class="chat-avatar">
                             <img src="/api/placeholder/42/42" alt="User avatar">
                         </div>
                         <div class="chat-info">
                             <h5 class="chat-name">Sarah Johnson</h5>
-                            <p class="chat-last-message">Thanks for your help yesterday!</p>
                         </div>
                         <div class="chat-meta">
                             <div class="chat-time">10:45 AM</div>
                             <div class="chat-badge">2</div>
                         </div>
                     </div>
-
-                    <!-- Other chats -->
-                    <div class="chat-item">
+                    <!-- Additional contacts -->
+                    <div class="chat-item" data-user-id="user3">
                         <div class="chat-avatar">
                             <img src="/api/placeholder/42/42" alt="User avatar">
                         </div>
                         <div class="chat-info">
                             <h5 class="chat-name">Michael Brown</h5>
-                            <p class="chat-last-message">Can we schedule a meeting?</p>
-                        </div>
-                        <div class="chat-meta">
-                            <div class="chat-time">9:32 AM</div>
-                        </div>
-                    </div>
-
-                    <div class="chat-item">
-                        <div class="chat-avatar">
-                            <img src="/api/placeholder/42/42" alt="User avatar">
-                        </div>
-                        <div class="chat-info">
-                            <h5 class="chat-name">Jessica Taylor</h5>
-                            <p class="chat-last-message">I've sent you the files via email</p>
+                            <p class="chat-last-message">See you tomorrow!</p>
                         </div>
                         <div class="chat-meta">
                             <div class="chat-time">Yesterday</div>
-                            <div class="chat-badge">1</div>
-                        </div>
-                    </div>
-
-                    <div class="chat-item">
-                        <div class="chat-avatar">
-                            <img src="/api/placeholder/42/42" alt="User avatar">
-                        </div>
-                        <div class="chat-info">
-                            <h5 class="chat-name">David Wilson</h5>
-                            <p class="chat-last-message">Perfect! See you tomorrow at 2 PM</p>
-                        </div>
-                        <div class="chat-meta">
-                            <div class="chat-time">Yesterday</div>
-                        </div>
-                    </div>
-
-                    <div class="chat-item">
-                        <div class="chat-avatar">
-                            <img src="/api/placeholder/42/42" alt="User avatar">
-                        </div>
-                        <div class="chat-info">
-                            <h5 class="chat-name">Emma Garcia</h5>
-                            <p class="chat-last-message">How is the project going?</p>
-                        </div>
-                        <div class="chat-meta">
-                            <div class="chat-time">Apr 28</div>
                         </div>
                     </div>
                 </div>
@@ -592,10 +601,10 @@
                         <img src="/api/placeholder/42/42" alt="User avatar">
                     </div>
                     <div class="user-info">
-                        <h5 class="chat-name">Sarah Johnson</h5>
+                        <h5 class="chat-name" id="current-chat-name">Sarah Johnson</h5>
                         <div class="user-status">
-                            <span class="status-dot"></span>
-                            <span>Online</span>
+                            <span class="status-dot" id="user-status"></span>
+                            <span id="status-text">Online</span>
                         </div>
                     </div>
                     <div class="user-actions">
@@ -605,78 +614,8 @@
                     </div>
                 </div>
 
-                <div class="chat-messages">
-                    <!-- Received messages -->
-                    <div class="message received">
-                        <div class="message-content">
-                            Hi there! How can I help you today?
-                        </div>
-                        <div class="message-meta">
-                            <span class="message-status">Sarah Johnson</span>
-                            <span class="message-time">10:30 AM</span>
-                        </div>
-                    </div>
-
-                    <!-- Sent messages -->
-                    <div class="message sent">
-                        <div class="message-content">
-                            I'm trying to figure out how to use the new reporting feature. Could you walk me through it?
-                        </div>
-                        <div class="message-meta">
-                            <span class="message-status">Delivered</span>
-                            <span class="message-time">10:32 AM</span>
-                        </div>
-                    </div>
-
-                    <div class="message received">
-                        <div class="message-content">
-                            Of course! I'd be happy to help you with that. The reporting feature can be accessed from the dashboard by clicking on the "Reports" tab in the left sidebar.
-                        </div>
-                        <div class="message-meta">
-                            <span class="message-status">Sarah Johnson</span>
-                            <span class="message-time">10:35 AM</span>
-                        </div>
-                    </div>
-
-                    <div class="message received">
-                        <div class="message-content">
-                            Once you're there, you'll see several report templates to choose from. Which specific report are you interested in?
-                        </div>
-                        <div class="message-meta">
-                            <span class="message-status">Sarah Johnson</span>
-                            <span class="message-time">10:36 AM</span>
-                        </div>
-                    </div>
-
-                    <div class="message sent">
-                        <div class="message-content">
-                            I need to create a monthly sales summary for my team. Is there a template for that?
-                        </div>
-                        <div class="message-meta">
-                            <span class="message-status">Delivered</span>
-                            <span class="message-time">10:40 AM</span>
-                        </div>
-                    </div>
-
-                    <div class="message received">
-                        <div class="message-content">
-                            Yes, there is! Look for the "Monthly Sales Analysis" template. It has all the charts and data tables you'll need. You can also customize it based on your specific requirements.
-                        </div>
-                        <div class="message-meta">
-                            <span class="message-status">Sarah Johnson</span>
-                            <span class="message-time">10:42 AM</span>
-                        </div>
-                    </div>
-
-                    <div class="message sent">
-                        <div class="message-content">
-                            Thanks for your help yesterday!
-                        </div>
-                        <div class="message-meta">
-                            <span class="message-status">Delivered</span>
-                            <span class="message-time">10:45 AM</span>
-                        </div>
-                    </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be displayed here -->
                 </div>
 
                 <div class="chat-input">
@@ -685,8 +624,8 @@
                             <i class="far fa-smile attachment-icon"></i>
                             <i class="fas fa-paperclip attachment-icon"></i>
                         </div>
-                        <input type="text" class="message-input" placeholder="Type a message...">
-                        <button class="send-button">
+                        <input type="text" class="message-input" id="message-input" placeholder="Type a message..." autocomplete="off">
+                        <button class="send-button" id="send-button">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -697,87 +636,60 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function handleLogout() {
-    Swal.fire({
-        title: 'Logout Confirmation',
-        text: 'Are you sure you want to logout?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, Logout',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Get CSRF token from meta tag
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        // User data - in a real app, this would come from your backend
+        const currentUser = {
+            id: 'user1',
+            name: 'You',
+            avatar: '/api/placeholder/42/42'
+        };
 
-            // Create form data instead of JSON
-            const formData = new FormData();
-            formData.append('_token', csrfToken);
+        // Contacts data
+        const contacts = {
+            'user2': {
+                id: 'user2',
+                name: 'Sarah Johnson',
+                avatar: '/api/placeholder/42/42',
+                status: 'online'
+            },
+            'user3': {
+                id: 'user3',
+                name: 'Michael Brown',
+                avatar: '/api/placeholder/42/42',
+                status: 'offline'
+            }
+        };
 
-            // Send logout request to server
-            fetch('/logout', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    // Don't set Content-Type to let browser set it with boundary for FormData
-                },
-                body: formData,
-                credentials: 'same-origin' // Include cookies in the request
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json().catch(() => {
-                        // If not JSON, treat as successful anyway
-                        return { success: true };
-                    });
-                } else {
-                    throw new Error('Server returned ' + response.status);
-                }
-            })
-            .then(data => {
-                // Clear client-side storage
-                localStorage.removeItem('token');
-                sessionStorage.clear();
+        // Ably configuration
+        let ably;
+        let chatChannel;
+        let currentChatUserId = 'user2'; // Default to Sarah Johnson
 
-                // Show success message
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer);
-                        toast.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
-                });
+        // Initialize the chat
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavbar();
+            initializeChat();
 
-                swal.fire({
-                    icon: 'success',
-                    title: 'Logged out successfully!'
-                });
-
-                // Allow notification to be seen before redirecting
-                setTimeout(() => {
-                    window.location.href = '/'; // Redirect to login page
-                }, 1000);
-            })
-            .catch(error => {
-                console.error('Logout error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Logout Failed',
-                    text: 'There was an issue connecting to the server. Please try again.'
+            // Set up event listeners for chat items
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    switchChat(userId);
                 });
             });
-        }
-    });
-}
 
-        // Add navbar animation code
-        document.addEventListener('DOMContentLoaded', function() {
+            // Set up event listeners for sending messages
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+
+        function initializeNavbar() {
             // Get all nav icons except logo and logout
             const navIcons = document.querySelectorAll('.nav-icon:not(:first-child):not(.logout)');
 
@@ -795,14 +707,9 @@
             // Add click event listeners to all nav icons
             navIcons.forEach(icon => {
                 icon.addEventListener('click', function(e) {
-                    // If clicking on the icon itself
                     if (e.target.tagName === 'I') {
                         e.preventDefault();
-
-                        // Get the parent anchor href
                         const href = this.querySelector('a').getAttribute('href');
-
-                        // Handle the active class and animation
                         handleNavClick(this, href);
                     }
                 });
@@ -812,64 +719,311 @@
             document.querySelectorAll('.nav-icon a').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
                     e.preventDefault();
-
                     const navIcon = this.parentElement;
                     const href = this.getAttribute('href');
-
-                    // Handle the active class and animation
                     handleNavClick(navIcon, href);
                 });
             });
 
-            // Function to handle nav click animation and navigation
             function handleNavClick(clickedIcon, href) {
-                // Skip if already active
                 if (clickedIcon.classList.contains('active')) return;
 
-                // Remove active class from current active icon
                 const currentActive = document.querySelector('.nav-icon.active');
                 if (currentActive) {
                     currentActive.classList.remove('active');
                 }
 
-                // Add active class to clicked icon
                 clickedIcon.classList.add('active');
-
-                // Animate the indicator
                 positionIndicator(clickedIcon);
 
-                // Navigate after animation completes
                 setTimeout(() => {
                     window.location.href = href;
                 }, 300);
             }
 
-            // Function to position the indicator
             function positionIndicator(targetIcon) {
                 const rect = targetIcon.getBoundingClientRect();
                 const navbarRect = document.querySelector('.vertical-navbar').getBoundingClientRect();
-
-                // Calculate position relative to navbar
                 const top = rect.top - navbarRect.top;
-
-                // Update indicator position
                 indicator.style.top = top + 'px';
             }
+        }
 
-            // Add event listeners for chat items
+        function initializeChat() {
+            // Initialize Ably (in a real app, you'd get this from your backend)
+            // Note: This is a client-side only example. In production, you should:
+            // 1. Have your server generate Ably tokens for each user
+            // 2. Never expose your API key in client-side code
+            ably = new Ably.Realtime('ooLakg.FjeVTg:aQwgKFtS-8JKmogyEl3Hj1iq5jU0An4aMidPJ5_-i0w'); // Replace with your Ably API key
+
+            ably.connection.on('connected', function() {
+                console.log('Connected to Ably');
+                // Subscribe to the current chat channel
+                subscribeToChannel(currentChatUserId);
+
+                // Load initial messages (in a real app, you'd fetch these from your backend)
+                loadInitialMessages(currentChatUserId);
+            });
+        }
+
+        function subscribeToChannel(userId) {
+            // Unsubscribe from previous channel if exists
+            if (chatChannel) {
+                chatChannel.unsubscribe();
+            }
+
+            // Create a unique channel name for this conversation
+            const channelName = getChannelName(currentUser.id, userId);
+
+            // Get the channel and subscribe
+            chatChannel = ably.channels.get(channelName);
+
+            chatChannel.subscribe('message', function(message) {
+                // Check if the message is from the current chat user
+                if (message.data.senderId === currentChatUserId) {
+                    displayMessage(message.data, false);
+                }
+            });
+
+            // Subscribe to presence events
+            chatChannel.presence.subscribe('enter', function(member) {
+                if (member.clientId === userId) {
+                    updateUserStatus(userId, 'online');
+                }
+            });
+
+            chatChannel.presence.subscribe('leave', function(member) {
+                if (member.clientId === userId) {
+                    updateUserStatus(userId, 'offline');
+                }
+            });
+
+            // Enter presence for the current user
+            chatChannel.presence.enter({ userId: currentUser.id });
+        }
+
+        function getChannelName(userId1, userId2) {
+            // Create a consistent channel name for any two users
+            const ids = [userId1, userId2].sort();
+            return `private-chat-${ids[0]}-${ids[1]}`;
+        }
+
+        function switchChat(userId) {
+            // Update active chat in sidebar
             document.querySelectorAll('.chat-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    // Remove active class from current active chat
-                    const currentActive = document.querySelector('.chat-item.active');
-                    if (currentActive) {
-                        currentActive.classList.remove('active');
+                item.classList.remove('active');
+                if (item.getAttribute('data-user-id') === userId) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Update current chat user
+            currentChatUserId = userId;
+
+            // Update chat header
+            const contact = contacts[userId];
+            document.getElementById('current-chat-name').textContent = contact.name;
+            updateUserStatus(userId, contact.status);
+
+            // Clear messages and load new ones
+            document.getElementById('chat-messages').innerHTML = '';
+
+            // Subscribe to the new channel
+            subscribeToChannel(userId);
+
+            // Load messages for this chat (in a real app, fetch from backend)
+            loadInitialMessages(userId);
+        }
+
+        function loadInitialMessages(userId) {
+            // In a real app, you would fetch messages from your backend API
+            // For this example, we'll just add some sample messages
+
+            const messages = [
+                {
+                    id: 'msg1',
+                    senderId: userId,
+                    text: 'Hi there! How are you doing?',
+                    timestamp: new Date(Date.now() - 3600000) // 1 hour ago
+                },
+                {
+                    id: 'msg2',
+                    senderId: currentUser.id,
+                    text: "I'm doing great! How about you?",
+                    timestamp: new Date(Date.now() - 1800000) // 30 minutes ago
+                },
+                {
+                    id: 'msg3',
+                    senderId: userId,
+                    text: "I'm good too. Just wanted to check in.",
+                    timestamp: new Date(Date.now() - 900000) // 15 minutes ago
+                }
+            ];
+
+            messages.forEach(message => {
+                const isCurrentUser = message.senderId === currentUser.id;
+                displayMessage(message, isCurrentUser);
+            });
+        }
+
+        function displayMessage(message, isCurrentUser) {
+            const messagesContainer = document.getElementById('chat-messages');
+
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = message.text;
+
+            const messageMeta = document.createElement('div');
+            messageMeta.className = 'message-meta';
+
+            const timeElement = document.createElement('span');
+            timeElement.className = 'message-time';
+            timeElement.textContent = formatTime(message.timestamp);
+
+            messageMeta.appendChild(timeElement);
+            messageElement.appendChild(messageContent);
+            messageElement.appendChild(messageMeta);
+
+            messagesContainer.appendChild(messageElement);
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const messageText = input.value.trim();
+
+            if (messageText === '') return;
+
+            // Create message object
+            const message = {
+                id: 'msg' + Date.now(),
+                senderId: currentUser.id,
+                text: messageText,
+                timestamp: new Date()
+            };
+
+            // Display the message immediately
+            displayMessage(message, true);
+
+            // Publish the message via Ably
+            const channelName = getChannelName(currentUser.id, currentChatUserId);
+            ably.channels.get(channelName).publish('message', message);
+
+            // Clear input
+            input.value = '';
+
+            // In a real app, you would also save the message to your backend database
+            // saveMessageToBackend(message);
+        }
+
+        function updateUserStatus(userId, status) {
+            const contact = contacts[userId];
+            contact.status = status;
+
+            const statusDot = document.getElementById('user-status');
+            const statusText = document.getElementById('status-text');
+
+            if (status === 'online') {
+                statusDot.style.backgroundColor = '#4CAF50';
+                statusText.textContent = 'Online';
+            } else {
+                statusDot.style.backgroundColor = '#aaa';
+                statusText.textContent = 'Offline';
+            }
+
+            // Update status in sidebar if this is the current chat
+            if (userId === currentChatUserId) {
+                const chatItem = document.querySelector(`.chat-item[data-user-id="${userId}"]`);
+                if (chatItem) {
+                    const statusIndicator = chatItem.querySelector('.status-indicator');
+                    if (statusIndicator) {
+                        statusIndicator.style.backgroundColor = status === 'online' ? '#4CAF50' : '#aaa';
+                    }
+                }
+            }
+        }
+
+        function handleLogout() {
+            Swal.fire({
+                title: 'Logout Confirmation',
+                text: 'Are you sure you want to logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    const formData = new FormData();
+                    formData.append('_token', csrfToken);
+
+                    // Disconnect from Ably
+                    if (ably) {
+                        ably.connection.close();
                     }
 
-                    // Add active class to clicked chat
-                    this.classList.add('active');
-                });
+                    fetch('/logout', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json().catch(() => ({ success: true }));
+                        } else {
+                            throw new Error('Server returned ' + response.status);
+                        }
+                    })
+                    .then(data => {
+                        localStorage.removeItem('token');
+                        sessionStorage.clear();
+
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer);
+                                toast.addEventListener('mouseleave', Swal.resumeTimer);
+                            }
+                        });
+
+                        swal.fire({
+                            icon: 'success',
+                            title: 'Logged out successfully!'
+                        });
+
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Logout Failed',
+                            text: 'There was an issue connecting to the server. Please try again.'
+                        });
+                    });
+                }
             });
-        });
+        }
     </script>
 </body>
 </html>
