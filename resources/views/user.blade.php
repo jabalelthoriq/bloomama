@@ -1525,16 +1525,7 @@ let currentTrackingData = [];
 
 function loadHealthTrackingData(pregnancyId) {
     // Show loading state
-    document.getElementById('healthTrackingTableBody').innerHTML = '<tr><td colspan="5">Memuat data...</td></tr>';
-
-    // Reset cards to loading state
-    showTrackingDetails({
-        weight: null,
-        blood_pressure: null,
-        heart_rate: null,
-        notes: 'Memuat data...',
-        date_recorded: null
-    });
+    healthTrackingTableBody.innerHTML = '<tr><td colspan="5">Memuat data...</td></tr>';
 
     fetch(`/api/health-tracking/${pregnancyId}`)
         .then(response => {
@@ -1548,26 +1539,20 @@ function loadHealthTrackingData(pregnancyId) {
                 currentTrackingData = data.data.trackings || [];
                 renderHealthTrackingTable(currentTrackingData);
 
-                // Update patient info
-                document.getElementById('htPatientName').textContent = data.data.patient || 'Unknown';
-                document.getElementById('htPregnancyWeek').textContent = data.data.pregnancy_week || '-';
-                document.getElementById('htLastUpdated').textContent = data.data.last_updated ? formatDate(data.data.last_updated) : '-';
+                // Update last updated date
+                document.getElementById('htLastUpdated').textContent =
+                    data.data.last_updated ? formatDate(data.data.last_updated) : '-';
 
-                // Show data in cards
-                if (currentTrackingData.length > 0) {
-                    // Show latest tracking data
-                    showTrackingDetails(currentTrackingData[0]);
-                } else if (data.data.weight || data.data.blood_pressure || data.data.heart_rate) {
-                    // Show pregnancy data if no tracking data exists
+                // Show latest data in cards
+                if (data.data.latest_stats) {
                     showTrackingDetails({
-                        weight: data.data.weight,
-                        blood_pressure: data.data.blood_pressure,
-                        heart_rate: data.data.heart_rate,
-                        notes: data.data.notes || 'Tidak ada catatan',
+                        weight: data.data.latest_stats.weight,
+                        blood_pressure: data.data.latest_stats.blood_pressure,
+                        heart_rate: data.data.latest_stats.heart_rate,
+                        notes: data.data.latest_stats.notes || 'Tidak ada catatan',
                         date_recorded: data.data.last_updated
                     });
                 } else {
-                    // No data available
                     showTrackingDetails({
                         weight: null,
                         blood_pressure: null,

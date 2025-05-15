@@ -3,8 +3,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\HealthTracking;
 use App\Models\UserPregnant;
+use App\Http\Controllers\Mobile\authcontroller;
 
-// routes/api.php
+
+//mobile api
+Route::post('/register', [authcontroller::class, 'register']);
+Route::post('/login', [authcontroller::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [AuthController::class, 'profile']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+
 Route::get('/health-tracking/{pregnancyId}', function($pregnancyId) {
     try {
         $pregnancy = UserPregnant::with(['user', 'healthTrackings' => function($query) {
@@ -18,12 +28,23 @@ Route::get('/health-tracking/{pregnancyId}', function($pregnancyId) {
             'data' => [
                 'patient' => $pregnancy->user->name,
                 'pregnancy_week' => $pregnancy->pregnancy_week,
-                'weight' => optional($latestTracking)->weight ?? null,
-                'blood_pressure' => optional($latestTracking)->blood_pressure ?? null,
-                'heart_rate' => optional($latestTracking)->heart_rate ?? null,
-                'notes' => optional($latestTracking)->notes ?? null,
-                'last_updated' => optional($latestTracking)->date_recorded ?? null,
-                'trackings' => $pregnancy->healthTrackings->toArray() // Pastikan ini tidak null
+                'last_updated' => $latestTracking ? $latestTracking->date_recorded : null,
+                'trackings' => $pregnancy->healthTrackings->map(function($tracking) {
+                    return [
+                        'tracking_id' => $tracking->tracking_id,
+                        'date_recorded' => $tracking->date_recorded,
+                        'weight' => $tracking->weight,
+                        'blood_pressure' => $tracking->blood_pressure,
+                        'heart_rate' => $tracking->heart_rate,
+                        'notes' => $tracking->notes
+                    ];
+                }),
+                'latest_stats' => $latestTracking ? [
+                    'weight' => $latestTracking->weight,
+                    'blood_pressure' => $latestTracking->blood_pressure,
+                    'heart_rate' => $latestTracking->heart_rate,
+                    'notes' => $latestTracking->notes
+                ] : null
             ]
         ]);
     } catch (\Exception $e) {
@@ -48,6 +69,10 @@ Route::post('/health-tracking', function(Request $request) {
         ]);
 
         $tracking = HealthTracking::create($validated);
+
+        // Update last check date in pregnancy
+        UserPregnant::where('pregnancy_id', $validated['pregnancy_id'])
+            ->update(['last_check_date' => $validated['date_recorded']]);
 
         return response()->json([
             'success' => true,

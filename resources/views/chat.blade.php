@@ -907,6 +907,7 @@
             const message = {
                 id: 'msg' + Date.now(),
                 senderId: currentUser.id,
+                receiverId: currentChatUserId,
                 text: messageText,
                 timestamp: new Date()
             };

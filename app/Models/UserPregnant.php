@@ -36,15 +36,14 @@ class UserPregnant extends Model
         'pregnancy_week' => 'integer'
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
     public function healthTrackings()
-{
-    return $this->hasMany(HealthTracking::class, 'pregnancy_id', 'pregnancy_id')
-        ->orderBy('date_recorded', 'desc');
-}
+    {
+        return $this->hasMany(HealthTracking::class, 'pregnancy_id', 'pregnancy_id')
+            ->orderBy('date_recorded', 'desc');
+    }
 }
