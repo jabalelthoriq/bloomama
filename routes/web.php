@@ -35,9 +35,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
         // User management routes for midwives
         Route::get('/user', [UsersController::class, 'showUsersAndMidwives'])->name('user');
-        Route::get('/users/edit', [UsersController::class, 'edit'])->name('users.edit');
-        Route::put('/users', [UsersController::class, 'update'])->name('users.update');
+        Route::put('/pregnancies/{pregnancyId}', [UsersController::class, 'update'])->name('pregnancies.update');
         Route::delete('/users', [UsersController::class, 'destroy'])->name('users.destroy');
+        // routes for health tracking
+        Route::prefix('api')->group(function() {
+            Route::get('/health-tracking/{pregnancyId}', [UsersController::class, 'getHealthTrackingData']);
+            Route::post('/health-tracking', [UsersController::class, 'storeHealthTracking']);
+            Route::put('/health-tracking/{trackingId}', [UsersController::class, 'updateHealthTracking']);
+            Route::delete('/health-tracking/{trackingId}', [UsersController::class, 'deleteHealthTracking']);
+        });
 
 
         // Chat routes

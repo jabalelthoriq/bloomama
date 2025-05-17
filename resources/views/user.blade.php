@@ -764,14 +764,18 @@
                                                         data-id="{{ $userPregnancy->id }}"
                                                         data-patient-id="{{ $userPregnancy->user_id ?? '' }}"
                                                         data-patient-name="{{ $userPregnancy->user->name ?? 'Unknown User' }}"
+                                                        data-gravida="{{ $userPregnancy->gravida ?? '0' }}"
+                                                        data-para="{{ $userPregnancy->para ?? '0' }}"
+                                                        data-abortus="{{ $userPregnancy->abortus ?? '0' }}"
                                                         data-start-date="{{ $userPregnancy->start_date ?? '' }}"
+                                                        data-due-date="{{ $userPregnancy->due_date ?? '' }}"
                                                         data-pregnancy-week="{{ $userPregnancy->pregnancy_week ?? '' }}"
                                                         data-last-check="{{ $userPregnancy->last_check_date ?? '' }}"
                                                         data-notes="{{ $userPregnancy->notes ?? '' }}">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-sm btn-outline-success ms-1 health-tracking-btn"
-                                                        data-id="{{ $userPregnancy->id }}" title="Health Tracking">
+                                                        data-id="{{ $userPregnancy->id }}" data-user-id="{{ $userPregnancy->user_id }}" title="Health Tracking">
                                                         <i class="fas fa-heartbeat"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-sm btn-outline-primary ms-1 live-chat-btn"
@@ -1045,35 +1049,57 @@
             </button>
         </div>
         <div class="modal-body">
-            <form id="editPregnancyForm">
+            <form id="editPregnancyForm" method="POST">
                 @csrf
                 @method('PUT')
                 <input type="hidden" id="editPregnancyId" name="pregnancy_id">
 
                 <div class="mb-3">
-                    <label for="editPregnancyPatient" class="form-label">Pasien</label>
-                    <input type="text" class="form-control" id="editPregnancyPatientDisplay" value="" readonly>
-                    <input type="hidden" id="editPregnancyPatient" name="user_id" value="">
+                    <label class="form-label fw-bold">Pasien</label>
+                    <p id="editPatientName" class="form-control-static"></p>
+                    <input type="hidden" id="editPregnancyPatient" name="user_id">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Gravida (G)</label>
+                        <input type="number" class="form-control" id="editGravida" name="gravida" min="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Para (P)</label>
+                        <input type="number" class="form-control" id="editPara" name="para" min="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Abortus (A)</label>
+                        <input type="number" class="form-control" id="editAbortus" name="abortus" min="0" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Tanggal Mulai</label>
+                        <input type="date" class="form-control" id="editStartDate" name="start_date" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Tanggal Berakhir</label>
+                        <input type="date" class="form-control" id="editDueDate" name="due_date">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Minggu Kehamilan</label>
+                        <input type="number" class="form-control" id="editPregnancyWeek" name="pregnancy_week" min="1" max="42" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Tanggal Cek Terakhir</label>
+                        <input type="date" class="form-control" id="editLastCheckDate" name="last_check_date">
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="editPregnancyStartDate" class="form-label">Tanggal Mulai</label>
-                    <input type="date" class="form-control" id="editPregnancyStartDate" name="start_date" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="editPregnancyWeek" class="form-label">Minggu Kehamilan</label>
-                    <input type="number" class="form-control" id="editPregnancyWeek" name="pregnancy_week" min="1" max="42" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="editPregnancyLastCheck" class="form-label">Tanggal Cek Terakhir</label>
-                    <input type="date" class="form-control" id="editPregnancyLastCheck" name="last_check_date">
-                </div>
-
-                <div class="mb-3">
-                    <label for="editPregnancyNotes" class="form-label">Catatan</label>
-                    <textarea class="form-control" id="editPregnancyNotes" name="notes" rows="3"></textarea>
+                    <label class="form-label fw-bold">Catatan</label>
+                    <textarea class="form-control" id="editNotes" name="notes" rows="3"></textarea>
                 </div>
             </form>
         </div>
@@ -1286,10 +1312,6 @@ function confirmDeleteUser(event, button) {
     </script>
     <script>
 
-
-
-
-
         document.addEventListener('DOMContentLoaded', function() {
     // View Pregnancy Modal
     const viewModal = document.getElementById('viewPregnancyModal');
@@ -1326,6 +1348,8 @@ function confirmDeleteUser(event, button) {
     viewModal.addEventListener('click', function(e) {
         if (e.target === viewModal) closeViewModal();
     });
+});
+
 
     // Edit Pregnancy Modal
     const editPregnancyModal = document.getElementById('editPregnancyModal');
@@ -1334,22 +1358,40 @@ function confirmDeleteUser(event, button) {
     const updatePregnancyBtn = document.getElementById('updatePregnancyBtn');
     const editPregnancyForm = document.getElementById('editPregnancyForm');
 
-    // Open edit modal
+   // Open edit modal
 document.querySelectorAll('.edit-pregnancy-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        // Set form action
-        editPregnancyForm.action = `/user-pregnancies/${this.dataset.id}`;
-        document.getElementById('editPregnancyId').value = this.dataset.id;
+        // Set form action with the correct route
+        const pregnancyId = this.dataset.id;
+        editPregnancyForm.action = "{{ route('pregnancies.update', ':id') }}".replace(':id', pregnancyId);
 
-        // Set patient name display and hidden ID
-        document.getElementById('editPregnancyPatientDisplay').value = this.dataset.patientName;
+        // Set hidden pregnancy ID
+        document.getElementById('editPregnancyId').value = pregnancyId;
+
+        // Set patient info
+        document.getElementById('editPatientName').textContent = this.dataset.patientName;
         document.getElementById('editPregnancyPatient').value = this.dataset.patientId;
 
+        // Set GPA fields
+        document.getElementById('editGravida').value = this.dataset.gravida;
+        document.getElementById('editPara').value = this.dataset.para;
+        document.getElementById('editAbortus').value = this.dataset.abortus;
+
+        // Format dates for input fields
+        const formatDateForInput = (dateString) => {
+            if (!dateString || dateString === '-') return '';
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        };
+
+        // Set date fields
+        document.getElementById('editStartDate').value = formatDateForInput(this.dataset.startDate);
+        document.getElementById('editDueDate').value = formatDateForInput(this.dataset.dueDate);
+        document.getElementById('editLastCheckDate').value = formatDateForInput(this.dataset.lastCheck);
+
         // Set other fields
-        document.getElementById('editPregnancyStartDate').value = this.dataset.startDate || '';
         document.getElementById('editPregnancyWeek').value = this.dataset.pregnancyWeek || '';
-        document.getElementById('editPregnancyLastCheck').value = this.dataset.lastCheck || '';
-        document.getElementById('editPregnancyNotes').value = this.dataset.notes || '';
+        document.getElementById('editNotes').value = this.dataset.notes || '';
 
         // Show modal
         editPregnancyModal.style.display = 'flex';
@@ -1357,49 +1399,61 @@ document.querySelectorAll('.edit-pregnancy-btn').forEach(btn => {
     });
 });
 
-    // Close edit modal
-    function closeEditPregnancyModal() {
-        editPregnancyModal.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-    closeEditPregnancyModalBtn.addEventListener('click', closeEditPregnancyModal);
-    cancelEditPregnancyBtn.addEventListener('click', closeEditPregnancyModal);
-    editPregnancyModal.addEventListener('click', function(e) {
-        if (e.target === editPregnancyModal) closeEditPregnancyModal();
-    });
+// Handle form submission
+document.getElementById('updatePregnancyBtn').addEventListener('click', async function() {
+    const form = document.getElementById('editPregnancyForm');
+    const formData = new FormData(form);
+    const submitBtn = this;
 
-    // Form submission
-updatePregnancyBtn.addEventListener('click', function() {
-    const formData = new FormData(editPregnancyForm);
-    formData.append('_method', 'PUT');
+    // Disable button during submission
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-    fetch(editPregnancyForm.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST', // Laravel will handle PUT via method spoofing
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        });
+
+        if (response.redirected) {
+            // Handle redirect response (non-AJAX)
+            window.location.href = response.url;
+            return;
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        Swal.fire({  // Perbaikan di sini - tambahkan Swal
-            title: 'Berhasil!',
-            text: 'Data kehamilan berhasil diperbarui',
-            icon: 'success'
-        });
-        closeEditPregnancyModal();
-        setTimeout(() => window.location.reload(), 1500);
-    })
-    .catch(error => {
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Terjadi kesalahan');
+        }
+
+        // Show success message and reload
+        alert('Data berhasil diperbarui');
+        window.location.reload();
+
+    } catch (error) {
         console.error('Error:', error);
-        Swal.fire({
-            title: 'Error!',
-            text: 'Gagal memperbarui data kehamilan',
-            icon: 'error'
-        });
-    });
+        alert(error.message || 'Gagal memperbarui data');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Simpan Perubahan';
+    }
 });
+
+// Close modal handlers
+document.getElementById('closeEditPregnancyModalBtn').addEventListener('click', function() {
+    editPregnancyModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+});
+
+document.getElementById('cancelEditPregnancyBtn').addEventListener('click', function() {
+    editPregnancyModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
 });
     </script>
     <script>
@@ -1508,7 +1562,7 @@ updatePregnancyBtn.addEventListener('click', function() {
 
     </script>
     <script>
-      // Health Tracking Modal
+     // Health Tracking Modal
 const healthTrackingModal = document.getElementById('healthTrackingModal');
 const closeHealthTrackingModalBtn = document.getElementById('closeHealthTrackingModalBtn');
 const closeHealthTrackingBtn = document.getElementById('closeHealthTrackingBtn');
@@ -1523,21 +1577,63 @@ const healthTrackingTableBody = document.getElementById('healthTrackingTableBody
 let currentPregnancyId = null;
 let currentTrackingData = [];
 
-function loadHealthTrackingData(pregnancyId) {
+// Open health tracking modal
+document.querySelectorAll('.health-tracking-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        currentPregnancyId = this.dataset.id;
+        currentUserId = this.dataset.userId; // Get user ID from data attribute
+
+        // Set patient info in modal
+        const row = this.closest('tr');
+        const patientName = row.querySelector('td:first-child span').textContent;
+        const pregnancyWeek = row.querySelector('td:nth-child(3)').textContent;
+
+        document.getElementById('htPatientName').textContent = patientName;
+        document.getElementById('htPregnancyWeek').textContent = pregnancyWeek;
+
+        // Load data
+        loadHealthTrackingData(currentPregnancyId, currentUserId);
+
+        // Show modal
+        healthTrackingModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Load health tracking data from API
+function loadHealthTrackingData(pregnancyId, userId) {
     // Show loading state
     healthTrackingTableBody.innerHTML = '<tr><td colspan="5">Memuat data...</td></tr>';
 
-    fetch(`/api/health-tracking/${pregnancyId}`)
+    // Build URL with user_id parameter if available
+    let url = `/api/health-tracking/${pregnancyId}`;
+    if (userId) {
+        url += `${userId}`;
+    }
+
+    console.log('Fetching health tracking data from URL:', url);
+
+    fetch(url)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+    console.log('HTTP status code:', response.status);
+    if (!response.ok) {
+        throw new Error(`Network response was not ok (status: ${response.status})`);
+    }
+    return response.json();
+})
+
         .then(data => {
+            console.log('Data received from server:', data);
+
             if (data.success && data.data) {
                 currentTrackingData = data.data.trackings || [];
+                console.log('Tracking data:', currentTrackingData);
+
                 renderHealthTrackingTable(currentTrackingData);
+
+                // Update patient info
+                document.getElementById('htPatientName').textContent = data.data.patient_name;
+                document.getElementById('htPregnancyWeek').textContent = data.data.pregnancy_week;
 
                 // Update last updated date
                 document.getElementById('htLastUpdated').textContent =
@@ -1545,6 +1641,8 @@ function loadHealthTrackingData(pregnancyId) {
 
                 // Show latest data in cards
                 if (data.data.latest_stats) {
+                    console.log('Latest stats:', data.data.latest_stats);
+
                     showTrackingDetails({
                         weight: data.data.latest_stats.weight,
                         blood_pressure: data.data.latest_stats.blood_pressure,
@@ -1553,6 +1651,7 @@ function loadHealthTrackingData(pregnancyId) {
                         date_recorded: data.data.last_updated
                     });
                 } else {
+                    console.warn('Tidak ada data latest_stats yang ditemukan.');
                     showTrackingDetails({
                         weight: null,
                         blood_pressure: null,
@@ -1562,6 +1661,7 @@ function loadHealthTrackingData(pregnancyId) {
                     });
                 }
             } else {
+                console.warn('Data tidak valid atau response success = false:', data);
                 throw new Error(data.message || 'Invalid data format');
             }
         })
@@ -1580,7 +1680,8 @@ function loadHealthTrackingData(pregnancyId) {
         });
 }
 
-// Function to render health tracking table
+
+// Render health tracking table with updated field names
 function renderHealthTrackingTable(data) {
     if (data.length === 0) {
         healthTrackingTableBody.innerHTML = '<tr><td colspan="5">Tidak ada data kesehatan</td></tr>';
@@ -1608,39 +1709,7 @@ function renderHealthTrackingTable(data) {
     addHealthTrackingTableEventListeners();
 }
 
-// Add event listeners to table buttons
-function addHealthTrackingTableEventListeners() {
-    // Add event listeners to edit buttons
-    document.querySelectorAll('.edit-tracking-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const trackingId = this.dataset.id;
-            const tracking = currentTrackingData.find(t => t.tracking_id == trackingId);
-            openHealthTrackingFormModal(tracking);
-        });
-    });
-
-    // Add event listeners to delete buttons
-    document.querySelectorAll('.delete-tracking-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const trackingId = this.dataset.id;
-            confirmDeleteTracking(trackingId);
-        });
-    });
-
-    // Add click event to rows to view details
-    document.querySelectorAll('#healthTrackingTable tbody tr').forEach(row => {
-        row.addEventListener('click', function() {
-            const trackingId = this.querySelector('.edit-tracking-btn')?.dataset.id;
-            if (trackingId) {
-                const tracking = currentTrackingData.find(t => t.tracking_id == trackingId);
-                showTrackingDetails(tracking);
-            }
-        });
-    });
-}
-
+// Show tracking details in cards
 function showTrackingDetails(tracking) {
     if (!tracking) {
         tracking = {
@@ -1671,42 +1740,31 @@ function showTrackingDetails(tracking) {
     document.getElementById('htNotes').textContent = tracking.notes || 'Tidak ada catatan';
 }
 
-// Open health tracking modal
-document.querySelectorAll('.health-tracking-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        currentPregnancyId = this.dataset.id;
-
-        // Set patient info in modal
-        const patientName = this.closest('tr').querySelector('td:first-child span').textContent;
-        const pregnancyWeek = this.closest('tr').querySelector('td:nth-child(3)').textContent;
-
-        document.getElementById('htPatientName').textContent = patientName;
-        document.getElementById('htPregnancyWeek').textContent = pregnancyWeek;
-
-        // Load data
-        loadHealthTrackingData(currentPregnancyId);
-
-        // Show modal
-        healthTrackingModal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    });
-});
-
 // Open form modal for adding/editing
 function openHealthTrackingFormModal(tracking = null) {
     document.getElementById('healthTrackingFormTitle').textContent = tracking ? 'Edit Data Kesehatan' : 'Tambah Data Kesehatan';
     document.getElementById('htFormPregnancyId').value = currentPregnancyId;
 
+    // Add user_id to the form
+    if (!document.getElementById('htFormUserId')) {
+        const userIdInput = document.createElement('input');
+        userIdInput.type = 'hidden';
+        userIdInput.id = 'htFormUserId';
+        userIdInput.name = 'user_id';
+        healthTrackingForm.appendChild(userIdInput);
+    }
+    document.getElementById('htFormUserId').value = currentUserId;
+
     if (tracking) {
         document.getElementById('htFormTrackingId').value = tracking.tracking_id;
-        document.getElementById('htFormDateRecorded').value = tracking.date_recorded;
+        document.getElementById('htFormDateRecorded').value = tracking.date_recorded.split('T')[0]; // Format date for input
         document.getElementById('htFormWeight').value = tracking.weight || '';
         document.getElementById('htFormBloodPressure').value = tracking.blood_pressure || '';
         document.getElementById('htFormHeartRate').value = tracking.heart_rate || '';
         document.getElementById('htFormNotes').value = tracking.notes || '';
     } else {
         document.getElementById('htFormTrackingId').value = '';
-        document.getElementById('htFormDateRecorded').value = '';
+        document.getElementById('htFormDateRecorded').value = new Date().toISOString().split('T')[0]; // Today's date
         document.getElementById('htFormWeight').value = '';
         document.getElementById('htFormBloodPressure').value = '';
         document.getElementById('htFormHeartRate').value = '';
@@ -1714,17 +1772,6 @@ function openHealthTrackingFormModal(tracking = null) {
     }
 
     healthTrackingFormModal.style.display = 'flex';
-}
-
-// Close health tracking modal
-function closeHealthTrackingModal() {
-    healthTrackingModal.style.display = 'none';
-    document.body.style.overflow = '';
-}
-
-// Close form modal
-function closeHealthTrackingFormModal() {
-    healthTrackingFormModal.style.display = 'none';
 }
 
 // Submit health tracking form
@@ -1744,13 +1791,17 @@ function submitHealthTrackingForm() {
     })
     .then(response => response.json())
     .then(data => {
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Data kesehatan berhasil disimpan'
-        });
-        closeHealthTrackingFormModal();
-        loadHealthTrackingData(currentPregnancyId);
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data kesehatan berhasil disimpan'
+            });
+            closeHealthTrackingFormModal();
+            loadHealthTrackingData(currentPregnancyId, currentUserId);
+        } else {
+            throw new Error(data.message || 'Failed to save data');
+        }
     })
     .catch(error => {
         console.error('Error:', error);
@@ -1775,7 +1826,7 @@ function confirmDeleteTracking(trackingId) {
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch(`/api/health-tracking/${trackingId}`, {
+            fetch(`/api/health-tracking/${trackingId}?user_id=${currentUserId}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -1784,12 +1835,16 @@ function confirmDeleteTracking(trackingId) {
             })
             .then(response => response.json())
             .then(data => {
-                Swal.fire(
-                    'Terhapus!',
-                    'Data kesehatan telah dihapus.',
-                    'success'
-                );
-                loadHealthTrackingData(currentPregnancyId);
+                if (data.success) {
+                    Swal.fire(
+                        'Terhapus!',
+                        'Data kesehatan telah dihapus.',
+                        'success'
+                    );
+                    loadHealthTrackingData(currentPregnancyId, currentUserId);
+                } else {
+                    throw new Error(data.message || 'Failed to delete');
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -1807,22 +1862,57 @@ function confirmDeleteTracking(trackingId) {
 function formatDate(dateString) {
     if (!dateString) return '';
 
-    try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) {
-            // Handle if dateString is already in the correct format
-            return dateString;
-        }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
 
-        const options = { day: '2-digit', month: 'short', year: 'numeric' };
-        return date.toLocaleDateString('id-ID', options);
-    } catch (e) {
-        console.error('Error formatting date:', e);
-        return dateString; // Return original if can't format
-    }
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    return date.toLocaleDateString('id-ID', options);
 }
 
-// Event listeners
+// Event listeners for buttons in the table
+function addHealthTrackingTableEventListeners() {
+    // Edit buttons
+    document.querySelectorAll('.edit-tracking-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const trackingId = this.dataset.id;
+            const tracking = currentTrackingData.find(t => t.tracking_id == trackingId);
+            openHealthTrackingFormModal(tracking);
+        });
+    });
+
+    // Delete buttons
+    document.querySelectorAll('.delete-tracking-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const trackingId = this.dataset.id;
+            confirmDeleteTracking(trackingId);
+        });
+    });
+
+    // Row click to view details
+    document.querySelectorAll('#healthTrackingTable tbody tr').forEach(row => {
+        row.addEventListener('click', function() {
+            const trackingId = this.querySelector('.edit-tracking-btn')?.dataset.id;
+            if (trackingId) {
+                const tracking = currentTrackingData.find(t => t.tracking_id == trackingId);
+                showTrackingDetails(tracking);
+            }
+        });
+    });
+}
+
+// Modal close functions
+function closeHealthTrackingModal() {
+    healthTrackingModal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function closeHealthTrackingFormModal() {
+    healthTrackingFormModal.style.display = 'none';
+}
+
+// Event listeners for modal buttons
 closeHealthTrackingModalBtn.addEventListener('click', closeHealthTrackingModal);
 closeHealthTrackingBtn.addEventListener('click', closeHealthTrackingModal);
 healthTrackingModal.addEventListener('click', function(e) {

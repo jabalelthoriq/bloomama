@@ -12,7 +12,7 @@ class UserPregnant extends Model
     protected $primaryKey = 'pregnancy_id';
     protected $table = 'user_pregnancies';
     public $incrementing = true;
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'user_id',

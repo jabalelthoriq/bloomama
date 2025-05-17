@@ -22,7 +22,7 @@ class authcontroller extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:100',
                 'email' => 'required|string|email|max:100|unique:users',
-                'password' => ['required', Password::min(8)->mixedCase()->numbers()],
+                'password' => ['required', Password::min(8)],
                 'phone_number' => 'nullable|string|max:20',
                 'address' => 'nullable|string',
             ]);
@@ -116,4 +116,63 @@ class authcontroller extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update user profile
+     */
+    public function updateProfile(Request $request)
+{
+    try {
+        $user = Auth::user();
+
+        // Validate incoming request (excluding email and password)
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|string|max:100',
+            'phone_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'profile_picture' => 'nullable|string', // assuming profile_picture is stored as string (path or URL)
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Prepare update data (excluding email and password)
+        $updateData = [];
+        if ($request->has('name')) {
+            $updateData['name'] = $request->name;
+        }
+        if ($request->has('phone_number')) {
+            $updateData['phone_number'] = $request->phone_number;
+        }
+        if ($request->has('address')) {
+            $updateData['address'] = $request->address;
+        }
+        if ($request->has('profile_picture')) {
+            $updateData['profile_picture'] = $request->profile_picture;
+        }
+
+        // Update user
+        $user->update($updateData);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile updated successfully',
+            'data' => [
+                'user' => $user->only(['user_id', 'name', 'email', 'phone_number', 'address', 'profile_picture'])
+            ]
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Server error',
+            'error' => $e->getMessage()
+        ],500);
+    }
+}
 }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\User;
 use App\Models\UserPregnant;
+use App\Models\HealthTracking;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
@@ -120,6 +121,8 @@ class AdminController extends Controller
         return back()->withInput()->with('error', 'Gagal menambahkan bidan');
     }
 }
+
+
 
     /**
      * Store a newly created resource in storage.
