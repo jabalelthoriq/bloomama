@@ -172,7 +172,58 @@ class authcontroller extends Controller
             'status' => false,
             'message' => 'Server error',
             'error' => $e->getMessage()
-        ],500);
+        ], 500);
     }
 }
+
+/**
+ * Change user password
+ */
+public function changePassword(Request $request)
+{
+    try {
+        $user = Auth::user();
+
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Check current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Password lama salah'
+            ], 400);
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password berhasil diubah'
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Server error',
+            'error' => $e->getMessage()
+        ], 500);
+}
+}
+
+
 }

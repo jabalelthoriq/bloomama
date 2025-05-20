@@ -444,6 +444,33 @@
     color: #6c757d;
     z-index: 1;
 }
+
+/* Appointment button style */
+.appointment-btn {
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.appointment-btn:hover {
+    color: white;
+    background-color: #17a2b8;
+}
+
+/* Modal input styles */
+.modal-container input[type="datetime-local"],
+.modal-container select,
+.modal-container textarea {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 10px 15px;
+}
+
+.modal-container input[type="datetime-local"]:focus,
+.modal-container select:focus,
+.modal-container textarea:focus {
+    border-color: #00b8d4;
+    box-shadow: 0 0 0 0.25rem rgba(0, 184, 212, 0.25);
+}
    </style>
 <body>
     <div class="vertical-navbar">
@@ -774,9 +801,18 @@
                                                         data-notes="{{ $userPregnancy->notes ?? '' }}">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
+
                                                     <button type="button" class="btn btn-sm btn-outline-success ms-1 health-tracking-btn"
                                                         data-id="{{ $userPregnancy->id }}" data-user-id="{{ $userPregnancy->user_id }}" title="Health Tracking">
                                                         <i class="fas fa-heartbeat"></i>
+                                                    </button>
+                                                    <!-- In the pregnancies table actions column, after the health tracking button -->
+                                                    <button type="button" class="btn btn-sm btn-outline-info ms-1 appointment-btn"
+                                                        data-id="{{ $userPregnancy->id }}"
+                                                        data-user-id="{{ $userPregnancy->user_id }}"
+                                                        data-patient-name="{{ $userPregnancy->user->name ?? 'Unknown User' }}"
+                                                        title="Appointment">
+                                                        <i class="fas fa-calendar-check"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-sm btn-outline-primary ms-1 live-chat-btn"
                                                         data-id="{{ $userPregnancy->id }}" title="Live Chat">
@@ -1110,6 +1146,54 @@
     </div>
 </div>
 
+<!-- Appointment Modal -->
+<div class="modal-overlay" id="appointmentModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Buat Janji Temu</h5>
+            <button class="close-modal" id="closeAppointmentModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="appointmentForm">
+                @csrf
+                <input type="hidden" id="appointmentPregnancyId" name="pregnancy_id">
+                <input type="hidden" id="appointmentUserId" name="user_id">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Pasien</label>
+                    <p id="appointmentPatientName" class="form-control-static"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="appointmentDateTime" class="form-label fw-bold">Tanggal & Waktu*</label>
+                    <input type="datetime-local" class="form-control" id="appointmentDateTime" name="date_time" required>
+                </div>
+{{--
+                <div class="mb-3">
+                    <label for="appointmentMidwife" class="form-label">Bidan*</label>
+                    <select class="form-select" id="appointmentMidwife" name="midwife_id" required>
+                        <option value="">Pilih Bidan</option>
+                        @foreach($midwives as $midwife)
+                            <option value="{{ $midwife->id }}">{{ $midwife->name }}</option>
+                        @endforeach
+                    </select>
+                </div> --}}
+
+                <div class="mb-3">
+                    <label for="appointmentNotes" class="form-label fw-bold">Catatan</label>
+                    <textarea class="form-control" id="appointmentNotes" name="notes" rows="3" placeholder="Masukkan catatan janji temu..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelAppointmentBtn">Batal</button>
+            <button type="button" class="btn btn-primary" id="submitAppointmentBtn">Simpan Janji</button>
+        </div>
+    </div>
+</div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
        function handleLogout() {
@@ -1362,8 +1446,9 @@ function confirmDeleteUser(event, button) {
 document.querySelectorAll('.edit-pregnancy-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         // Set form action with the correct route
-        const pregnancyId = this.dataset.id;
-        editPregnancyForm.action = "{{ route('pregnancies.update', ':id') }}".replace(':id', pregnancyId);
+       const pregnancyId = this.dataset.id;
+        editPregnancyForm.action = `/api/pregnancies/${pregnancyId}`;
+
 
         // Set hidden pregnancy ID
         document.getElementById('editPregnancyId').value = pregnancyId;
@@ -1411,7 +1496,7 @@ document.getElementById('updatePregnancyBtn').addEventListener('click', async fu
 
     try {
         const response = await fetch(form.action, {
-            method: 'POST', // Laravel will handle PUT via method spoofing
+            method: 'PUT', // Laravel will handle PUT via method spoofing
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                 'Accept': 'application/json',
@@ -2010,6 +2095,93 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+});
+
+// Appointment Modal
+const appointmentModal = document.getElementById('appointmentModal');
+const closeAppointmentModalBtn = document.getElementById('closeAppointmentModalBtn');
+const cancelAppointmentBtn = document.getElementById('cancelAppointmentBtn');
+const submitAppointmentBtn = document.getElementById('submitAppointmentBtn');
+const appointmentForm = document.getElementById('appointmentForm');
+
+// Open appointment modal
+document.querySelectorAll('.appointment-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const pregnancyId = this.dataset.id;
+        const userId = this.dataset.userId;
+        const patientName = this.dataset.patientName;
+
+        // Set form values
+        document.getElementById('appointmentPregnancyId').value = pregnancyId;
+        document.getElementById('appointmentUserId').value = userId;
+        document.getElementById('appointmentPatientName').textContent = patientName;
+
+        // Set default date/time (next hour)
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        now.setMinutes(0);
+        now.setSeconds(0);
+        document.getElementById('appointmentDateTime').value = now.toISOString().slice(0, 16);
+
+        // Show modal
+        appointmentModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Close appointment modal
+function closeAppointmentModal() {
+    appointmentModal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+closeAppointmentModalBtn.addEventListener('click', closeAppointmentModal);
+cancelAppointmentBtn.addEventListener('click', closeAppointmentModal);
+appointmentModal.addEventListener('click', function(e) {
+    if (e.target === appointmentModal) closeAppointmentModal();
+});
+
+// Submit appointment form
+submitAppointmentBtn.addEventListener('click', function() {
+    const formData = new FormData(appointmentForm);
+
+    // Disable button during submission
+    submitAppointmentBtn.disabled = true;
+    submitAppointmentBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+    fetch('/appointments', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Janji temu berhasil dibuat'
+            });
+            closeAppointmentModal();
+        } else {
+            throw new Error(data.message || 'Failed to create appointment');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal membuat janji',
+            text: error.message || 'Terjadi kesalahan saat membuat janji temu'
+        });
+    })
+    .finally(() => {
+        submitAppointmentBtn.disabled = false;
+        submitAppointmentBtn.innerHTML = 'Simpan Janji';
+    });
 });
 
         </script>

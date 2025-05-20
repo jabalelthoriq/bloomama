@@ -56,6 +56,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function getProfilePictureUrlAttribute()
+{
+    return $this->profile_picture ? asset('storage/' . $this->profile_picture) : null;
+}
     /**
      * The attributes that should be cast.
      *

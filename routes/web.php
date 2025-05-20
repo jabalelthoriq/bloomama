@@ -13,6 +13,22 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SettingController;
 
+Route::resource('admin/pasien', AdminController::class);
+
+
+
+//use api web
+ Route::prefix('api')->group(function() {
+        // routes for health tracking
+            Route::get('/health-tracking/{pregnancyId}', [UsersController::class, 'getHealthTrackingData']);
+            Route::post('/health-tracking', [UsersController::class, 'storeHealthTracking']);
+            Route::put('/health-tracking/{trackingId}', [UsersController::class, 'updateHealthTracking']);
+            Route::delete('/health-tracking/{trackingId}', [UsersController::class, 'deleteHealthTracking']);
+
+
+         // routes for users
+
+        });
 
 // Public routes - accessible without login
 Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
@@ -35,16 +51,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
         // User management routes for midwives
         Route::get('/user', [UsersController::class, 'showUsersAndMidwives'])->name('user');
-        Route::put('/pregnancies/{pregnancyId}', [UsersController::class, 'update'])->name('pregnancies.update');
-        Route::delete('/users', [UsersController::class, 'destroy'])->name('users.destroy');
-        // routes for health tracking
-        Route::prefix('api')->group(function() {
-            Route::get('/health-tracking/{pregnancyId}', [UsersController::class, 'getHealthTrackingData']);
-            Route::post('/health-tracking', [UsersController::class, 'storeHealthTracking']);
-            Route::put('/health-tracking/{trackingId}', [UsersController::class, 'updateHealthTracking']);
-            Route::delete('/health-tracking/{trackingId}', [UsersController::class, 'deleteHealthTracking']);
-        });
-
 
         // Chat routes
         Route::get('/chat', [ChatController::class, 'chat']);

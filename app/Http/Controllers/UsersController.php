@@ -6,12 +6,15 @@ use App\Models\User;
 use App\Models\Midwive;
 use App\Models\UserPregnant;
 use App\Models\HealthTracking;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Flasher\Prime\FlasherInterface;
+
 
 class UsersController extends Controller
 {
@@ -77,18 +80,20 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $pregnancyId): RedirectResponse
+    /**
+ * Update the specified user in database.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  int  $id
+ * @return \Illuminate\Http\Response
+ */
+public function update(Request $request, $pregnancyId): RedirectResponse
 {
     try {
-        // Validate pregnancyId exists and is numeric
-        if (!is_numeric($pregnancyId)) {
-            return redirect()->back()
-                ->with('error', 'Invalid pregnancy ID');
-        }
+        $userPregnancy = UserPregnant::findOrFail($pregnancyId);
 
-        // Validate input data
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,user_id',
             'gravida' => 'required|integer|min:0',
             'para' => 'required|integer|min:0',
             'abortus' => 'required|integer|min:0',
@@ -99,22 +104,14 @@ class UsersController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Find the pregnancy record by ID
-        $userPregnancy = UserPregnant::findOrFail($pregnancyId);
-
-        // Update the record
         $userPregnancy->update($validated);
 
         return redirect()->route('user.pregnancies')
             ->with('success', 'Data kehamilan berhasil diperbarui.');
 
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return redirect()->back()
-            ->with('error', 'Pregnancy record not found');
-
     } catch (\Exception $e) {
-        return redirect()->back()
-            ->with('error', 'Failed to update pregnancy data');
+        Log::error("Update Error: " . $e->getMessage());
+        return back()->with('error', 'Gagal memperbarui data kehamilan.');
     }
 }
 
@@ -323,6 +320,9 @@ public function deleteHealthTracking($trackingId)
         ], 500);
     }
 }
+
+ 
+
 
 
 }

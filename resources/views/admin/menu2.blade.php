@@ -448,77 +448,81 @@
         <div class="header-container">
             <h2 class="fs-3 fw-bold m-0">Users</h2>
         </div>
-        <!-- Modal Edit Pasien Form -->
-        <div class="modal-overlay" id="editPasienModal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h5 class="fw-bold m-0">Edit Pasien</h5>
-                    <button class="close-modal" id="closeEditPasienModalBtn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="editPasienForm" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="editPasienId" name="user_id">
-                        <div class="mb-3">
-                            <label for="editPasienName" class="form-label">Nama Pasien</label>
-                            <input type="text" class="form-control" id="editPasienName" name="name" placeholder="Masukkan nama pasien">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPasienEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="editPasienEmail" name="email" placeholder="Masukkan email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPasienPhoneNumber" class="form-label">Nomor Telepon</label>
-                            <input type="text" class="form-control" id="editPasienPhoneNumber" name="phone_number" placeholder="Masukkan nomor telepon">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPasienAddress" class="form-label">Alamat</label>
-                            <textarea class="form-control" id="editPasienAddress" name="address" placeholder="Masukkan alamat"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPasienPassword" class="form-label">Password (Kosongkan jika tidak ingin mengubah)</label>
-                            <input type="password" class="form-control" id="editPasienPassword" name="password" placeholder="Masukkan password baru">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPasienPasswordConfirmation" class="form-label">Konfirmasi Password</label>
-                            <input type="password" class="form-control" id="editPasienPasswordConfirmation" name="password_confirmation" placeholder="Konfirmasi password baru">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPasienPhoto" class="form-label">Foto Profil</label>
-                            <div class="input-group">
-                                <input type="file" class="form-control" id="editPasienPhoto" name="photo" accept="image/*">
-                                <label class="input-group-text" for="editPasienPhoto">
-                                    <i class="fas fa-upload"></i>
-                                </label>
-                            </div>
-                            <small class="text-muted">Upload foto profil (Max: 2MB, Format: JPG, PNG)</small>
-                            <div class="d-flex align-items-center mt-2">
-                                <div id="currentPasienPhotoContainer" class="me-3">
-                                    <p class="mb-1">Foto saat ini:</p>
-                                    <img id="currentPasienPhoto" src="" alt="Current Photo" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
-                                </div>
-                                <div id="editPasienPhotoPreview" class="d-none">
-                                    <div class="position-relative" style="max-width: 100px;">
-                                        <p class="mb-1">Foto baru:</p>
-                                        <img src="" alt="Photo Preview" class="img-thumbnail">
-                                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" id="removeEditPasienPhoto">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="cancelEditPasienBtn">Batal</button>
-                    <button type="button" class="btn btn-primary" id="updatePasienBtn" style="background-color: #0400d4">Update</button>
-                </div>
+       <!-- Modal Edit Pasien Form -->
+<div class="modal-overlay" id="editPasienModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Edit Pasien</h5>
+            <button type="button" class="close-modal" id="closeEditPasienModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+             <form id="editPasienForm"
+      action="#"
+       @foreach($users as $user)
+      data-base-url-{{ $user->user_id }}="{{ route('admin.pasien.update', ['id' => $user->user_id]) }}"
+      @endforeach
+      method="POST"
+      enctype="multipart/form-data">
+    @csrf
+    <input type="hidden" id="editPasienId" name="user_id">
+
+    <div class="mb-3">
+        <label for="editPasienName" class="form-label">Nama Pasien</label>
+        <input type="text" class="form-control" id="editPasienName" name="name" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="editPasienEmail" class="form-label">Email</label>
+        <input type="email" class="form-control" id="editPasienEmail" name="email" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="editPasienPhoneNumber" class="form-label">Nomor Telepon</label>
+        <input type="text" class="form-control" id="editPasienPhoneNumber" name="phone_number" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="editPasienAddress" class="form-label">Alamat</label>
+        <textarea class="form-control" id="editPasienAddress" name="address" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="editPasienPassword" class="form-label">Password Baru</label>
+        <input type="password" class="form-control" id="editPasienPassword" name="password">
+        <small class="text-muted">Kosongkan jika tidak ingin mengubah password</small>
+    </div>
+
+    <div class="mb-3">
+        <label for="editPasienPasswordConfirmation" class="form-label">Konfirmasi Password</label>
+        <input type="password" class="form-control" id="editPasienPasswordConfirmation" name="password_confirmation">
+    </div>
+
+    <div class="mb-3">
+        <label for="editPasienPhoto" class="form-label">Foto Profil</label>
+        <input type="file" class="form-control" id="editPasienPhoto" name="profile_picture" accept="image/*">
+        <small class="text-muted">Format: JPG, PNG (Max: 2MB)</small>
+
+        <div class="mt-2">
+            <div id="currentPasienPhotoContainer" class="d-none">
+                <p class="mb-1">Foto Saat Ini:</p>
+                <img id="currentPasienPhoto" src="" class="img-thumbnail" style="max-width: 150px;">
+            </div>
+            <div id="editPasienPhotoPreview" class="d-none mt-2">
+                <p class="mb-1">Foto Baru:</p>
+                <img src="" class="img-thumbnail" style="max-width: 150px;">
             </div>
         </div>
+    </div>
+</form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelEditPasienBtn">Batal</button>
+            <button type="button" class="btn btn-primary" id="updatePasienBtn" style="background-color: #0400d4">Update</button>
+        </div>
+    </div>
+</div>
 
         <!-- Modal Input Bidan Form -->
 <div class="modal-overlay" id="eventModal">
@@ -1149,7 +1153,7 @@
         }
     });
 
-    ;
+
 
     // === EDIT BIDAN MODAL ===
     const editBidanModal = document.getElementById('editBidanModal');
@@ -1163,42 +1167,97 @@
     const currentPhotoContainer = document.getElementById('currentPhotoContainer');
     const updateBidanBtn = document.getElementById('updateBidanBtn');
 
-    // Function to handle edit buttons
-    document.querySelectorAll('.edit-bidan-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.dataset.id;
-            const name = this.dataset.name;
-            const email = this.dataset.email;
-            const phoneNumber = this.dataset.phoneNumber;
-            const status = this.dataset.status;
-            const photoUrl = this.dataset.photo;
+    document.querySelectorAll('.edit-pasien-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const id = this.dataset.id;
+        const name = this.dataset.name;
+        const email = this.dataset.email;
+        const phoneNumber = this.dataset.phoneNumber;
+        const address = this.dataset.address;
+        const photoUrl = this.dataset.photo;
 
-            // Populate the form fields
-            document.getElementById('editBidanId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editPhoneNumber').value = phoneNumber;
-            document.getElementById('editStatus').value = status;
-            document.getElementById('editPassword').value = '';
-            document.getElementById('editPasswordConfirmation').value = '';
+        // Ambil URL dari atribut data yang sesuai
+        const baseUrl = editPasienForm.getAttribute(`data-base-url-${id}`);
 
-            // Handle photo preview
-            if (photoUrl && photoUrl !== '') {
-                currentPhoto.src = photoUrl;
-                currentPhotoContainer.classList.remove('d-none');
-            } else {
-                currentPhotoContainer.classList.add('d-none');
-            }
+        // Pastikan URL ditemukan
+        if (!baseUrl) {
+            console.error(`URL not found for user ID: ${id}`);
+            return;
+        }
 
-            // Reset new photo preview
-            editPhotoPreview.classList.add('d-none');
-            editPhoto.value = '';
+        // Update form action
+        editPasienForm.action = baseUrl;
 
-            // Show modal
-            editBidanModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
+        // Isi form fields
+        document.getElementById('editPasienId').value = id;
+        document.getElementById('editPasienName').value = name;
+        document.getElementById('editPasienEmail').value = email;
+        document.getElementById('editPasienPhoneNumber').value = phoneNumber;
+        document.getElementById('editPasienAddress').value = address || '';
+
+        // Handle photo preview
+        if (photoUrl && photoUrl !== 'null') {
+            currentPasienPhoto.src = photoUrl;
+            currentPasienPhotoContainer.classList.remove('d-none');
+        } else {
+            currentPasienPhotoContainer.classList.add('d-none');
+        }
+
+        // Reset fields
+        editPasienPhotoPreview.classList.add('d-none');
+        editPasienPhoto.value = '';
+        document.getElementById('editPasienPassword').value = '';
+        document.getElementById('editPasienPasswordConfirmation').value = '';
+
+        // Show modal
+        editPasienModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     });
+});
+
+// Handle form submission
+updatePasienBtn.addEventListener('click', async function() {
+    const formData = new FormData(editPasienForm);
+
+    // Loading state
+    updatePasienBtn.disabled = true;
+    updatePasienBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+    try {
+        const response = await fetch(editPasienForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Gagal memperbarui data');
+        }
+
+        if (data.success) {
+            alertify.success(data.message || 'Data berhasil diperbarui');
+            closeEditPasienModal();
+
+            // Refresh data table atau halaman
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            throw new Error(data.message || 'Gagal memperbarui data');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alertify.error(error.message || 'Terjadi kesalahan saat memperbarui data');
+    } finally {
+        updatePasienBtn.disabled = false;
+        updatePasienBtn.innerHTML = 'Update';
+    }
+});
 
     // Close edit modal functions
     function closeEditModal() {
@@ -1267,8 +1326,7 @@
     });
 });
 
-
-// === EDIT PASIEN MODAL ===
+///edit users
 const editPasienModal = document.getElementById('editPasienModal');
 const closeEditPasienModalBtn = document.getElementById('closeEditPasienModalBtn');
 const cancelEditPasienBtn = document.getElementById('cancelEditPasienBtn');
@@ -1295,9 +1353,7 @@ document.querySelectorAll('.edit-pasien-btn').forEach(button => {
         document.getElementById('editPasienName').value = name;
         document.getElementById('editPasienEmail').value = email;
         document.getElementById('editPasienPhoneNumber').value = phoneNumber;
-        document.getElementById('editPasienAddress').value = address;
-        document.getElementById('editPasienPassword').value = '';
-        document.getElementById('editPasienPasswordConfirmation').value = '';
+        document.getElementById('editPasienAddress').value = address || '';
 
         // Handle photo preview
         if (photoUrl && photoUrl !== '') {
@@ -1307,9 +1363,11 @@ document.querySelectorAll('.edit-pasien-btn').forEach(button => {
             currentPasienPhotoContainer.classList.add('d-none');
         }
 
-        // Reset new photo preview
+        // Reset new photo preview and password fields
         editPasienPhotoPreview.classList.add('d-none');
         editPasienPhoto.value = '';
+        document.getElementById('editPasienPassword').value = '';
+        document.getElementById('editPasienPasswordConfirmation').value = '';
 
         // Show modal
         editPasienModal.classList.add('active');
@@ -1354,171 +1412,52 @@ removeEditPasienPhoto.addEventListener('click', function() {
 // Handle form submission
 updatePasienBtn.addEventListener('click', function() {
     const formData = new FormData(editPasienForm);
-    const pasienId = document.getElementById('editPasienId').value;
 
-    // Add the _method field for Laravel to recognize this as a PUT request
-    formData.append('_method', 'PUT');
+    // Show loading state
+    updatePasienBtn.disabled = true;
+    updatePasienBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
 
-    fetch(`/users/${pasienId}`, {
-        method: 'POST', // Still using POST but Laravel will treat it as PUT
+    fetch(editPasienForm.action, {
+        method: 'POST',
         body: formData,
         headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
+            // Show success message
+            alertify.success(data.message || 'Data pasien berhasil diperbarui');
+
+            // Close modal
+            closeEditPasienModal();
+
+            // Reload the page to see changes
             window.location.reload();
         } else {
-            // Handle errors
-            console.error('Error updating pasien:', data.message);
-            alert('Error updating pasien: ' + data.message);
+            throw new Error(data.message || 'Gagal memperbarui data pasien');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while updating the pasien.');
+        alertify.error(error.message || 'Terjadi kesalahan saat memperbarui data pasien');
+    })
+    .finally(() => {
+        updatePasienBtn.disabled = false;
+        updatePasienBtn.innerHTML = 'Update';
     });
 });
 
 
-// New function to handle pagination clicks
-function handlePaginationClick(event, element, tabId) {
-            event.preventDefault();
 
-            // Show loading state
-            const tableContainer = document.querySelector(`#${tabId} .table-responsive`);
-            tableContainer.classList.add('table-loading');
 
-            // Get the URL and tab to activate
-            const url = element.getAttribute('href').split('#')[0];
-            const tabToActivate = tabId;
-
-            // Store current scroll position
-            const scrollPosition = window.scrollY;
-
-            // Fetch the new page
-            fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                // Create a temporary DOM element to parse the response
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                // Extract the table content
-                const newTableContent = doc.querySelector(`#${tabId}`).innerHTML;
-
-                // Update the content
-                document.getElementById(tabId).innerHTML = newTableContent;
-
-                // Reinitialize event listeners for the new content
-                initializeEditButtons();
-
-                // Remove loading state
-                tableContainer.classList.remove('table-loading');
-
-                // Activate the correct tab
-                if (tabId === 'bidan-content') {
-                    document.getElementById('bidan-tab').click();
-                } else {
-                    document.getElementById('pasien-tab').click();
-                }
-
-                // Restore scroll position
-                window.scrollTo(0, scrollPosition);
-
-                // Update browser history
-                history.pushState(null, null, url + `#${tabId}`);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                tableContainer.classList.remove('table-loading');
-                window.location.href = url + `#${tabId}`;
-            });
-        }
-
-        // Function to initialize edit buttons after content load
-        function initializeEditButtons() {
-            // Reinitialize bidan edit buttons
-            document.querySelectorAll('.edit-bidan-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    const name = this.dataset.name;
-                    const email = this.dataset.email;
-                    const phoneNumber = this.dataset.phoneNumber;
-                    const status = this.dataset.status;
-                    const photoUrl = this.dataset.photo;
-
-                    // Populate the form fields
-                    document.getElementById('editBidanId').value = id;
-                    document.getElementById('editName').value = name;
-                    document.getElementById('editEmail').value = email;
-                    document.getElementById('editPhoneNumber').value = phoneNumber;
-                    document.getElementById('editStatus').value = status;
-                    document.getElementById('editPassword').value = '';
-                    document.getElementById('editPasswordConfirmation').value = '';
-
-                    // Handle photo preview
-                    if (photoUrl && photoUrl !== '') {
-                        currentPhoto.src = photoUrl;
-                        currentPhotoContainer.classList.remove('d-none');
-                    } else {
-                        currentPhotoContainer.classList.add('d-none');
-                    }
-
-                    // Reset new photo preview
-                    editPhotoPreview.classList.add('d-none');
-                    editPhoto.value = '';
-
-                    // Show modal
-                    editBidanModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            });
-
-            // Reinitialize pasien edit buttons
-            document.querySelectorAll('.edit-pasien-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    const name = this.dataset.name;
-                    const email = this.dataset.email;
-                    const phoneNumber = this.dataset.phoneNumber;
-                    const address = this.dataset.address;
-                    const photoUrl = this.dataset.photo;
-
-                    // Populate the form fields
-                    document.getElementById('editPasienId').value = id;
-                    document.getElementById('editPasienName').value = name;
-                    document.getElementById('editPasienEmail').value = email;
-                    document.getElementById('editPasienPhoneNumber').value = phoneNumber;
-                    document.getElementById('editPasienAddress').value = address;
-                    document.getElementById('editPasienPassword').value = '';
-                    document.getElementById('editPasienPasswordConfirmation').value = '';
-
-                    // Handle photo preview
-                    if (photoUrl && photoUrl !== '') {
-                        currentPasienPhoto.src = photoUrl;
-                        currentPasienPhotoContainer.classList.remove('d-none');
-                    } else {
-                        currentPasienPhotoContainer.classList.add('d-none');
-                    }
-
-                    // Reset new photo preview
-                    editPasienPhotoPreview.classList.add('d-none');
-                    editPasienPhoto.value = '';
-
-                    // Show modal
-                    editPasienModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            });
-        }
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {

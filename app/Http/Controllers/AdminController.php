@@ -17,34 +17,35 @@ use Illuminate\Support\Facades\Log;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 class AdminController extends Controller
 {
     /**
      * Constructor to check admin role for all methods
      */
-    public function __construct()
-    {
-        $this->checkAdminAccess();
-    }
+    // public function __construct()
+    // {
+    //     $this->checkAdminAccess();
+    // }
 
-    /**
-     * Check if the authenticated user is a midwife with admin role
-     */
-    private function checkAdminAccess()
-    {
-        // Check if user is authenticated as midwife
-        if (!Auth::guard('midwife')->check()) {
-            abort(403, 'Unauthorized access');
-        }
+    // /**
+    //  * Check if the authenticated user is a midwife with admin role
+    //  */
+    // private function checkAdminAccess()
+    // {
+    //     // Check if user is authenticated as midwife
+    //     if (!Auth::guard('midwife')->check()) {
+    //         abort(403, 'Unauthorized access');
+    //     }
 
-        // Check if midwife has admin role
-        $midwife = Auth::guard('midwife')->user();
+    //     // Check if midwife has admin role
+    //     $midwife = Auth::guard('midwife')->user();
 
-        // Check if role field exists, is not null, and is set to 'admin'
-        if (!isset($midwife->role) || $midwife->role === null || empty($midwife->role) || $midwife->role !== 'admin') {
-            abort(403, 'Admin access required');
-        }
-    }
+    //     // Check if role field exists, is not null, and is set to 'admin'
+    //     if (!isset($midwife->role) || $midwife->role === null || empty($midwife->role) || $midwife->role !== 'admin') {
+    //         abort(403, 'Admin access required');
+    //     }
+    // }
     /**
      * Display a listing of the resource.
      */
@@ -121,6 +122,127 @@ class AdminController extends Controller
         return back()->withInput()->with('error', 'Gagal menambahkan bidan');
     }
 }
+/**
+ * Update user information
+ *
+ * @param Request $request
+ * @param string $id
+ * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+ */
+public function update(Request $request, $id)
+{
+    DB::beginTransaction();
+    try {
+        $user = User::where('user_id', $id)->firstOrFail();
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.$id.',user_id',
+            'phone_number' => 'required|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'password' => 'nullable|string|min:8|confirmed',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        $updateData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->phone_number,
+            'address' => $request->address,
+        ];
+
+        // Update password jika diisi
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
+        }
+
+        // Handle file upload
+        if ($request->hasFile('profile_picture')) {
+            // Delete old file if exists
+            if ($user->profile_picture) {
+                Storage::delete('public/'.$user->profile_picture);
+            }
+
+            $path = $request->file('profile_picture')->store('users', 'public');
+            $updateData['profile_picture'] = $path;
+        }
+
+        $user->update($updateData);
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pasien berhasil diperbarui',
+           // 'data' => $user,
+             'id' => $user->user_id
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error updating pasien: '.$e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan: '.$e->getMessage()
+        ], 500);
+    }
+}
+public function destroyUsers(string $id, FlasherInterface $flasher)
+{
+    try {
+        $user = User::findOrFail($id);
+
+        // Delete profile picture if exists
+        if ($user->profile_picture && file_exists(public_path('storage/' . $user->profile_picture))) {
+            unlink(public_path('storage/' . $user->profile_picture));
+        }
+
+        // Check if there are related records before deleting
+        // You might want to check if the user has appointments, pregnancy records, etc.
+        // and handle them accordingly (delete or set null references)
+
+        // Check for related UserPregnant records
+        $pregnancyRecords = UserPregnant::where('user_id', $id)->count();
+        if ($pregnancyRecords > 0) {
+            // Option 1: Prevent deletion if there are related records
+            // $flasher->addWarning('Tidak dapat menghapus pengguna karena memiliki data kehamilan');
+            // return redirect()->route('admin.user');
+
+            // Option 2: Delete related records
+            UserPregnant::where('user_id', $id)->delete();
+        }
+
+        // Check for related HealthTracking records
+        $healthRecords = HealthTracking::where('user_id', $id)->count();
+        if ($healthRecords > 0) {
+            HealthTracking::where('user_id', $id)->delete();
+        }
+
+        // Check for related Appointment records
+        $appointmentRecords = Appointment::where('user_id', $id)->count();
+        if ($appointmentRecords > 0) {
+            Appointment::where('user_id', $id)->delete();
+        }
+
+        // Delete the user
+        $user->delete();
+        $flasher->addSuccess('Pengguna berhasil dihapus');
+
+        return redirect()->route('admin.user');
+    } catch (\Exception $e) {
+        Log::error("Error deleting user: " . $e->getMessage());
+        $flasher->addError('Gagal menghapus pengguna');
+        return redirect()->route('admin.user');
+    }
+}
 
 
 
@@ -151,10 +273,7 @@ class AdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+
 
     /**
      * Remove the specified resource from storage.
