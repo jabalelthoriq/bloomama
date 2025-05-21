@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Flasher\Prime\FlasherInterface;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -178,21 +179,34 @@ public function update(Request $request, $id)
 
         DB::commit();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data pasien berhasil diperbarui',
-           // 'data' => $user,
-             'id' => $user->user_id
-        ]);
+        // Jika request adalah AJAX, return JSON response
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pasien berhasil diperbarui',
+                'id' => $user->user_id
+            ]);
+        }
+
+        // Untuk request non-AJAX, redirect dengan flasher
+        flash()->addSuccess('Data pasien berhasil diperbarui');
+        return redirect()->route('admin.user');
 
     } catch (\Exception $e) {
         DB::rollBack();
         Log::error('Error updating pasien: '.$e->getMessage());
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan: '.$e->getMessage()
-        ], 500);
+        // Jika request adalah AJAX, return JSON response
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: '.$e->getMessage()
+            ], 500);
+        }
+
+        // Untuk request non-AJAX, redirect dengan flasher
+        flash()->addError('Terjadi kesalahan: ' . $e->getMessage());
+        return redirect()->back()->withInput();
     }
 }
 public function destroyUsers(string $id, FlasherInterface $flasher)
@@ -244,6 +258,90 @@ public function destroyUsers(string $id, FlasherInterface $flasher)
     }
 }
 
+public function updateMidwife(Request $request, $id) {
+    DB::beginTransaction();
+    try {
+        $midwife = Midwive::where('midwife_id', $id)->firstOrFail();
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:midwives,email,'.$id.',midwife_id',
+            'phone_number' => 'required|string|max:20',
+            'status' => 'required|in:active,inactive',
+            'available_day' => 'nullable|string|max:255',
+            'start_time' => 'nullable',
+            'end_time' => 'nullable',
+            'password' => 'nullable|string|min:8|confirmed',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        $updateData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->phone_number,
+            'status' => $request->status,
+            'available_day' => $request->available_day,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+        ];
+
+        // Update password jika diisi
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
+        }
+
+        // Handle file upload
+        if ($request->hasFile('profile_picture')) {
+            // Delete old file if exists
+            if ($midwife->profile_picture) {
+                Storage::delete('public/'.$midwife->profile_picture);
+            }
+
+            $path = $request->file('profile_picture')->store('midwives', 'public');
+            $updateData['profile_picture'] = $path;
+        }
+
+        $midwife->update($updateData);
+
+        DB::commit();
+
+        // Jika request adalah AJAX, return JSON response
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data bidan berhasil diperbarui',
+                'id' => $midwife->midwife_id
+            ]);
+        }
+
+        // Untuk request non-AJAX, redirect dengan flash notification
+        flash()->addSuccess('Data bidan berhasil diperbarui');
+        return redirect()->route('admin.user');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error updating bidan: '.$e->getMessage());
+
+        // Jika request adalah AJAX, return JSON response
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: '.$e->getMessage()
+            ], 500);
+        }
+
+        // Untuk request non-AJAX, redirect dengan flash notification
+        flash()->addError('Terjadi kesalahan: ' . $e->getMessage());
+        return redirect()->back()->withInput();
+    }
+}
 
 
     /**

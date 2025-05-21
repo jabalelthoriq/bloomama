@@ -43,7 +43,8 @@ class User extends Authenticatable
         'password',
         'phone_number',
         'address',
-        'profile_picture'
+        'profile_picture',
+        'status'
     ];
 
     /**

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -411,6 +412,7 @@
 }
 </style>
 <body>
+    
     <div class="vertical-navbar">
         <div class="nav-logo" >
             <img src="{{ asset('image/logo2.png') }}" alt="Logo">
@@ -448,7 +450,7 @@
         <div class="header-container">
             <h2 class="fs-3 fw-bold m-0">Users</h2>
         </div>
-       <!-- Modal Edit Pasien Form -->
+    <!-- Modal Edit Pasien Form -->
 <div class="modal-overlay" id="editPasienModal">
     <div class="modal-container">
         <div class="modal-header">
@@ -458,64 +460,62 @@
             </button>
         </div>
         <div class="modal-body">
-             <form id="editPasienForm"
-      action="#"
-       @foreach($users as $user)
-      data-base-url-{{ $user->user_id }}="{{ route('admin.pasien.update', ['id' => $user->user_id]) }}"
-      @endforeach
-      method="POST"
-      enctype="multipart/form-data">
-    @csrf
-    <input type="hidden" id="editPasienId" name="user_id">
+            <!-- Form tanpa action - akan diatur oleh JavaScript -->
+            <form id="editPasienForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                <!-- Method POST untuk rute Laravel -->
+                <input type="hidden" name="_method" value="POST">
+                <!-- Pastikan ID tersimpan dan terkirim dengan benar -->
+                <input type="hidden" id="editPasienId" name="user_id">
 
-    <div class="mb-3">
-        <label for="editPasienName" class="form-label">Nama Pasien</label>
-        <input type="text" class="form-control" id="editPasienName" name="name" required>
-    </div>
+                <div class="mb-3">
+                    <label for="editPasienName" class="form-label">Nama Pasien</label>
+                    <input type="text" class="form-control" id="editPasienName" name="name" required>
+                </div>
 
-    <div class="mb-3">
-        <label for="editPasienEmail" class="form-label">Email</label>
-        <input type="email" class="form-control" id="editPasienEmail" name="email" required>
-    </div>
+                <div class="mb-3">
+                    <label for="editPasienEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="editPasienEmail" name="email" required>
+                </div>
 
-    <div class="mb-3">
-        <label for="editPasienPhoneNumber" class="form-label">Nomor Telepon</label>
-        <input type="text" class="form-control" id="editPasienPhoneNumber" name="phone_number" required>
-    </div>
+                <div class="mb-3">
+                    <label for="editPasienPhoneNumber" class="form-label">Nomor Telepon</label>
+                    <input type="text" class="form-control" id="editPasienPhoneNumber" name="phone_number" required>
+                </div>
 
-    <div class="mb-3">
-        <label for="editPasienAddress" class="form-label">Alamat</label>
-        <textarea class="form-control" id="editPasienAddress" name="address" rows="3"></textarea>
-    </div>
+                <div class="mb-3">
+                    <label for="editPasienAddress" class="form-label">Alamat</label>
+                    <textarea class="form-control" id="editPasienAddress" name="address" rows="3"></textarea>
+                </div>
 
-    <div class="mb-3">
-        <label for="editPasienPassword" class="form-label">Password Baru</label>
-        <input type="password" class="form-control" id="editPasienPassword" name="password">
-        <small class="text-muted">Kosongkan jika tidak ingin mengubah password</small>
-    </div>
+                <div class="mb-3">
+                    <label for="editPasienPassword" class="form-label">Password Baru</label>
+                    <input type="password" class="form-control" id="editPasienPassword" name="password">
+                    <small class="text-muted">Kosongkan jika tidak ingin mengubah password</small>
+                </div>
 
-    <div class="mb-3">
-        <label for="editPasienPasswordConfirmation" class="form-label">Konfirmasi Password</label>
-        <input type="password" class="form-control" id="editPasienPasswordConfirmation" name="password_confirmation">
-    </div>
+                <div class="mb-3">
+                    <label for="editPasienPasswordConfirmation" class="form-label">Konfirmasi Password</label>
+                    <input type="password" class="form-control" id="editPasienPasswordConfirmation" name="password_confirmation">
+                </div>
 
-    <div class="mb-3">
-        <label for="editPasienPhoto" class="form-label">Foto Profil</label>
-        <input type="file" class="form-control" id="editPasienPhoto" name="profile_picture" accept="image/*">
-        <small class="text-muted">Format: JPG, PNG (Max: 2MB)</small>
+                <div class="mb-3">
+                    <label for="editPasienPhoto" class="form-label">Foto Profil</label>
+                    <input type="file" class="form-control" id="editPasienPhoto" name="profile_picture" accept="image/*">
+                    <small class="text-muted">Format: JPG, PNG (Max: 2MB)</small>
 
-        <div class="mt-2">
-            <div id="currentPasienPhotoContainer" class="d-none">
-                <p class="mb-1">Foto Saat Ini:</p>
-                <img id="currentPasienPhoto" src="" class="img-thumbnail" style="max-width: 150px;">
-            </div>
-            <div id="editPasienPhotoPreview" class="d-none mt-2">
-                <p class="mb-1">Foto Baru:</p>
-                <img src="" class="img-thumbnail" style="max-width: 150px;">
-            </div>
-        </div>
-    </div>
-</form>
+                    <div class="mt-2">
+                        <div id="currentPasienPhotoContainer" class="d-none">
+                            <p class="mb-1">Foto Saat Ini:</p>
+                            <img id="currentPasienPhoto" src="" class="img-thumbnail" style="max-width: 150px;">
+                        </div>
+                        <div id="editPasienPhotoPreview" class="d-none mt-2">
+                            <p class="mb-1">Foto Baru:</p>
+                            <img src="" class="img-thumbnail" style="max-width: 150px;">
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" id="cancelEditPasienBtn">Batal</button>
@@ -524,70 +524,95 @@
     </div>
 </div>
 
-        <!-- Modal Input Bidan Form -->
-<div class="modal-overlay" id="eventModal">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h5 class="fw-bold m-0">Input Bidan Baru</h5>
-            <button class="close-modal" id="closeModalBtn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form action="{{ route('store.midwife') }}" method="POST" id="eventForm">
-                @csrf
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nama Bidan</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama bidan" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email Bidan</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email bidan" required>
-                </div>
-                <div class="mb-3">
-                    <label for="phone_number" class="form-label">Nomor Telepon</label>
-                    <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Masukkan nomor telepon" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="role" class="form-label">Role</label>
-                    <select class="form-select" id="role" name="role">
-                        <option value="midwife" selected>Bidan</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-select" id="status" name="status">
-                        <option value="active" selected>Aktif</option>
-                        <option value="inactive">Tidak Aktif</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="available_day" class="form-label">Hari Kerja</label>
-                    <input type="text" class="form-control" id="available_day" name="available_day" placeholder="Contoh: Senin-Jumat">
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="start_time" class="form-label">Jam Mulai</label>
-                        <input type="time" class="form-control" id="start_time" name="start_time">
+        <!-- Modal Edit Bidan Form - Improved to match pasien form -->
+    <div class="modal-overlay" id="editBidanModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h5 class="fw-bold m-0">Edit Bidan</h5>
+                <button type="button" class="close-modal" id="closeEditBidanModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editBidanForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="_method" value="POST">
+                    <input type="hidden" id="editBidanId" name="midwife_id">
+
+                    <div class="mb-3">
+                        <label for="editBidanName" class="form-label">Nama Bidan</label>
+                        <input type="text" class="form-control" id="editBidanName" name="name" required>
                     </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
-            <button type="submit" form="eventForm" class="btn btn-primary" style="background-color: #0400d4">Submit</button>
+
+                    <div class="mb-3">
+                        <label for="editBidanEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editBidanEmail" name="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editBidanPhoneNumber" class="form-label">Nomor Telepon</label>
+                        <input type="text" class="form-control" id="editBidanPhoneNumber" name="phone_number" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editBidanStatus" class="form-label">Status</label>
+                        <select class="form-control" id="editBidanStatus" name="status" required>
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Tidak Aktif</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editBidanAvailableDay" class="form-label">Hari Kerja</label>
+                        <input type="text" class="form-control" id="editBidanAvailableDay" name="available_day">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editBidanStartTime" class="form-label">Jam Mulai</label>
+                            <input type="time" class="form-control" id="editBidanStartTime" name="start_time">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editBidanEndTime" class="form-label">Jam Selesai</label>
+                            <input type="time" class="form-control" id="editBidanEndTime" name="end_time">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editBidanPassword" class="form-label">Password Baru</label>
+                        <input type="password" class="form-control" id="editBidanPassword" name="password">
+                        <small class="text-muted">Kosongkan jika tidak ingin mengubah password</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editBidanPasswordConfirmation" class="form-label">Konfirmasi Password</label>
+                        <input type="password" class="form-control" id="editBidanPasswordConfirmation" name="password_confirmation">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editBidanPhoto" class="form-label">Foto Profil</label>
+                        <input type="file" class="form-control" id="editBidanPhoto" name="profile_picture" accept="image/*">
+                        <small class="text-muted">Format: JPG, PNG (Max: 2MB)</small>
+
+                        <div class="mt-2">
+                            <div id="currentBidanPhotoContainer" class="d-none">
+                                <p class="mb-1">Foto Saat Ini:</p>
+                                <img id="currentBidanPhoto" src="" class="img-thumbnail" style="max-width: 150px;">
+                            </div>
+                            <div id="editBidanPhotoPreview" class="d-none mt-2">
+                                <p class="mb-1">Foto Baru:</p>
+                                <img src="" class="img-thumbnail" style="max-width: 150px;">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelEditBidanBtn">Batal</button>
+                <button type="button" class="btn btn-primary" id="updateBidanBtn" style="background-color: #0400d4">Update</button>
+            </div>
         </div>
     </div>
-</div>
 
 
         <!-- Modal Edit Bidan Form -->
@@ -735,13 +760,16 @@
                                                         </span>
                                                     </td>
                                                     <td class="text-end">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-bidan-btn"
-                                                            data-id="{{ $midwife->id }}"
+                                                       <button type="button" class="btn btn-sm btn-outline-primary edit-bidan-btn"
+                                                            data-id="{{ $midwife->midwife_id }}"
                                                             data-name="{{ $midwife->name }}"
                                                             data-email="{{ $midwife->email }}"
                                                             data-phone-number="{{ $midwife->phone_number }}"
-                                                            data-status="{{ $midwife->midwifeDetail ? $midwife->midwifeDetail->status : 'Active' }}"
-                                                            data-photo="{{ $midwife->photo ? asset('storage/' . $midwife->photo) : '' }}">
+                                                            data-status="{{ $midwife->status }}"
+                                                            data-available-day="{{ $midwife->available_day }}"
+                                                            data-start-time="{{ $midwife->start_time }}"
+                                                            data-end-time="{{ $midwife->end_time }}"
+                                                            data-photo="{{ $midwife->profile_picture ? asset('storage/' . $midwife->profile_picture) : '' }}">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
 
@@ -841,13 +869,14 @@
                                                     <td>{{ $user->phone_number }}</td>
                                                     <td>{{ $user->address }}</td>
                                                     <td class="text-end">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-pasien-btn"
-                                                        data-id="{{ $user->id }}"
-                                                        data-name="{{ $user->name }}"
-                                                        data-email="{{ $user->email }}"
-                                                        data-phone-number="{{ $user->phone_number }}"
-                                                        data-address="{{ $user->address }}"
-                                                        data-photo="{{ $user->photo ? asset('storage/' . $user->photo) : '' }}">
+
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-pasien-btn"
+                                                            data-id="{{ $user->user_id }}"
+                                                            data-name="{{ $user->name }}"
+                                                            data-email="{{ $user->email }}"
+                                                            data-phone-number="{{ $user->phone_number }}"
+                                                            data-address="{{ $user->address }}"
+                                                            data-photo="{{ $user->profile_picture_url }}">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                         <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
@@ -1152,179 +1181,199 @@
             closeModal();
         }
     });
+    });
 
 
-
-    // === EDIT BIDAN MODAL ===
+// === EDIT BIDAN FUNCTIONALITY ===
+document.addEventListener('DOMContentLoaded', function() {
     const editBidanModal = document.getElementById('editBidanModal');
+    const editBidanForm = document.getElementById('editBidanForm');
+    const editBidanPhoto = document.getElementById('editBidanPhoto');
+    const editBidanPhotoPreview = document.getElementById('editBidanPhotoPreview');
+    const currentBidanPhoto = document.getElementById('currentBidanPhoto');
+    const currentBidanPhotoContainer = document.getElementById('currentBidanPhotoContainer');
+    const updateBidanBtn = document.getElementById('updateBidanBtn');
     const closeEditBidanModalBtn = document.getElementById('closeEditBidanModalBtn');
     const cancelEditBidanBtn = document.getElementById('cancelEditBidanBtn');
-    const editBidanForm = document.getElementById('editBidanForm');
-    const editPhoto = document.getElementById('editPhoto');
-    const editPhotoPreview = document.getElementById('editPhotoPreview');
-    const removeEditPhoto = document.getElementById('removeEditPhoto');
-    const currentPhoto = document.getElementById('currentPhoto');
-    const currentPhotoContainer = document.getElementById('currentPhotoContainer');
-    const updateBidanBtn = document.getElementById('updateBidanBtn');
 
-    document.querySelectorAll('.edit-pasien-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const id = this.dataset.id;
-        const name = this.dataset.name;
-        const email = this.dataset.email;
-        const phoneNumber = this.dataset.phoneNumber;
-        const address = this.dataset.address;
-        const photoUrl = this.dataset.photo;
+    // Definisikan fungsi route di JavaScript
+    function route(name, params = {}) {
+        // Ambil data rute dari meta tag yang disediakan Laravel
+        let routes = window.Laravel.routes || {};
+        let route = routes[name] || '';
 
-        // Ambil URL dari atribut data yang sesuai
-        const baseUrl = editPasienForm.getAttribute(`data-base-url-${id}`);
-
-        // Pastikan URL ditemukan
-        if (!baseUrl) {
-            console.error(`URL not found for user ID: ${id}`);
-            return;
-        }
-
-        // Update form action
-        editPasienForm.action = baseUrl;
-
-        // Isi form fields
-        document.getElementById('editPasienId').value = id;
-        document.getElementById('editPasienName').value = name;
-        document.getElementById('editPasienEmail').value = email;
-        document.getElementById('editPasienPhoneNumber').value = phoneNumber;
-        document.getElementById('editPasienAddress').value = address || '';
-
-        // Handle photo preview
-        if (photoUrl && photoUrl !== 'null') {
-            currentPasienPhoto.src = photoUrl;
-            currentPasienPhotoContainer.classList.remove('d-none');
-        } else {
-            currentPasienPhotoContainer.classList.add('d-none');
-        }
-
-        // Reset fields
-        editPasienPhotoPreview.classList.add('d-none');
-        editPasienPhoto.value = '';
-        document.getElementById('editPasienPassword').value = '';
-        document.getElementById('editPasienPasswordConfirmation').value = '';
-
-        // Show modal
-        editPasienModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-});
-
-// Handle form submission
-updatePasienBtn.addEventListener('click', async function() {
-    const formData = new FormData(editPasienForm);
-
-    // Loading state
-    updatePasienBtn.disabled = true;
-    updatePasienBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-    try {
-        const response = await fetch(editPasienForm.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
+        // Ganti parameter dalam route
+        if (typeof params === 'object') {
+            for (let key in params) {
+                route = route.replace(new RegExp(`{${key}}`, 'g'), params[key]);
             }
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Gagal memperbarui data');
-        }
-
-        if (data.success) {
-            alertify.success(data.message || 'Data berhasil diperbarui');
-            closeEditPasienModal();
-
-            // Refresh data table atau halaman
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
         } else {
-            throw new Error(data.message || 'Gagal memperbarui data');
+            // Jika params bukan object, anggap sebagai parameter tunggal
+            route = route.replace(/{[^}]+}/, params);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alertify.error(error.message || 'Terjadi kesalahan saat memperbarui data');
-    } finally {
-        updatePasienBtn.disabled = false;
-        updatePasienBtn.innerHTML = 'Update';
-    }
-});
 
-    // Close edit modal functions
-    function closeEditModal() {
-        editBidanModal.classList.remove('active');
-        document.body.style.overflow = '';
+        return route;
     }
 
-    closeEditBidanModalBtn.addEventListener('click', closeEditModal);
-    cancelEditBidanBtn.addEventListener('click', closeEditModal);
+    window.Laravel = {
+        routes: {
+            'admin.midwife.update': '{{ route("admin.midwife.update", ["id" => "__id__"]) }}'.replace('__id__', '')
+        }
+    };
+
+    // Handle edit buttons for bidan - Switched to getAttribute() to match user edit functionality
+    document.querySelectorAll('.edit-bidan-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const name = this.getAttribute('data-name');
+            const email = this.getAttribute('data-email');
+            const phoneNumber = this.getAttribute('data-phone-number');
+            const status = this.getAttribute('data-status');
+            const availableDay = this.getAttribute('data-available-day');
+            const startTime = this.getAttribute('data-start-time');
+            const endTime = this.getAttribute('data-end-time');
+            const photoUrl = this.getAttribute('data-photo');
+
+            console.log("Opening edit modal for bidan ID:", id); // Debug
+
+            // Set form action
+            editBidanForm.action = `/midwife/update/${id}`;
+
+            // Populate form fields
+            document.getElementById('editBidanId').value = id;
+            document.getElementById('editBidanName').value = name;
+            document.getElementById('editBidanEmail').value = email;
+            document.getElementById('editBidanPhoneNumber').value = phoneNumber;
+            document.getElementById('editBidanStatus').value = status;
+            document.getElementById('editBidanAvailableDay').value = availableDay || '';
+            document.getElementById('editBidanStartTime').value = startTime || '';
+            document.getElementById('editBidanEndTime').value = endTime || '';
+
+            // Handle photo preview
+            if (photoUrl && photoUrl !== 'null') {
+                currentBidanPhoto.src = photoUrl;
+                currentBidanPhotoContainer.classList.remove('d-none');
+            } else {
+                currentBidanPhotoContainer.classList.add('d-none');
+            }
+
+            // Reset fields
+            editBidanPhotoPreview.classList.add('d-none');
+            editBidanPhoto.value = '';
+            document.getElementById('editBidanPassword').value = '';
+            document.getElementById('editBidanPasswordConfirmation').value = '';
+
+            // Show modal
+            editBidanModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    // Handle file input change for photo preview
+    editBidanPhoto.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            const previewContainer = document.getElementById('editBidanPhotoPreview');
+            const previewImage = previewContainer.querySelector('img');
+
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewContainer.classList.remove('d-none');
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Close modal handlers
+    closeEditBidanModalBtn.addEventListener('click', closeEditBidanModal);
+    cancelEditBidanBtn.addEventListener('click', closeEditBidanModal);
 
     // Close edit modal when clicking outside
     editBidanModal.addEventListener('click', function(e) {
         if (e.target === editBidanModal) {
-            closeEditModal();
+            closeEditBidanModal();
         }
     });
 
-    // Handle photo preview
-    editPhoto.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                editPhotoPreview.querySelector('img').src = e.target.result;
-                editPhotoPreview.classList.remove('d-none');
-            };
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
 
-    // Remove selected new photo
-    removeEditPhoto.addEventListener('click', function() {
-        editPhoto.value = '';
-        editPhotoPreview.classList.add('d-none');
-    });
+    // Close edit modal function
+    function closeEditBidanModal() {
+        editBidanModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
 
-    // Handle form submission
-    updateBidanBtn.addEventListener('click', function() {
+    // Handle form submission for bidan
+    updateBidanBtn.addEventListener('click', async function() {
         const formData = new FormData(editBidanForm);
         const midwifeId = document.getElementById('editBidanId').value;
 
-        // Add the _method field for Laravel to recognize this as a PUT request
-        formData.append('_method', 'PUT');
+        console.log("Bidan ID being submitted:", midwifeId); // Debug
 
-        fetch(`/midwives/${midwifeId}`, {
-            method: 'POST', // Still using POST but Laravel will treat it as PUT
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
+        // Pastikan midwifeId tidak kosong
+        if (!midwifeId) {
+            console.error("Error: Bidan ID is empty!");
+            // Menggunakan alertify sesuai dengan kode pasien
+            if (typeof alertify !== 'undefined') {
+                alertify.error("ID Bidan tidak ditemukan. Silakan coba lagi.");
             } else {
-                // Handle errors
-                console.error('Error updating bidan:', data.message);
-                alert('Error updating bidan: ' + data.message);
+                alert("ID Bidan tidak ditemukan. Silakan coba lagi.");
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while updating the bidan.');
-        });
+            return;
+        }
+
+        // Validate password confirmation
+        const password = document.getElementById('editBidanPassword').value;
+        const passwordConfirmation = document.getElementById('editBidanPasswordConfirmation').value;
+
+        if (password && password !== passwordConfirmation) {
+            if (typeof alertify !== 'undefined') {
+                alertify.error("Password dan konfirmasi password tidak sama");
+            } else {
+                alert("Password dan konfirmasi password tidak sama");
+            }
+            return;
+        }
+
+        // Loading state
+        updateBidanBtn.disabled = true;
+        updateBidanBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
+
+        try {
+            const response = await fetch(editBidanForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Gagal memperbarui data bidan');
+            }
+
+            if (data.success) {
+    closeEditBidanModal();
+    window.location.reload(); // Flasher akan tampil setelah reload
+}
+ else {
+                throw new Error(data.message || 'Gagal memperbarui data bidan');
+            }
+        } catch (error) {
+    console.error('Error:', error);
+    alert(error.message || 'Terjadi kesalahan saat memperbarui data bidan'); // fallback sederhana
+} finally {
+            updateBidanBtn.disabled = false;
+            updateBidanBtn.innerHTML = 'Update';
+        }
     });
 });
+
 
 ///edit users
 const editPasienModal = document.getElementById('editPasienModal');
@@ -1338,15 +1387,46 @@ const currentPasienPhoto = document.getElementById('currentPasienPhoto');
 const currentPasienPhotoContainer = document.getElementById('currentPasienPhotoContainer');
 const updatePasienBtn = document.getElementById('updatePasienBtn');
 
+
+    // Definisikan fungsi route di JavaScript
+    function route(name, params = {}) {
+        // Ambil data rute dari meta tag yang disediakan Laravel
+        let routes = window.Laravel.routes || {};
+        let route = routes[name] || '';
+
+        // Ganti parameter dalam route
+        if (typeof params === 'object') {
+            for (let key in params) {
+                route = route.replace(new RegExp(`{${key}}`, 'g'), params[key]);
+            }
+        } else {
+            // Jika params bukan object, anggap sebagai parameter tunggal
+            route = route.replace(/{[^}]+}/, params);
+        }
+
+        return route;
+    }
+
+
+    window.Laravel = {
+        routes: {
+            'admin.pasien.update': '{{ route("admin.pasien.update", ["id" => "__id__"]) }}'.replace('__id__', '')
+        }
+    };
+
+
 // Function to handle edit buttons for patients
 document.querySelectorAll('.edit-pasien-btn').forEach(button => {
     button.addEventListener('click', function() {
-        const id = this.dataset.id;
-        const name = this.dataset.name;
-        const email = this.dataset.email;
-        const phoneNumber = this.dataset.phoneNumber;
-        const address = this.dataset.address;
-        const photoUrl = this.dataset.photo;
+        // Ambil data dari atribut data- pada tombol
+        const id = this.getAttribute('data-id');
+        const name = this.getAttribute('data-name');
+        const email = this.getAttribute('data-email');
+        const phoneNumber = this.getAttribute('data-phone-number');
+        const address = this.getAttribute('data-address');
+        const photoUrl = this.getAttribute('data-photo');
+
+        console.log("Opening edit modal for user ID:", id); // Debug
 
         // Populate the form fields
         document.getElementById('editPasienId').value = id;
@@ -1356,6 +1436,11 @@ document.querySelectorAll('.edit-pasien-btn').forEach(button => {
         document.getElementById('editPasienAddress').value = address || '';
 
         // Handle photo preview
+        const currentPasienPhotoContainer = document.getElementById('currentPasienPhotoContainer');
+        const currentPasienPhoto = document.getElementById('currentPasienPhoto');
+        const editPasienPhotoPreview = document.getElementById('editPasienPhotoPreview');
+        const editPasienPhoto = document.getElementById('editPasienPhoto');
+
         if (photoUrl && photoUrl !== '') {
             currentPasienPhoto.src = photoUrl;
             currentPasienPhotoContainer.classList.remove('d-none');
@@ -1370,9 +1455,227 @@ document.querySelectorAll('.edit-pasien-btn').forEach(button => {
         document.getElementById('editPasienPasswordConfirmation').value = '';
 
         // Show modal
+        const editPasienModal = document.getElementById('editPasienModal');
         editPasienModal.classList.add('active');
         document.body.style.overflow = 'hidden';
     });
+});
+
+// Handle file input change for photo preview
+document.getElementById('editPasienPhoto').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        const previewContainer = document.getElementById('editPasienPhotoPreview');
+        const previewImage = previewContainer.querySelector('img');
+
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.classList.remove('d-none');
+        };
+
+        reader.readAsDataURL(file);
+    }
+});
+
+// Alternatif jika flasher tidak tersedia
+function showFlasherAlert(type, title, message) {
+    // Pastikan library flasher tersedia, jika tidak gunakan alternatif
+    if (typeof flasher !== 'undefined') {
+        flasher[type](title, message);
+    } else {
+        // Alternatif jika flasher tidak tersedia
+        alert(message);
+    }
+}
+
+// Handle the update button click
+document.getElementById('updatePasienBtn').addEventListener('click', function() {
+    const form = document.getElementById('editPasienForm');
+    const userId = document.getElementById('editPasienId').value;
+
+    // Pastikan userId tidak kosong
+    if (!userId) {
+        console.error("Error: User ID is empty!");
+        alert("ID Pasien tidak ditemukan. Silakan coba lagi.");
+        return;
+    }
+
+    // Set action URL dengan ID yang sudah dipastikan ada
+    form.action = `/pasien/update/${userId}`;
+
+    // Menggunakan AJAX untuk update data dan menampilkan notifikasi dengan flasher
+    const formData = new FormData(form);
+
+    // Tampilkan loading state
+    const updateBtn = document.getElementById('updatePasienBtn');
+    const originalText = updateBtn.innerHTML;
+    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+    updateBtn.disabled = true;
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Tutup modal
+        document.getElementById('editPasienModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+
+        // Notifikasi akan ditampilkan oleh controller dengan flasher
+        // setelah reload halaman
+
+        // Refresh halaman setelah jeda singkat
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Notifikasi error akan ditampilkan oleh controller
+
+        // Namun untuk UX yang lebih baik, juga tampilkan error di klien
+        alert('Terjadi kesalahan saat memperbarui data pasien');
+    })
+    .finally(() => {
+        // Kembalikan button ke kondisi awal
+        updateBtn.innerHTML = originalText;
+        updateBtn.disabled = false;
+    });
+});
+
+// Close modal handlers
+document.getElementById('closeEditPasienModalBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+});
+
+document.getElementById('cancelEditPasienBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+});
+
+// Handle file input change for photo preview
+document.getElementById('editPasienPhoto').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        const previewContainer = document.getElementById('editPasienPhotoPreview');
+        const previewImage = previewContainer.querySelector('img');
+
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.classList.remove('d-none');
+        };
+
+        reader.readAsDataURL(file);
+    }
+});
+
+// Handle the update button click
+document.getElementById('updatePasienBtn').addEventListener('click', function() {
+    const form = document.getElementById('editPasienForm');
+    const userId = document.getElementById('editPasienId').value;
+
+    console.log("User ID being submitted:", userId); // Debug
+
+    // Pastikan userId tidak kosong
+    if (!userId) {
+        console.error("Error: User ID is empty!");
+        alert("ID Pasien tidak ditemukan. Silakan coba lagi.");
+        return;
+    }
+
+    // Set action URL dengan ID yang sudah dipastikan ada
+    form.action = `/pasien/update/${userId}`;
+    console.log("Form action set to:", form.action); // Debug
+    form.submit();
+});
+
+// Close modal handlers
+document.getElementById('closeEditPasienModalBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+});
+
+document.getElementById('cancelEditPasienBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+});
+
+// Handle file input change for photo preview
+document.getElementById('editPasienPhoto').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        const previewContainer = document.getElementById('editPasienPhotoPreview');
+        const previewImage = previewContainer.querySelector('img');
+
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.classList.remove('d-none');
+        };
+
+        reader.readAsDataURL(file);
+    }
+});
+
+// Handle the update button click
+document.getElementById('updatePasienBtn').addEventListener('click', function() {
+    document.getElementById('editPasienForm').submit();
+});
+
+// Close modal handlers
+document.getElementById('closeEditPasienModalBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+});
+
+document.getElementById('cancelEditPasienBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+});
+
+// Handle file input change for photo preview
+document.getElementById('editPasienPhoto').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        const previewContainer = document.getElementById('editPasienPhotoPreview');
+        const previewImage = previewContainer.querySelector('img');
+
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.classList.remove('d-none');
+        };
+
+        reader.readAsDataURL(file);
+    }
+});
+
+// Handle the update button click
+document.getElementById('updatePasienBtn').addEventListener('click', function() {
+    document.getElementById('editPasienForm').submit();
+});
+
+// Close modal handlers
+document.getElementById('closeEditPasienModalBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+});
+
+document.getElementById('cancelEditPasienBtn').addEventListener('click', function() {
+    document.getElementById('editPasienModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
 });
 
 // Close edit modal functions

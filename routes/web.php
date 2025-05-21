@@ -13,7 +13,6 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SettingController;
 
-Route::resource('admin/pasien', AdminController::class);
 
 
 
@@ -70,6 +69,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         //menu2
         Route::get('/menu2', [AdminController::class, 'showUsersAndMidwives'])->name('admin.user');
         Route::post('/midwives', [AdminController::class, 'storeMidwife'])->name('store.midwife');
+        Route::post('/pasien/update/{id}', [AdminController::class, 'update'])->name('admin.pasien.update');
+        Route::post('/midwife/update/{id}', [AdminController::class, 'updateMidwife'])->name('admin.midwife.update');
+
+
 
         // Event routes
         Route::get('/acara', [EventController::class, 'showevent'])->name('acara');

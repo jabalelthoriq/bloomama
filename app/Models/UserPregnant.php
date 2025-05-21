@@ -24,6 +24,7 @@ class UserPregnant extends Model
         'pregnancy_week',
         'last_check_date',
         'notes',
+        'status'
     ];
 
     protected $casts = [
