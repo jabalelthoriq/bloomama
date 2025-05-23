@@ -38,6 +38,6 @@ Route::post('/register-pregnancies/{user_id}', [dashboardcontroller::class, 'reg
 ///kesehatan
 Route::get('/content/latest', [kesehatancontroller::class, 'getLatestContent']);
 Route::get('/content/all', [kesehatancontroller::class, 'getAllContents']);
-Route::get('{pregnancy_id}/week/{week}',[kesehatancontroller::class, 'getPregnancyByIdWithWeek'] )->where(['pregnancy_id' => '[0-9]+','week' => '[0-9]+']);
+Route::get('/user/{user_id}/week/{week}',[kesehatancontroller::class, 'getHealthTrackingByWeek'] )->where(['pregnancy_id' => '[0-9]+','week' => '[0-9]+']);
 
 

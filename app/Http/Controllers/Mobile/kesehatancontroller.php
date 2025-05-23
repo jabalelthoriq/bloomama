@@ -43,56 +43,57 @@ class kesehatancontroller extends Controller
         ]);
     }
 
-public function getPregnancyByIdWithWeek($pregnancy_id, $week)
+public function getHealthTrackingByWeek($user_id, $week)
 {
     try {
         // Validasi week
         if (!is_numeric($week) || $week < 1 || $week > 40) {
             return response()->json([
                 'success' => false,
-                'message' => 'Minggu kehamilan harus antara 1-40'
+                'message' => 'Pregnancy week must be between 1-40'
             ], 400);
         }
 
-        $pregnancy = HealthTracking::where('pregnancy_id', $pregnancy_id)
-                                ->where('pregnancy_week', $week)
-                                ->first([
-                                    'tracking_id',
-                                    'pregnancy_week',
-                                    'weight',
-                                    'height',
-                                    'blood_pressure',
-                                    'heart_rate',
-                                    'notes',
-                                    'date_recorded'
-                                ]);
+        $healthTracking = HealthTracking::where('user_id', $user_id)
+                                     ->where('pregnancy_week', $week)
+                                     ->first([
+                                         'tracking_id',
+                                         'user_id',
+                                         'pregnancy_week',
+                                         'weight',
+                                         'height',
+                                         'blood_pressure',
+                                         'heart_rate',
+                                         'notes',
+                                         'date_recorded'
+                                     ]);
 
-        if (!$pregnancy) {
+        if (!$healthTracking) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data kehamilan tidak ditemukan untuk ID '.$pregnancy_id.' dan minggu ke-'.$week
+                'message' => 'Health tracking data not found for week '.$week
             ], 404);
         }
 
         return response()->json([
             'success' => true,
             'data' => [
-                'tracking_id' => $pregnancy->tracking_id,
-                'pregnancy_id' => $pregnancy_id,
-                'week' => $pregnancy->pregnancy_week,
-                'weight' => $pregnancy->weight,
-                'height' => $pregnancy->height,
-                'blood_pressure' => $pregnancy->blood_pressure,
-                'heart_rate' => $pregnancy->heart_rate,
-                'notes' => $pregnancy->notes,
-                'date_recorded' => $pregnancy->date_recorded
+                'tracking_id' => $healthTracking->tracking_id,
+                'user_id' => $healthTracking->user_id,
+                'week' => $healthTracking->pregnancy_week,
+                'weight' => $healthTracking->weight,
+                'height' => $healthTracking->height,
+                'blood_pressure' => $healthTracking->blood_pressure,
+                'heart_rate' => $healthTracking->heart_rate,
+                'notes' => $healthTracking->notes,
+                'date_recorded' => $healthTracking->date_recorded
             ]
         ]);
 
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Terjadi kesalahan',
+            'message' => 'An error occurred',
             'error' => $e->getMessage()
         ], 500);
     }
