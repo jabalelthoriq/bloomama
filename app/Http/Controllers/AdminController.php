@@ -209,52 +209,18 @@ public function update(Request $request, $id)
         return redirect()->back()->withInput();
     }
 }
-public function destroyUsers(string $id, FlasherInterface $flasher)
+
+public function destroyUsers($id)
 {
     try {
         $user = User::findOrFail($id);
-
-        // Delete profile picture if exists
-        if ($user->profile_picture && file_exists(public_path('storage/' . $user->profile_picture))) {
-            unlink(public_path('storage/' . $user->profile_picture));
-        }
-
-        // Check if there are related records before deleting
-        // You might want to check if the user has appointments, pregnancy records, etc.
-        // and handle them accordingly (delete or set null references)
-
-        // Check for related UserPregnant records
-        $pregnancyRecords = UserPregnant::where('user_id', $id)->count();
-        if ($pregnancyRecords > 0) {
-            // Option 1: Prevent deletion if there are related records
-            // $flasher->addWarning('Tidak dapat menghapus pengguna karena memiliki data kehamilan');
-            // return redirect()->route('admin.user');
-
-            // Option 2: Delete related records
-            UserPregnant::where('user_id', $id)->delete();
-        }
-
-        // Check for related HealthTracking records
-        $healthRecords = HealthTracking::where('user_id', $id)->count();
-        if ($healthRecords > 0) {
-            HealthTracking::where('user_id', $id)->delete();
-        }
-
-        // Check for related Appointment records
-        $appointmentRecords = Appointment::where('user_id', $id)->count();
-        if ($appointmentRecords > 0) {
-            Appointment::where('user_id', $id)->delete();
-        }
-
-        // Delete the user
         $user->delete();
-        $flasher->addSuccess('Pengguna berhasil dihapus');
 
-        return redirect()->route('admin.user');
+        return redirect()->route('admin.user')
+            ->with('success', 'User berhasil dihapus.');
     } catch (\Exception $e) {
-        Log::error("Error deleting user: " . $e->getMessage());
-        $flasher->addError('Gagal menghapus pengguna');
-        return redirect()->route('admin.user');
+        \Log::error("Delete User Error: " . $e->getMessage());
+        return back()->with('error', 'Gagal menghapus user.');
     }
 }
 
@@ -262,7 +228,7 @@ public function updateMidwife(Request $request, $id) {
     DB::beginTransaction();
     try {
         $midwife = Midwive::where('midwife_id', $id)->firstOrFail();
-
+    
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:midwives,email,'.$id.',midwife_id',
@@ -340,6 +306,41 @@ public function updateMidwife(Request $request, $id) {
         // Untuk request non-AJAX, redirect dengan flash notification
         flash()->addError('Terjadi kesalahan: ' . $e->getMessage());
         return redirect()->back()->withInput();
+    }
+}
+
+
+    public function destroyMidwife(string $id, FlasherInterface $flasher)
+{
+    try {
+        $midwife = Midwive::where('midwife_id', $id)->firstOrFail();
+
+        // Delete profile picture if exists
+        if ($midwife->profile_picture && Storage::exists('public/' . $midwife->profile_picture)) {
+            Storage::delete('public/' . $midwife->profile_picture);
+        }
+
+        // Check for related appointments and handle them
+        $appointmentRecords = Appointment::where('midwife_id', $id)->count();
+        if ($appointmentRecords > 0) {
+            // Option 1: Prevent deletion if there are related appointments
+            // $flasher->addWarning('Tidak dapat menghapus bidan karena memiliki janji temu dengan pasien');
+            // return redirect()->route('admin.user');
+
+            // Option 2: Delete related appointments or reassign them
+            Appointment::where('midwife_id', $id)->delete();
+            // Alternative: You could reassign appointments to another midwife here
+        }
+
+        // Delete the midwife
+        $midwife->delete();
+        $flasher->addSuccess('Bidan berhasil dihapus');
+
+        return redirect()->route('admin.user');
+    } catch (\Exception $e) {
+        Log::error("Error deleting midwife: " . $e->getMessage());
+        $flasher->addError('Gagal menghapus bidan: ' . $e->getMessage());
+        return redirect()->route('admin.user');
     }
 }
 

@@ -623,10 +623,10 @@
                             data-thumbnail="{{ $content->thumbnail ? asset('storage/' . $content->thumbnail) : '' }}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <form action="{{ route('content.destroy', $content->id) }}" method="POST" class="d-inline">
+                        <form action="{{ route('content.destroy', $content->content_id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Are you sure you want to delete this content?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteContent(event, this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
@@ -761,6 +761,23 @@
     });
 }
 
+
+function confirmDeleteContent(event, button) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.closest('form').submit();
+                }
+            });
+        }
         // Add navbar animation code
         document.addEventListener('DOMContentLoaded', function() {
             // Get all nav icons except logo and logout

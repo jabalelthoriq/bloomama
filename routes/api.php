@@ -16,7 +16,7 @@ Route::delete('/users', [UsersController::class, 'destroy'])->name('users.destro
 
 
 
-//mobile api
+    //mobile api
 
 ///auth
 Route::post('/register', [authcontroller::class, 'register']);
@@ -29,9 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
-///dashboard
-Route::get('/health-trackings/user/{userId}', [dashboardcontroller::class, 'getHealthTrackingByUserId']);
-Route::post('/register-pregnancies/{user_id}', [dashboardcontroller::class, 'registerUserPregnancy']);
+    ///dashboard
+    Route::get('/health-trackings/user/{userId}', [dashboardcontroller::class, 'getHealthTrackingByUserId']);
+    Route::post('/register-pregnancies/{user_id}', [dashboardcontroller::class, 'registerUserPregnancy']);
 
 
 

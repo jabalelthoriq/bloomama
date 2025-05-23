@@ -185,20 +185,21 @@ class EventController extends Controller
     /**
      * Delete an event
      */
-    public function destroyEvent($id, FlasherInterface $flasher)
-    {
-        try {
-            $event = Event::findOrFail($id);
-            $event->delete();
+   public function destroy($id, FlasherInterface $flasher)
+{
+    try {
+        $event = Event::findOrFail($id);
+        $event->delete();
 
-            $flasher->addSuccess('Event berhasil dihapus');
-            return redirect()->route('acara');
-        } catch (\Exception $e) {
-            Log::error("Error deleting event: " . $e->getMessage());
-            $flasher->addError('Gagal menghapus event: ' . $e->getMessage());
-            return redirect()->route('acara');
-        }
+        $flasher->addSuccess('Event berhasil dihapus');
+        return redirect()->route('acara');
+    } catch (\Exception $e) {
+        Log::error("Error deleting event: " . $e->getMessage());
+        $flasher->addError('Gagal menghapus event: ' . $e->getMessage());
+        return redirect()->route('acara');
     }
+}
+
 
     /**
      * Update event status
@@ -230,3 +231,4 @@ class EventController extends Controller
         }
     }
 }
+

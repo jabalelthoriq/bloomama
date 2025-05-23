@@ -12,8 +12,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-  
+
+
     <style>
         .flasher {
     background-color: #ffffff;
@@ -139,7 +139,7 @@
             border-radius: 12px;
         }
 
-        .table>:not(caption)>*>* {
+        .table>:not(caption)>> {
             padding: 0.75rem 1rem;
             vertical-align: middle;
         }
@@ -192,7 +192,7 @@
             overflow-x: auto;
         }
 
-        .table>:not(caption)>*>* {
+        .table>:not(caption)>> {
             padding: 1rem 1.25rem;
             vertical-align: middle;
         }
@@ -399,6 +399,26 @@
     </style>
 </head>
 
+<script>
+    function confirmDeleteEvent(event, button) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                button.closest('form').submit();
+            }
+        });
+    }
+</script>
+
+
 <body>
 
 
@@ -572,11 +592,11 @@
                                                 data-description="{{ $event->description }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
-                                            <form action="{{ route('event.destroy', ['id' => $event->id]) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('event.destroy', $event->event_id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
-                                                    <i class="bi bi-trash"></i>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteEvent(event, this)">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
                                         </th>
@@ -703,6 +723,25 @@
     });
 }
 
+
+function confirmDeleteEvent(event, button) {
+    event.preventDefault();
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            button.closest('form').submit();
+        }
+    });
+}
+
+
         // Modal functionality
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('eventModal');
@@ -820,9 +859,6 @@
             }
         });
 
-        // Delete confirmation
-        function confirmDelete(event, button) {
-            event.preventDefault();
 
             Swal.fire({
                 title: 'Konfirmasi Hapus',
@@ -838,7 +874,7 @@
                     button.closest('form').submit();
                 }
             });
-        }
+
 
         // Save & restore scroll position for pagination
         document.addEventListener('DOMContentLoaded', function() {
@@ -866,7 +902,7 @@
                 window.scrollTo(0, parseInt(sessionStorage.getItem('eventScrollPosition')));
             }
         });
-    
+
 
 
 
@@ -889,7 +925,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ganti parameter dalam route
         if (typeof params === 'object') {
             for (let key in params) {
-                route = route.replace(new RegExp(`{${key}}`, 'g'), params[key]);
+                route = route.replace(new RegExp({${key}}, 'g'), params[key]);
             }
         } else {
             // Jika params bukan object, anggap sebagai parameter tunggal
@@ -901,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.Laravel = {
         routes: {
-            'admin.event.update': '{{ route("admin.event.update", ["id" => "__id__"]) }}'.replace('__id__', '')
+            'admin.event.update': '{{ route("admin.event.update", ["id" => "_id"]) }}'.replace('id_', '')
         }
     };
 
@@ -918,14 +954,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const formatForDateTimeInput = (dateString) => {
                 const date = new Date(dateString);
                 const pad = (num) => num.toString().padStart(2, '0');
-                return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+                return ${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())};
             };
 
             console.log("Opening edit modal for event ID:", id); // Debug
 
             // Set form action
-            editEventForm.action = `/event/update/${id}`;
-          
+            editEventForm.action = /event/update/${id};
+
             // Populate form fields
             document.getElementById('editEventId').value = id;
             document.getElementById('editEventTitle').value = title;
@@ -947,7 +983,7 @@ document.addEventListener('DOMContentLoaded', function() {
     editEventModal.addEventListener('click', function(e) {
         if (e.target === editEventModal) {
             closeEditEventModal();
-            
+
         }
     });
 
@@ -1041,7 +1077,7 @@ updateEventBtnText.addEventListener('click', async function() {
         }
     } catch (error) {
         console.error('Error:', error);
-        
+
         // Close loading dialog if still open
         if (swalInstance.isOpen) {
             await swalInstance.close();
@@ -1062,7 +1098,7 @@ updateEventBtnText.addEventListener('click', async function() {
     });
 
 });
-    
+
 
 
 

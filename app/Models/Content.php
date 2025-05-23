@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Content extends Model
 {
     use HasFactory;
-protected $primaryKey = 'content_id';
+    protected $primaryKey = 'content_id';
+
     /**
      * The attributes that are mass assignable.
      *
