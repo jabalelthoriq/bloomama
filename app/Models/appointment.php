@@ -10,6 +10,9 @@ class Appointment extends Model
     use HasFactory;
 
     protected $table = 'appointments';
+    protected $primaryKey = 'appointment_id'; 
+    public $incrementing = true;             
+    protected $keyType = 'int';               
 
     protected $fillable = [
         'user_id',
@@ -19,15 +22,36 @@ class Appointment extends Model
         'notes',
     ];
 
+    /**
+     * Format waktu janji temu
+     */
     public function getFormattedVisitTime()
     {
         return date('h:ia', strtotime($this->date_time));
     }
 
+    /**
+     * Ambil inisial dari user_id
+     * (sebaiknya diganti jika kamu sudah punya relasi ke tabel user)
+     */
     public function getInitials()
     {
-        // Since we don't have a patient_name field, we'll return a placeholder
-        // You might want to establish relationships with a users table to get the actual name
         return 'U' . $this->user_id;
+    }
+
+    /**
+     * Relasi ke User (opsional)
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relasi ke Midwife (opsional)
+     */
+    public function midwife()
+    {
+        return $this->belongsTo(Midwife::class);
     }
 }

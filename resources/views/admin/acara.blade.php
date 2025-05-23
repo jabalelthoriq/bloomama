@@ -5,15 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
     <title>Event</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@flasher/flasher@1.2.4/dist/flasher.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@flasher/flasher@1.2.4/dist/flasher.min.css">
+    
+  
     <style>
+        .flasher {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.flasher .flasher-title {
+    font-weight: bold;
+    color: #000;
+}
+.flasher-success {
+    border-left: 5px solid #28a745;
+}
+.flasher-error {
+    border-left: 5px solid #dc3545;
+}
+.flasher-warning {
+    border-left: 5px solid #ffc107;
+}
+.flasher-info {
+    border-left: 5px solid #17a2b8;
+}
+
         body {
             margin: 0;
             padding: 0;
@@ -115,7 +139,7 @@
             border-radius: 12px;
         }
 
-        .table>:not(caption)>*>* {
+        .table>:not(caption)>> {
             padding: 0.75rem 1rem;
             vertical-align: middle;
         }
@@ -168,7 +192,7 @@
             overflow-x: auto;
         }
 
-        .table>:not(caption)>*>* {
+        .table>:not(caption)>> {
             padding: 1rem 1.25rem;
             vertical-align: middle;
         }
@@ -375,6 +399,26 @@
     </style>
 </head>
 
+<script>
+    function confirmDeleteEvent(event, button) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                button.closest('form').submit();
+            }
+        });
+    }
+</script>
+
+
 <body>
 
 
@@ -427,9 +471,8 @@
             </button>
         </div>
         <div class="modal-body">
-            <form id="editEventForm">
+            <form id="editEventForm"  method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
                 <input type="hidden" id="editEventId" name="event_id">
                 <div class="mb-3">
                     <label for="editEventTitle" class="form-label">Nama Acara</label>
@@ -451,7 +494,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" id="cancelEditEventBtn">Batal</button>
-            <button type="button" class="btn btn-primary" id="updateEventBtn" style="background-color: #0400d4">Update</button>
+            <button type="button" class="btn btn-primary" id="updateEventBtnText" style="background-color: #0400d4">Update</button>
         </div>
     </div>
 </div>
@@ -542,14 +585,18 @@
                                         </td>
                                         <th>
                                              <button type="button" class="btn btn-sm btn-outline-primary edit-event-btn"
-                                                data-id="{{ $event->id }}">
+                                                data-id="{{ $event->event_id }}"
+                                                data-title="{{ $event->title }}"
+                                                data-start-datetime="{{ $event->start_date_time }}"
+                                                data-end-datetime="{{ $event->end_date_time }}"
+                                                data-description="{{ $event->description }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
-                                            <form action="{{ route('event.destroy', ['id' => $event->id]) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('event.destroy', $event->event_id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
-                                                    <i class="bi bi-trash"></i>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteEvent(event, this)">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
                                         </th>
@@ -597,11 +644,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Inisialisasi Flasher
-        document.addEventListener('DOMContentLoaded', function() {
-            window.flasher = new Flasher();
-        });
-
         function handleLogout() {
     Swal.fire({
         title: 'Logout Confirmation',
@@ -680,6 +722,25 @@
         }
     });
 }
+
+
+function confirmDeleteEvent(event, button) {
+    event.preventDefault();
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            button.closest('form').submit();
+        }
+    });
+}
+
 
         // Modal functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -798,9 +859,6 @@
             }
         });
 
-        // Delete confirmation
-        function confirmDelete(event, button) {
-            event.preventDefault();
 
             Swal.fire({
                 title: 'Konfirmasi Hapus',
@@ -816,7 +874,7 @@
                     button.closest('form').submit();
                 }
             });
-        }
+        
 
         // Save & restore scroll position for pagination
         document.addEventListener('DOMContentLoaded', function() {
@@ -844,120 +902,204 @@
                 window.scrollTo(0, parseInt(sessionStorage.getItem('eventScrollPosition')));
             }
         });
+    
 
 
 
 
 
-        document.addEventListener('DOMContentLoaded', function() {
-    // Edit Event Modal functionality
+// === EDIT EVENT FUNCTIONALITY ===
+document.addEventListener('DOMContentLoaded', function() {
     const editEventModal = document.getElementById('editEventModal');
+    const editEventForm = document.getElementById('editEventForm');
     const closeEditEventModalBtn = document.getElementById('closeEditEventModalBtn');
     const cancelEditEventBtn = document.getElementById('cancelEditEventBtn');
-    const updateEventBtn = document.getElementById('updateEventBtn');
-    const editEventForm = document.getElementById('editEventForm');
+    const updateEventBtnText = document.getElementById('updateEventBtnText');
 
-    // Close edit modal functions
-    function closeEditEventModal() {
-        editEventModal.classList.remove('active');
-        document.body.style.overflow = '';
-        // Reset form
-        editEventForm.reset();
+    // Definisikan fungsi route di JavaScript
+    function route(name, params = {}) {
+        // Ambil data rute dari meta tag yang disediakan Laravel
+        let routes = window.Laravel.routes || {};
+        let route = routes[name] || '';
+
+        // Ganti parameter dalam route
+        if (typeof params === 'object') {
+            for (let key in params) {
+                route = route.replace(new RegExp({${key}}, 'g'), params[key]);
+            }
+        } else {
+            // Jika params bukan object, anggap sebagai parameter tunggal
+            route = route.replace(/{[^}]+}/, params);
+        }
+
+        return route;
     }
 
-    closeEditEventModalBtn.addEventListener('click', closeEditEventModal);
-    cancelEditEventBtn.addEventListener('click', closeEditEventModal);
-
-    // Close modal when clicking outside
-    editEventModal.addEventListener('click', function(e) {
-        if (e.target === editEventModal) {
-            closeEditEventModal();
+    window.Laravel = {
+        routes: {
+            'admin.event.update': '{{ route("admin.event.update", ["id" => "_id"]) }}'.replace('id_', '')
         }
-    });
+    };
 
-    // Show edit modal when edit button is clicked
-    document.querySelectorAll('.edit-event-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // Get event data from data attributes or from the row
-            const eventId = this.getAttribute('data-id');
-            const eventTitle = this.closest('tr').querySelector('td:nth-child(1) span').textContent;
-            const startDateTime = this.closest('tr').querySelector('td:nth-child(2)').textContent;
-            const endDateTime = this.closest('tr').querySelector('td:nth-child(3)').textContent;
-            const description = this.closest('tr').querySelector('td:nth-child(4)').textContent;
+    // Handle edit buttons for event
+    document.querySelectorAll('.edit-event-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const title = this.getAttribute('data-title');
+            const startDateTime = this.getAttribute('data-start-datetime');
+            const endDateTime = this.getAttribute('data-end-datetime');
+            const description = this.getAttribute('data-description');
 
             // Format dates for datetime-local input
             const formatForDateTimeInput = (dateString) => {
                 const date = new Date(dateString);
                 const pad = (num) => num.toString().padStart(2, '0');
-                return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+                return ${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())};
             };
 
+            console.log("Opening edit modal for event ID:", id); // Debug
+
+            // Set form action
+            editEventForm.action = /event/update/${id};
+          
             // Populate form fields
-            document.getElementById('editEventId').value = eventId;
-            document.getElementById('editEventTitle').value = eventTitle;
+            document.getElementById('editEventId').value = id;
+            document.getElementById('editEventTitle').value = title;
             document.getElementById('editStartDateTime').value = formatForDateTimeInput(startDateTime);
             document.getElementById('editEndDateTime').value = formatForDateTimeInput(endDateTime);
-            document.getElementById('editEventDescription').value = description.trim();
+            document.getElementById('editEventDescription').value = description;
 
-            // Update form action to include the event ID
-            editEventForm.action = `/event/${eventId}`;
-
-            // Open modal
+            // Show modal
             editEventModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
     });
 
-    // Submit edit form
-    updateEventBtn.addEventListener('click', function() {
-        const eventId = document.getElementById('editEventId').value;
-        const formData = new FormData(editEventForm);
+    // Close modal handlers
+    closeEditEventModalBtn.addEventListener('click', closeEditEventModal);
+    cancelEditEventBtn.addEventListener('click', closeEditEventModal);
 
-        // Add method spoofing for Laravel since fetch doesn't support PUT natively
-        formData.append('_method', 'PUT');
+    // Close edit modal when clicking outside
+    editEventModal.addEventListener('click', function(e) {
+        if (e.target === editEventModal) {
+            closeEditEventModal();
+            
+        }
+    });
 
-        // Send AJAX request
-        fetch(`/event/${eventId}`, {
+    // Close edit modal function
+    function closeEditEventModal() {
+        editEventModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Handle form submission for event
+updateEventBtnText.addEventListener('click', async function() {
+    const formData = new FormData(editEventForm);
+    const eventId = document.getElementById('editEventId').value;
+
+    console.log("Event ID being submitted:", eventId); // Debug
+
+    // Validate required fields
+    const title = document.getElementById('editEventTitle').value;
+    const startDateTime = document.getElementById('editStartDateTime').value;
+    const endDateTime = document.getElementById('editEndDateTime').value;
+
+    if (!title || !startDateTime || !endDateTime) {
+        await Swal.fire({
+            title: 'Error!',
+            text: 'Harap isi semua field yang wajib diisi',
+            icon: 'error',
+            confirmButtonColor: '#D21F3C'
+        });
+        return;
+    }
+
+    // Validate date sequence
+    if (new Date(startDateTime) >= new Date(endDateTime)) {
+        await Swal.fire({
+            title: 'Error!',
+            text: 'Tanggal selesai harus setelah tanggal mulai',
+            icon: 'error',
+            confirmButtonColor: '#D21F3C'
+        });
+        return;
+    }
+
+    // Show loading state with SweetAlert2
+    const swalInstance = Swal.fire({
+        title: 'Memproses...',
+        html: 'Sedang menyimpan perubahan event',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+        const response = await fetch(editEventForm.action, {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            Swal.fire({
-                title: 'Success!',
-                text: 'Event updated successfully',
-                icon: 'success'
-            });
-            closeEditEventModal();
-
-            // Reload page to show updated content
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
-        })
-        .catch(error => {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Failed to update event',
-                icon: 'error'
-            });
-            console.error('Error:', error);
         });
+
+        const data = await response.json();
+        console.log("Response data:", data);
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Gagal memperbarui data event');
+        }
+
+        // Close loading dialog
+        await swalInstance.close();
+
+        if (data.status === 'success') {
+            // Show success notification
+            await Swal.fire({
+                title: 'Sukses!',
+                text: data.message || 'Event berhasil diperbarui',
+                icon: 'success',
+                confirmButtonColor: '#D21F3C',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+
+            // Close modal and reload
+            closeEditEventModal();
+            window.location.reload();
+        } else {
+            throw new Error(data.message || 'Gagal memperbarui data event');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        
+        // Close loading dialog if still open
+        if (swalInstance.isOpen) {
+            await swalInstance.close();
+        }
+
+        // Show error notification
+        await Swal.fire({
+            title: 'Error!',
+            text: error.message || 'Gagal memperbarui data event',
+            icon: 'error',
+            confirmButtonColor: '#D21F3C'
+        });
+    } finally {
+        // Reset button state
+        updateEventBtnText.disabled = false;
+        updateEventBtnText.innerHTML = 'Update';
+    }
     });
 
-
 });
+    
+
 
 
 

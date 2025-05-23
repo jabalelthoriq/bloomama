@@ -634,16 +634,12 @@
                                                     class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <form
-                                                    action="{{ route('appointments.destroy', ['appointment' => $appointment->id]) }}"
-                                                    method="POST" class="d-inline">
+                                                <form action="{{ route('appointments.destroy', $appointment->appointment_id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?')" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-1"
-                                                        onclick="confirmDelete(event, this)">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteAppointment(event, this)">
                                                         <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
+                                                    </form>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -738,7 +734,7 @@
         });
     </script>
     <script>
-        function confirmDelete(event, element) {
+        function confirmDeleteAppointment(event, element) {
             event.preventDefault();
             Swal.fire({
                 title: 'Delete Confirmation',

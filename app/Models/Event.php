@@ -21,5 +21,5 @@ class Event extends Model
 
 
 
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'event_id';
 }

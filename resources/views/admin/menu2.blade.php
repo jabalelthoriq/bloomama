@@ -524,6 +524,8 @@
     </div>
 </div>
 
+
+
         <!-- Modal Edit Bidan Form - Improved to match pasien form -->
     <div class="modal-overlay" id="editBidanModal">
         <div class="modal-container">
@@ -773,9 +775,17 @@
                                                             <i class="fas fa-edit"></i>
                                                         </button>
 
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
+                                                        <form action="{{ route('admin.midwife.destroy', $midwife->midwife_id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteMidwife(event, this)">
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
+                                                        </form>
+
+                                                            {{-- <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(event, this)">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button> --}}
 
                                                     </td>
                                                 </tr>
@@ -879,13 +889,15 @@
                                                             data-photo="{{ $user->profile_picture_url }}">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
+                                                        <form action="{{ route('admin.users.destroy', $user->user_id) }}" method="POST" class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDeleteUser(event, this)">
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
                                                         </form>
+                                                        
+
                                                     </td>
                                                 </tr>
                                             @empty
@@ -1023,7 +1035,7 @@
     });
 }
 
-        function confirmDelete(event, button) {
+        function confirmDeleteMidwife(event, button) {
             event.preventDefault();
             Swal.fire({
                 title: 'Are you sure?',

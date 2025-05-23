@@ -121,17 +121,17 @@ class ContentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
-    {
-        $content = Content::findOrFail($id);
-
-        // Delete thumbnail if exists
-        if ($content->thumbnail && Storage::disk('public')->exists($content->thumbnail)) {
-            Storage::disk('public')->delete($content->thumbnail);
-        }
-
-        $content->delete();
-
-        return back()->with('success', 'Content deleted successfully.');
+  public function destroy($id)
+{
+    $content = Content::where('content_id', $id)->firstOrFail();
+    
+    // Delete thumbnail if exists
+    if ($content->thumbnail && Storage::disk('public')->exists($content->thumbnail)) {
+        Storage::disk('public')->delete($content->thumbnail);
     }
+    
+    $content->delete();
+    
+    return back()->with('success', 'Content deleted successfully.');
+}
 }

@@ -831,6 +831,40 @@
                         </table>
                     </div>
 
+                    @section('scripts')
+                    <script>
+                    document.addEventListener('click', function (e) {
+                        if (e.target.closest('.delete-tracking-btn')) {
+                            const button = e.target.closest('.delete-tracking-btn');
+                            const trackingId = button.getAttribute('data-id');
+
+                            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                                fetch(`/api/health-tracking/${trackingId}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    if (result.success) {
+                                        alert(result.message);
+                                        loadHealthTrackingData(); // Pastikan fungsi ini ada dan memuat ulang data tabel tracking
+                                    } else {
+                                        alert('Gagal menghapus data');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Terjadi kesalahan saat menghapus data');
+                                });
+                            }
+                        }
+                    });
+                    </script>
+                    @endsection
+
                     <!-- Pagination for User Pregnancies -->
                     @if($userPregnancies->hasPages())
                     <div class="pagination-container">
