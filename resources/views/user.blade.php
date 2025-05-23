@@ -1859,15 +1859,23 @@ function openHealthTrackingFormModal(tracking = null) {
     healthTrackingFormModal.style.display = 'flex';
 }
 
-// Submit health tracking form
+// Submit health tracking form (always using POST)
 function submitHealthTrackingForm() {
     const formData = new FormData(healthTrackingForm);
     const trackingId = document.getElementById('htFormTrackingId').value;
-    const method = trackingId ? 'PUT' : 'POST';
-    const url = trackingId ? `/api/health-tracking/${trackingId}` : '/api/health-tracking';
+    const pregnancyId = document.getElementById('htFormPregnancyId').value;
+
+    // Always use POST, route includes pregnancyId
+    const url = `/api/health-tracking/Store/${pregnancyId}`;
+
+    // Include tracking_id in form data if editing
+    if (trackingId) {
+        formData.append('_method', 'PUT'); // Laravel's way to simulate PUT with POST
+        formData.append('tracking_id', trackingId);
+    }
 
     fetch(url, {
-        method: method,
+        method: 'POST', // Always POST
         body: formData,
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -1893,7 +1901,7 @@ function submitHealthTrackingForm() {
         Swal.fire({
             icon: 'error',
             title: 'Gagal menyimpan',
-            text: 'Terjadi kesalahan saat menyimpan data kesehatan'
+            text: error.message || 'Terjadi kesalahan saat menyimpan data kesehatan'
         });
     });
 }

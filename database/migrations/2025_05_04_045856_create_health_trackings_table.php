@@ -17,8 +17,10 @@ return new class extends Migration
             $table->unsignedBigInteger('pregnancy_id');
             $table->date('date_recorded');
             $table->decimal('weight', 5, 2)->nullable();
+            $table->decimal('height', 5, 2)->nullable(); // Added height field
             $table->string('blood_pressure', 20)->nullable();
             $table->integer('heart_rate')->nullable();
+            $table->integer('pregnancy_week')->nullable(); // Added pregnancy_week field
             $table->text('notes')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();

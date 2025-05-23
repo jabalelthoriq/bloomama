@@ -17,15 +17,19 @@ class HealthTracking extends Model
         'pregnancy_id',
         'date_recorded',
         'weight',
+        'height', // Added height
         'blood_pressure',
         'heart_rate',
-        'notes'
+        'notes',
+        'pregnancy_week', // Added pregnancy_week
     ];
 
     protected $casts = [
         'date_recorded' => 'datetime:Y-m-d',
         'weight' => 'decimal:2',
-        'heart_rate' => 'integer'
+        'height' => 'decimal:2', // Added height cast
+        'heart_rate' => 'integer',
+        'pregnancy_week' => 'integer', // Added pregnancy_week cast
     ];
 
     public function user()

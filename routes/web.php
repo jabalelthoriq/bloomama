@@ -20,7 +20,7 @@ use App\Http\Controllers\SettingController;
  Route::prefix('api')->group(function() {
         // routes for health tracking
             Route::get('/health-tracking/{pregnancyId}', [UsersController::class, 'getHealthTrackingData']);
-            Route::post('/health-tracking', [UsersController::class, 'storeHealthTracking']);
+            Route::post('/health-tracking/Store/{pregnancyId}', [UsersController::class, 'storeHealthTracking']);
             Route::put('/health-tracking/{trackingId}', [UsersController::class, 'updateHealthTracking']);
             Route::delete('/health-tracking/{trackingId}', [UsersController::class, 'deleteHealthTracking']);
 
@@ -77,15 +77,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         // Event routes
         Route::get('/acara', [EventController::class, 'showevent'])->name('acara');
         Route::post('/acara', [EventController::class, 'addEvent'])->name('add.event');
-        Route::get('/acara/edit', [EventController::class, 'editEvent'])->name('event.edit');
-        Route::put('/acara/update', [EventController::class, 'updateEvent'])->name('event.update');
+        Route::post('/event/update/{id}', [EventController::class, 'updateEvent'])->name('admin.event.update');
         Route::delete('/acara/destroy', [EventController::class, 'destroyEvent'])->name('event.destroy');
 
 
 
-        // Content management routes
+        // Content
         Route::get('/content', [ContentController::class, 'index'])->name('content.index');
         Route::post('/content', [ContentController::class, 'store'])->name('content.store');
-        Route::put('/content/{id}', [ContentController::class, 'update'])->name('content.update');
+        Route::post('/content/update/{id}', [ContentController::class, 'updateContent'])->name('admin.content.update');
         Route::delete('/content', [ContentController::class, 'destroy'])->name('content.destroy');
     // });

@@ -615,80 +615,6 @@
     </div>
 
 
-        <!-- Modal Edit Bidan Form -->
-<div class="modal-overlay" id="editBidanModal">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h5 class="fw-bold m-0">Edit Bidan</h5>
-            <button class="close-modal" id="closeEditBidanModalBtn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form id="editBidanForm" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-                <input type="hidden" id="editBidanId" name="midwife_id">
-                <div class="mb-3">
-                    <label for="editName" class="form-label">Nama Bidan</label>
-                    <input type="text" class="form-control" id="editName" name="name" placeholder="Masukkan nama bidan">
-                </div>
-                <div class="mb-3">
-                    <label for="editEmail" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="editEmail" name="email" placeholder="Masukkan email">
-                </div>
-                <div class="mb-3">
-                    <label for="editPhoneNumber" class="form-label">Nomor Telepon</label>
-                    <input type="text" class="form-control" id="editPhoneNumber" name="phone_number" placeholder="Masukkan nomor telepon">
-                </div>
-                <div class="mb-3">
-                    <label for="editStatus" class="form-label">Status</label>
-                    <select class="form-control" id="editStatus" name="status">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="editPassword" class="form-label">Password (Kosongkan jika tidak ingin mengubah)</label>
-                    <input type="password" class="form-control" id="editPassword" name="password" placeholder="Masukkan password baru">
-                </div>
-                <div class="mb-3">
-                    <label for="editPasswordConfirmation" class="form-label">Konfirmasi Password</label>
-                    <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation" placeholder="Konfirmasi password baru">
-                </div>
-                <div class="mb-3">
-                    <label for="editPhoto" class="form-label">Foto Profil</label>
-                    <div class="input-group">
-                        <input type="file" class="form-control" id="editPhoto" name="photo" accept="image/*">
-                        <label class="input-group-text" for="editPhoto">
-                            <i class="fas fa-upload"></i>
-                        </label>
-                    </div>
-                    <small class="text-muted">Upload foto profil (Max: 2MB, Format: JPG, PNG)</small>
-                    <div class="d-flex align-items-center mt-2">
-                        <div id="currentPhotoContainer" class="me-3">
-                            <p class="mb-1">Foto saat ini:</p>
-                            <img id="currentPhoto" src="" alt="Current Photo" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
-                        </div>
-                        <div id="editPhotoPreview" class="d-none">
-                            <div class="position-relative" style="max-width: 100px;">
-                                <p class="mb-1">Foto baru:</p>
-                                <img src="" alt="Photo Preview" class="img-thumbnail">
-                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" id="removeEditPhoto">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="cancelEditBidanBtn">Batal</button>
-            <button type="button" class="btn btn-primary" id="updateBidanBtn" style="background-color: #0400d4">Update</button>
-        </div>
-    </div>
-</div>
 
         <!-- Tab navigation -->
         <ul class="nav nav-tabs" id="userTabs" role="tablist">
@@ -1304,75 +1230,84 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = '';
     }
 
-    // Handle form submission for bidan
-    updateBidanBtn.addEventListener('click', async function() {
-        const formData = new FormData(editBidanForm);
-        const midwifeId = document.getElementById('editBidanId').value;
+   // Handle form submission for bidan with SweetAlert2
+            updateBidanBtn.addEventListener('click', async function() {
+                const formData = new FormData(editBidanForm);
+                const midwifeId = document.getElementById('editBidanId').value;
 
-        console.log("Bidan ID being submitted:", midwifeId); // Debug
+                if (!midwifeId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'ID Bidan tidak ditemukan. Silakan coba lagi.'
+                    });
+                    return;
+                }
 
-        // Pastikan midwifeId tidak kosong
-        if (!midwifeId) {
-            console.error("Error: Bidan ID is empty!");
-            // Menggunakan alertify sesuai dengan kode pasien
-            if (typeof alertify !== 'undefined') {
-                alertify.error("ID Bidan tidak ditemukan. Silakan coba lagi.");
-            } else {
-                alert("ID Bidan tidak ditemukan. Silakan coba lagi.");
-            }
-            return;
-        }
+                // Validate password confirmation
+                const password = document.getElementById('editBidanPassword').value;
+                const passwordConfirmation = document.getElementById('editBidanPasswordConfirmation').value;
 
-        // Validate password confirmation
-        const password = document.getElementById('editBidanPassword').value;
-        const passwordConfirmation = document.getElementById('editBidanPasswordConfirmation').value;
+                if (password && password !== passwordConfirmation) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Password dan konfirmasi password tidak sama'
+                    });
+                    return;
+                }
 
-        if (password && password !== passwordConfirmation) {
-            if (typeof alertify !== 'undefined') {
-                alertify.error("Password dan konfirmasi password tidak sama");
-            } else {
-                alert("Password dan konfirmasi password tidak sama");
-            }
-            return;
-        }
+                // Loading state with SweetAlert2
+                Swal.fire({
+                    title: 'Memproses...',
+                    html: 'Sedang memperbarui data bidan',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
-        // Loading state
-        updateBidanBtn.disabled = true;
-        updateBidanBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
+                try {
+                    const response = await fetch(editBidanForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
 
-        try {
-            const response = await fetch(editBidanForm.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Gagal memperbarui data bidan');
+                    }
+
+                    if (data.success) {
+                        closeEditBidanModal();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message || 'Data bidan berhasil diperbarui',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Gagal memperbarui data bidan');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: error.message || 'Terjadi kesalahan saat memperbarui data bidan'
+                    });
                 }
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Gagal memperbarui data bidan');
-            }
-
-            if (data.success) {
-    closeEditBidanModal();
-    window.location.reload(); // Flasher akan tampil setelah reload
-}
- else {
-                throw new Error(data.message || 'Gagal memperbarui data bidan');
-            }
-        } catch (error) {
-    console.error('Error:', error);
-    alert(error.message || 'Terjadi kesalahan saat memperbarui data bidan'); // fallback sederhana
-} finally {
-            updateBidanBtn.disabled = false;
-            updateBidanBtn.innerHTML = 'Update';
-        }
-    });
-});
+        });
 
 
 ///edit users
@@ -1489,69 +1424,74 @@ function showFlasherAlert(type, title, message) {
     }
 }
 
-// Handle the update button click
-document.getElementById('updatePasienBtn').addEventListener('click', function() {
-    const form = document.getElementById('editPasienForm');
-    const userId = document.getElementById('editPasienId').value;
+// Handle the update button click with SweetAlert2
+        document.getElementById('updatePasienBtn').addEventListener('click', async function() {
+            const form = document.getElementById('editPasienForm');
+            const userId = document.getElementById('editPasienId').value;
 
-    // Pastikan userId tidak kosong
-    if (!userId) {
-        console.error("Error: User ID is empty!");
-        alert("ID Pasien tidak ditemukan. Silakan coba lagi.");
-        return;
-    }
+            if (!userId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'ID Pasien tidak ditemukan. Silakan coba lagi.'
+                });
+                return;
+            }
 
-    // Set action URL dengan ID yang sudah dipastikan ada
-    form.action = `/pasien/update/${userId}`;
+            // Set action URL
+            form.action = `/pasien/update/${userId}`;
+            const formData = new FormData(form);
 
-    // Menggunakan AJAX untuk update data dan menampilkan notifikasi dengan flasher
-    const formData = new FormData(form);
+            // Show loading state
+            Swal.fire({
+                title: 'Memproses...',
+                html: 'Sedang memperbarui data pasien',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
-    // Tampilkan loading state
-    const updateBtn = document.getElementById('updatePasienBtn');
-    const originalText = updateBtn.innerHTML;
-    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-    updateBtn.disabled = true;
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
 
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Tutup modal
-        document.getElementById('editPasienModal').classList.remove('active');
-        document.body.style.overflow = 'auto';
+                const data = await response.json();
 
-        // Notifikasi akan ditampilkan oleh controller dengan flasher
-        // setelah reload halaman
+                if (!response.ok) {
+                    throw new Error(data.message || 'Gagal memperbarui data pasien');
+                }
 
-        // Refresh halaman setelah jeda singkat
-        setTimeout(() => {
-            window.location.reload();
-        }, 500);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Notifikasi error akan ditampilkan oleh controller
-
-        // Namun untuk UX yang lebih baik, juga tampilkan error di klien
-        alert('Terjadi kesalahan saat memperbarui data pasien');
-    })
-    .finally(() => {
-        // Kembalikan button ke kondisi awal
-        updateBtn.innerHTML = originalText;
-        updateBtn.disabled = false;
-    });
-});
+                if (data.success) {
+                    closeEditPasienModal();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message || 'Data pasien berhasil diperbarui',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Gagal memperbarui data pasien');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Terjadi kesalahan saat memperbarui data pasien'
+                });
+            }
+        });
 
 // Close modal handlers
 document.getElementById('closeEditPasienModalBtn').addEventListener('click', function() {

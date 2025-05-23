@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+     <meta name="base-url" content="{{ url('/') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -349,7 +350,7 @@
             padding: 1rem;
             border-bottom: 1px solid #e9ecef;
         }
-       
+
 
         .search-container {
     position: relative;
@@ -481,16 +482,16 @@
 <div class="modal-overlay" id="editContentModal">
     <div class="modal-container">
         <div class="modal-header">
-            
+
             <h5 class="fw-bold m-0">Edit Content</h5>
             <button class="close-modal" id="closeEditModalBtn">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="modal-body">
-            <form id="editContentForm" enctype="multipart/form-data">
+            <form id="editContentForm" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
+
                 <input type="hidden" id="editContentId" name="content_id">
                 <div class="mb-3">
                     <label for="editTitle" class="form-label">Judul Content</label>
@@ -614,7 +615,7 @@
                     <td>{{ $content->created_at->format('M d, Y') }}</td>
                     <td class="text-end">
                         <button type="button" class="btn btn-sm btn-outline-primary edit-content-btn"
-                            data-id="{{ $content->id }}"
+                            data-id="{{ $content->content_id }}"
                             data-title="{{ $content->title }}"
                             data-url="{{ $content->url }}"
                             data-category="{{ $content->category }}"
@@ -882,44 +883,50 @@
         });
 
 
-        // Edit Content Modal functionality
+     // === EDIT CONTENT FUNCTIONALITY ===
 document.addEventListener('DOMContentLoaded', function() {
     // Edit Content Modal functionality
     const editModal = document.getElementById('editContentModal');
+    const editContentForm = document.getElementById('editContentForm');
     const closeEditModalBtn = document.getElementById('closeEditModalBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     const updateBtn = document.getElementById('updateBtn');
-    const editContentForm = document.getElementById('editContentForm');
 
     // Edit thumbnail preview functionality
     const editThumbnailInput = document.getElementById('editThumbnail');
     const editThumbnailPreview = document.getElementById('editThumbnailPreview');
-    const editThumbnailImage = editThumbnailPreview.querySelector('img');
+    const editThumbnailImage = editThumbnailPreview?.querySelector('img');
     const removeEditThumbnailBtn = document.getElementById('removeEditThumbnail');
     const currentThumbnailContainer = document.getElementById('currentThumbnailContainer');
 
-    // Close edit modal functions
-    function closeEditModal() {
-        editModal.classList.remove('active');
-        document.body.style.overflow = '';
-        // Reset form
-        editContentForm.reset();
-        editThumbnailPreview.classList.add('d-none');
+    // Definisikan fungsi route di JavaScript
+    function route(name, params = {}) {
+        // Ambil data rute dari meta tag yang disediakan Laravel
+        let routes = window.Laravel.routes || {};
+        let route = routes[name] || '';
+
+        // Ganti parameter dalam route
+        if (typeof params === 'object') {
+            for (let key in params) {
+                route = route.replace(new RegExp(`{${key}}`, 'g'), params[key]);
+            }
+        } else {
+            // Jika params bukan object, anggap sebagai parameter tunggal
+            route = route.replace(/{[^}]+}/, params);
+        }
+
+        return route;
     }
 
-    closeEditModalBtn.addEventListener('click', closeEditModal);
-    cancelEditBtn.addEventListener('click', closeEditModal);
-
-    // Close modal when clicking outside
-    editModal.addEventListener('click', function(e) {
-        if (e.target === editModal) {
-            closeEditModal();
+    window.Laravel = {
+        routes: {
+            'admin.content.update': '{{ route("admin.content.update", ["id" => "__id__"]) }}'.replace('__id__', '')
         }
-    });
+    };
 
-    // Show edit modal when edit button is clicked
-    document.querySelectorAll('.edit-content-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+    // Handle edit buttons for content
+    document.querySelectorAll('.edit-content-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
             e.preventDefault();
 
             // Get content data from data attributes
@@ -929,6 +936,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const category = this.getAttribute('data-category');
             const description = this.getAttribute('data-description');
             const thumbnailUrl = this.getAttribute('data-thumbnail');
+
+            console.log("Opening edit modal for content ID:", contentId); // Debug
+
+            // Set form action
+            editContentForm.action = `/content/update/${contentId}`;
 
             // Populate form fields
             document.getElementById('editContentId').value = contentId;
@@ -945,133 +957,231 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentThumbnailContainer.classList.add('d-none');
             }
 
-            // Update form action to include the content ID
-            editContentForm.action = `/content/${contentId}`;
-
             // Open modal
             editModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
     });
 
-    // Edit thumbnail preview when file is selected
-    editThumbnailInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            const file = this.files[0];
+    // Close modal handlers
+    closeEditModalBtn.addEventListener('click', closeEditModal);
+    cancelEditBtn.addEventListener('click', closeEditModal);
 
-            // Check file type
-            if (!file.type.match('image.*')) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Please select an image file (JPG, PNG)',
-                    icon: 'error'
-                });
-                this.value = '';
-                return;
-            }
-
-            // Check file size (max 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Image size should be less than 2MB',
-                    icon: 'error'
-                });
-                this.value = '';
-                return;
-            }
-
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                editThumbnailImage.src = e.target.result;
-                editThumbnailPreview.classList.remove('d-none');
-            }
-            reader.readAsDataURL(file);
+    // Close modal when clicking outside
+    editModal.addEventListener('click', function(e) {
+        if (e.target === editModal) {
+            closeEditModal();
         }
     });
 
-    // Remove edit thumbnail
-    removeEditThumbnailBtn.addEventListener('click', function() {
-        editThumbnailInput.value = '';
-        editThumbnailPreview.classList.add('d-none');
-        editThumbnailImage.src = '';
-    });
+    // Close edit modal function
+    function closeEditModal() {
+        editModal.classList.remove('active');
+        document.body.style.overflow = '';
 
-    // Submit edit form
-    updateBtn.addEventListener('click', function() {
+        // Reset form
+        editContentForm.reset();
+        if (editThumbnailPreview) {
+            editThumbnailPreview.classList.add('d-none');
+        }
+        if (editThumbnailImage) {
+            editThumbnailImage.src = '';
+        }
+    }
+
+    // Edit thumbnail preview when file is selected
+    if (editThumbnailInput) {
+        editThumbnailInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+
+                // Check file type
+                if (!file.type.match('image.*')) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Harap pilih file gambar (JPG, PNG)',
+                        icon: 'error',
+                        confirmButtonColor: '#D21F3C'
+                    });
+                    this.value = '';
+                    return;
+                }
+
+                // Check file size (max 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Ukuran gambar harus kurang dari 2MB',
+                        icon: 'error',
+                        confirmButtonColor: '#D21F3C'
+                    });
+                    this.value = '';
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (editThumbnailImage) {
+                        editThumbnailImage.src = e.target.result;
+                        editThumbnailPreview.classList.remove('d-none');
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Remove edit thumbnail
+    if (removeEditThumbnailBtn) {
+        removeEditThumbnailBtn.addEventListener('click', function() {
+            editThumbnailInput.value = '';
+            editThumbnailPreview.classList.add('d-none');
+            editThumbnailImage.src = '';
+        });
+    }
+
+    // Handle form submission for content
+    updateBtn.addEventListener('click', async function() {
         const contentId = document.getElementById('editContentId').value;
 
-        // Use FormData to handle file uploads
-        const formData = new FormData(editContentForm);
+        console.log("Content ID being submitted:", contentId); // Debug
 
-        // Add method spoofing for Laravel since fetch doesn't support PUT natively
-        formData.append('_method', 'PUT');
+        // Validate required fields
+        const title = document.getElementById('editTitle').value;
+        const url = document.getElementById('editUrl').value;
+        const category = document.getElementById('editCategory').value;
 
-        // Send AJAX request
-        fetch(`/content/${contentId}`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            Swal.fire({
-                title: 'Success!',
-                text: 'Content updated successfully',
-                icon: 'success'
-            });
-            closeEditModal();
-
-            // Reload page to show updated content
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
-        })
-        .catch(error => {
-            Swal.fire({
+        if (!title || !url || !category) {
+            await Swal.fire({
                 title: 'Error!',
-                text: 'Failed to update content',
-                icon: 'error'
+                text: 'Harap isi semua field yang wajib diisi',
+                icon: 'error',
+                confirmButtonColor: '#D21F3C'
             });
-            console.error('Error:', error);
+            return;
+        }
+
+        // Validate URL format
+        try {
+            new URL(url);
+        } catch (error) {
+            await Swal.fire({
+                title: 'Error!',
+                text: 'Format URL tidak valid',
+                icon: 'error',
+                confirmButtonColor: '#D21F3C'
+            });
+            return;
+        }
+
+        // Show loading state with SweetAlert2
+        const swalInstance = Swal.fire({
+            title: 'Memproses...',
+            html: 'Sedang menyimpan perubahan konten',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
+
+        try {
+            // Use FormData to handle file uploads
+            const formData = new FormData(editContentForm);
+
+            // Add method spoofing for Laravel since fetch doesn't support PUT natively
+            formData.append('_method', 'POST');
+
+            const response = await fetch(editContentForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+            console.log("Response data:", data);
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Gagal memperbarui data konten');
+            }
+
+            // Close loading dialog
+            await swalInstance.close();
+
+            if (data.status === 'success') {
+                // Show success notification
+                await Swal.fire({
+                    title: 'Sukses!',
+                    text: data.message || 'Konten berhasil diperbarui',
+                    icon: 'success',
+                    confirmButtonColor: '#D21F3C',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+
+                // Close modal and reload
+                closeEditModal();
+                window.location.reload();
+            } else {
+                throw new Error(data.message || 'Gagal memperbarui data konten');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+
+            // Close loading dialog if still open
+            if (swalInstance.isOpen) {
+                await swalInstance.close();
+            }
+
+            // Show error notification
+            await Swal.fire({
+                title: 'Error!',
+                text: error.message || 'Gagal memperbarui data konten',
+                icon: 'error',
+                confirmButtonColor: '#D21F3C'
+            });
+        } finally {
+            // Reset button state
+            updateBtn.disabled = false;
+            updateBtn.innerHTML = 'Update';
+        }
     });
 });
 
-// Add this inside your existing DOMContentLoaded event listener or create a new one
+// === SEARCH FUNCTIONALITY ===
 document.addEventListener('DOMContentLoaded', function() {
     // Search functionality for content table
     const searchInput = document.getElementById('contentSearch');
     const contentTable = document.querySelector('.table');
-    const contentRows = contentTable.querySelectorAll('tbody tr');
 
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        
-        contentRows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            let rowMatches = false;
-            
-            // Skip the last cell (actions column)
-            for (let i = 0; i < cells.length - 1; i++) {
-                const cellText = cells[i].textContent.toLowerCase();
-                if (cellText.includes(searchTerm)) {
-                    rowMatches = true;
-                    break;
+    if (searchInput && contentTable) {
+        const contentRows = contentTable.querySelectorAll('tbody tr');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            contentRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let rowMatches = false;
+
+                // Skip the last cell (actions column)
+                for (let i = 0; i < cells.length - 1; i++) {
+                    const cellText = cells[i].textContent.toLowerCase();
+                    if (cellText.includes(searchTerm)) {
+                        rowMatches = true;
+                        break;
+                    }
                 }
-            }
-            
-            row.style.display = rowMatches ? '' : 'none';
+
+                row.style.display = rowMatches ? '' : 'none';
+            });
         });
-    });
+    }
 });
     </script>
 </body>

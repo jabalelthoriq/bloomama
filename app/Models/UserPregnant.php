@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserPregnant extends Model
 {
+const STATUS_ACTIVE = 'active';
+const STATUS_COMPLETED = 'completed';
+const STATUS_INACTIVE = 'inactive';
+
     use HasFactory;
 
     protected $primaryKey = 'pregnancy_id';
@@ -47,4 +51,8 @@ class UserPregnant extends Model
         return $this->hasMany(HealthTracking::class, 'pregnancy_id', 'pregnancy_id')
             ->orderBy('date_recorded', 'desc');
     }
+    public function scopeActive($query)
+{
+    return $query->where('status', 'active');
+}
 }

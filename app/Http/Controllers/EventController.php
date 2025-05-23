@@ -127,83 +127,59 @@ class EventController extends Controller
     /**
      * Show edit event form
      */
-    public function editEvent($id, FlasherInterface $flasher)
-    {
-        try {
-            $event = Event::findOrFail($id);
-            return view('event.edit', compact('event'));
-        } catch (\Exception $e) {
-            Log::error("Error finding event: " . $e->getMessage());
-            $flasher->addError('Event tidak ditemukan');
-            return redirect()->route('acara');
-        }
-    }
+
 
     /**
      * Update an existing event
      */
-    public function updateEvent(Request $request, $id, FlasherInterface $flasher)
+    public function updateEvent(Request $request, $id)
     {
+        // Find the event
+         $event = Event::where('event_id', $id)->firstOrFail();
+        // Check if event exists
+        if (!$event) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Event not found'
+            ], 404);
+        }
+
         // Validate the request data
-        $validator = Validator::make($request->all(), $this->rules);
+        $validator = Validator::make($request->all(), [
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|nullable|string',
+            'start_date_time' => 'sometimes|required|date',
+            'end_date_time' => 'sometimes|required|date|after_or_equal:start_date_time',
+            'status' => 'sometimes|required|in:active,cancelled,postponed,completed',
+        ]);
 
+        // Return error if validation fails
         if ($validator->fails()) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation error',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        try {
-            // Find the event or throw a 404 error
-            $event = Event::findOrFail($id);
+        // Update event with validated data
+        $event->fill($request->only([
+            'title',
+            'description',
+            'start_date_time',
+            'end_date_time',
+            'status',
+        ]));
 
-            // Update the event
-            $event->update([
-                'title' => $request->title,
-                'description' => $request->description,
-                'start_date_time' => $request->start_date_time,
-                'end_date_time' => $request->end_date_time,
-            ]);
+        // Save the updated event
+        $event->save();
 
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Event updated successfully',
-                    'event' => $event
-                ]);
-            }
-
-            // Add Flasher notification
-            $flasher->addSuccess('Event berhasil diperbarui');
-
-            // Redirect with success message
-            return redirect()->route('acara');
-        } catch (\Exception $e) {
-            // Log the error
-            Log::error("Error updating event: " . $e->getMessage());
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to update event',
-                    'error' => $e->getMessage()
-                ], 500);
-            }
-
-            // Add Flasher notification for error
-            $flasher->addError('Gagal memperbarui event: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->withInput();
-        }
+        // Return success response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Event updated successfully',
+            'data' => $event
+        ], 200);
     }
 
     /**

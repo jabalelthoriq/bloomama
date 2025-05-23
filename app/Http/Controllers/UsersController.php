@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Flasher\Prime\FlasherInterface;
-
+use Illuminate\Support\Carbon;
 
 class UsersController extends Controller
 {
@@ -211,45 +211,55 @@ public function getHealthTrackingData($pregnancyId, $userId = null)
 /**
  * Store health tracking data
  */
-public function storeHealthTracking(Request $request)
+/**
+ * Store health tracking data for a specific pregnancy
+ *
+ * @param Request $request
+ * @param int $pregnancy_id
+ * @return \Illuminate\Http\JsonResponse
+ */
+public function storeHealthTracking(Request $request, $pregnancy_id)
 {
-    $validator = Validator::make($request->all(), [
-        'pregnancy_id' => 'required|exists:user_pregnants,pregnancy_id',
-        'date_recorded' => 'required|date',
-        'weight' => 'nullable|numeric|min:30|max:200',
-        'blood_pressure' => 'nullable|string|max:20',
-        'heart_rate' => 'nullable|integer|min:40|max:200',
+    // Validate the request data
+    $validatedData = $request->validate([
+        'date_recorded' => 'required|date_format:Y-m-d',
+        'weight' => 'required|numeric|between:0,999.99',
+        'blood_pressure' => 'nullable|string|max:20', // e.g., "120/80"
+        'heart_rate' => 'required|integer|min:0',
         'notes' => 'nullable|string|max:500'
     ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
     try {
-        $tracking = HealthTracking::create([
-            'user_id' => UserPregnant::find($request->pregnancy_id)->user_id,
-            'pregnancy_id' => $request->pregnancy_id,
-            'date_recorded' => $request->date_recorded,
-            'weight' => $request->weight,
-            'blood_pressure' => $request->blood_pressure,
-            'heart_rate' => $request->heart_rate,
-            'notes' => $request->notes
+        // Check if the pregnancy exists
+        $pregnancy = UserPregnant::findOrFail($pregnancy_id);
+
+        // Create new health tracking record using fillable fields
+        $healthData = HealthTracking::create([
+            'user_id' => $pregnancy->user_id,
+            'pregnancy_id' => $pregnancy_id,
+            'date_recorded' => $validatedData['date_recorded'],
+            'weight' => $validatedData['weight'],
+            'blood_pressure' => $validatedData['blood_pressure'] ?? null,
+            'heart_rate' => $validatedData['heart_rate'],
+            'notes' => $validatedData['notes'] ?? null
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Health tracking data saved successfully',
-            'data' => $tracking
-        ]);
-    } catch (\Exception $e) {
-        Log::error("Error saving health tracking: " . $e->getMessage());
+            'message' => 'Health tracking data stored successfully',
+            'data' => $healthData
+        ], 201);
+
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Failed to save health tracking data'
+            'message' => 'Pregnancy record not found'
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to store health tracking data',
+            'error' => $e->getMessage()
         ], 500);
     }
 }
@@ -321,7 +331,7 @@ public function deleteHealthTracking($trackingId)
     }
 }
 
- 
+
 
 
 
