@@ -512,7 +512,8 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="card-title m-0 fw-bold">Pregnant Users Statistics</h5>
-                            <small class="text-muted">Last 12 months</small>
+                            <span class="text-muted">Tahun {{ \Carbon\Carbon::now()->year }}</span>
+
                         </div>
                         <div class="chart-container">
                             <svg class="chart" viewBox="0 0 500 200" id="pregnant-users-chart">
