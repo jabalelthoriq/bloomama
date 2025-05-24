@@ -228,7 +228,7 @@ public function updateMidwife(Request $request, $id) {
     DB::beginTransaction();
     try {
         $midwife = Midwive::where('midwife_id', $id)->firstOrFail();
-    
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:midwives,email,'.$id.',midwife_id',

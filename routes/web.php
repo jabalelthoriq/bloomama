@@ -17,7 +17,7 @@ use App\Http\Controllers\SettingController;
  Route::prefix('api')->group(function() {
         // routes for health tracking
             Route::get('/health-tracking/{pregnancyId}', [UsersController::class, 'getHealthTrackingData']);
-            Route::post('/health-tracking/Store/{pregnancyId}', [UsersController::class, 'storeHealthTracking']);
+            Route::post('/health-tracking/store/{pregnancyId}', [UsersController::class, 'storeHealthTracking']);
             Route::put('/health-tracking/{trackingId}', [UsersController::class, 'updateHealthTracking']);
             Route::delete('/health-tracking/{trackingId}', [UsersController::class, 'deleteHealthTracking']);
 
@@ -37,9 +37,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // APPOINTMENT ROUTES - DIPERBAIKI
-Route::get('/appointments/edit', [AppointmentController::class, 'edit'])->name('appointments.edit');
 Route::put('/appointments/update', [AppointmentController::class, 'update'])->name('appointments.update');
-
 Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
 

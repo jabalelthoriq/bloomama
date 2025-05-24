@@ -45,20 +45,19 @@ class DashboardController extends Controller
         $totalPregnant = UserPregnant::count();
 
         $monthlyData = DB::table('user_pregnancies')
-            ->selectRaw('MONTH(start_date) as month, YEAR(start_date) as year, COUNT(*) as count')
-            ->whereNotNull('start_date')
-            ->where('start_date', '>=', now()->subYear())
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get()
-            ->map(function($item) {
-                // Create a Carbon date to get the month name
-                $date = Carbon::createFromDate($item->year, $item->month, 1);
-                $item->month_name = $date->format('M');
-                $item->month_year = $date->format('M Y');
-                return $item;
-            });
+        ->selectRaw('MONTH(start_date) as month, YEAR(start_date) as year, COUNT(*) as count')
+        ->whereNotNull('start_date')
+        ->whereYear('start_date', 2025)
+        ->groupBy('year', 'month')
+        ->orderBy('month')
+        ->get()
+        ->map(function($item) {
+            $date = Carbon::createFromDate($item->year, $item->month, 1);
+            $item->month_name = $date->format('M');
+            $item->month_year = $date->format('M');
+            return $item;
+        });
+
 
         // Fill in missing months with zero counts
         $filledMonthlyData = $this->fillMissingMonths($monthlyData);
@@ -73,43 +72,47 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function fillMissingMonths($monthlyData)
-    {
-        $result = [];
-        $endDate = now();
-        $startDate = now()->subYear();
+   private function fillMissingMonths($monthlyData)
+{
+    $result = [];
 
-        // Create a period of 12 months
-        $period = CarbonPeriod::create($startDate->startOfMonth(), '1 month', $endDate->endOfMonth());
+    // Batasi hanya untuk tahun 2025
+    $startDate = Carbon::create(2025, 1, 1);
+    $endDate = Carbon::create(2025, 12, 31);
 
-        // Create an associative array with month-year as key
-        $dataByMonth = [];
-        foreach ($monthlyData as $data) {
-            $key = $data->year . '-' . str_pad($data->month, 2, '0', STR_PAD_LEFT);
-            $dataByMonth[$key] = $data;
-        }
+    // Buat periode 12 bulan
+    $period = CarbonPeriod::create($startDate->startOfMonth(), '1 month', $endDate->endOfMonth());
 
-        // Fill in all months in the period
-        foreach ($period as $date) {
-            $key = $date->format('Y-m');
-            $monthName = $date->format('M');
-            $monthYear = $date->format('M Y');
-
-            if (isset($dataByMonth[$key])) {
-                $result[] = $dataByMonth[$key];
-            } else {
-                // Create an object with zero count for missing months
-                $emptyMonth = (object)[
-                    'month' => intval($date->format('m')),
-                    'year' => intval($date->format('Y')),
-                    'count' => 0,
-                    'month_name' => $monthName,
-                    'month_year' => $monthYear
-                ];
-                $result[] = $emptyMonth;
-            }
-        }
-
-        return $result;
+    // Susun data berdasarkan bulan
+    $dataByMonth = [];
+    foreach ($monthlyData as $data) {
+        $key = $data->year . '-' . str_pad($data->month, 2, '0', STR_PAD_LEFT);
+        $dataByMonth[$key] = $data;
     }
+
+    // Isi semua bulan di tahun 2025
+    foreach ($period as $date) {
+        $key = $date->format('Y-m');
+        $monthName = $date->format('M');
+        $monthYear = $date->format('M');
+
+        if (isset($dataByMonth[$key])) {
+            $result[] = $dataByMonth[$key];
+        } else {
+            // Tambahkan bulan kosong jika tidak ada data
+            $emptyMonth = (object)[
+                'month' => intval($date->format('m')),
+                'year' => intval($date->format('Y')),
+                'count' => 0,
+                'month_name' => $monthName,
+                'month_year' => $monthYear
+            ];
+            $result[] = $emptyMonth;
+        }
+    }
+
+    return $result;
 }
+
+}
+

@@ -14,7 +14,7 @@ Route::put('/pregnancies/{pregnancyId}', [UsersController::class, 'update'])->na
 Route::delete('/users', [UsersController::class, 'destroy'])->name('users.destroy');
 
 
-
+ 
 
     //mobile api
 
@@ -30,10 +30,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
     ///dashboard
-    Route::get('/health-trackings/user/{userId}', [dashboardcontroller::class, 'getHealthTrackingByUserId']);
-    Route::post('/register-pregnancies/{user_id}', [dashboardcontroller::class, 'registerUserPregnancy']);
-
-
+Route::get('/health-trackings/latest/{userId}', [dashboardcontroller::class, 'getLatestHealthData']);
+Route::post('/register-pregnancies/{user_id}', [dashboardcontroller::class, 'registerUserPregnancy']);
+Route::get('/getPregnancyData/{user_id}', [dashboardcontroller::class, 'getPregnancyData']);
 
 ///kesehatan
 Route::get('/content/latest', [kesehatancontroller::class, 'getLatestContent']);

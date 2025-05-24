@@ -26,8 +26,8 @@ class HealthTracking extends Model
 
     protected $casts = [
         'date_recorded' => 'datetime:Y-m-d',
-        'weight' => 'decimal:3',
-        'height' => 'decimal:3', // Added height cast
+        'weight' => 'decimal:2',
+        'height' => 'decimal:2', // Added height cast
         'heart_rate' => 'integer',
         'pregnancy_week' => 'integer', // Added pregnancy_week cast
     ];

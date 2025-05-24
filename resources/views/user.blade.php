@@ -1012,41 +1012,52 @@
     </div>
 </div>
 
-<!-- Add/Edit Health Tracking Form Modal -->
+<!-- Add Health Tracking Form Modal -->
 <div class="modal-overlay" id="healthTrackingFormModal">
     <div class="modal-container">
         <div class="modal-header">
-            <h5 class="fw-bold m-0" id="healthTrackingFormTitle">Tambah Data Health Tracking</h5>
+            <h5 class="fw-bold m-0" id="healthTrackingFormTitle">Tambah Data Kesehatan</h5>
             <button class="close-modal" id="closeHealthTrackingFormModalBtn">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="modal-body">
-            <form id="healthTrackingForm">
+            <form id="healthTrackingForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" id="htFormTrackingId" name="tracking_id">
                 <input type="hidden" id="htFormPregnancyId" name="pregnancy_id">
-
+                
                 <div class="mb-3">
                     <label for="htFormDateRecorded" class="form-label">Tanggal Pencatatan*</label>
                     <input type="date" class="form-control" id="htFormDateRecorded" name="date_recorded" required>
                 </div>
-
+                
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label for="htFormWeight" class="form-label">Berat Badan (kg)</label>
-                        <input type="number" step="0.01" class="form-control" id="htFormWeight" name="weight" placeholder="50.5">
+                        <label for="htFormWeight" class="form-label">Berat Badan (kg)*</label>
+                        <input type="number" step="0.01" class="form-control" id="htFormWeight" name="weight" placeholder="50.5" required>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="htFormBloodPressure" class="form-label">Tekanan Darah</label>
+                        <label for="htFormHeight" class="form-label">Tinggi Badan (cm)</label>
+                        <input type="number" step="0.1" class="form-control" id="htFormHeight" name="height" placeholder="160.5">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="htFormPregnancyWeek" class="form-label">Minggu Kehamilan*</label>
+                        <input type="number" class="form-control" id="htFormPregnancyWeek" name="pregnancy_week" min="1" max="42" placeholder="12" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="htFormBloodPressure" class="form-label">Tekanan Darah (mmHg)</label>
                         <input type="text" class="form-control" id="htFormBloodPressure" name="blood_pressure" placeholder="120/80">
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="htFormHeartRate" class="form-label">Denyut Jantung (bpm)</label>
                         <input type="number" class="form-control" id="htFormHeartRate" name="heart_rate" placeholder="72">
                     </div>
                 </div>
-
+                
                 <div class="mb-3">
                     <label for="htFormNotes" class="form-label">Catatan</label>
                     <textarea class="form-control" id="htFormNotes" name="notes" rows="3" placeholder="Masukkan catatan kesehatan..."></textarea>
@@ -1817,9 +1828,6 @@ function renderHealthTrackingTable(data) {
                 <button class="btn btn-sm btn-outline-primary edit-tracking-btn" data-id="${tracking.tracking_id}">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger delete-tracking-btn" data-id="${tracking.tracking_id}">
-                    <i class="fas fa-trash"></i>
-                </button>
             </td>
         </tr>
     `).join('');
@@ -1859,10 +1867,16 @@ function showTrackingDetails(tracking) {
     document.getElementById('htNotes').textContent = tracking.notes || 'Tidak ada catatan';
 }
 
-// Open form modal for adding/editing
-function openHealthTrackingFormModal(tracking = null) {
-    document.getElementById('healthTrackingFormTitle').textContent = tracking ? 'Edit Data Kesehatan' : 'Tambah Data Kesehatan';
-    document.getElementById('htFormPregnancyId').value = currentPregnancyId;
+// Open form modal for adding new health tracking data only
+function openHealthTrackingFormModal() {
+    document.getElementById('healthTrackingFormTitle').textContent = 'Tambah Data Kesehatan';
+    
+    // Debug: Check if currentPregnancyId is available
+    console.log('currentPregnancyId:', currentPregnancyId);
+    
+    // Set pregnancy ID - use currentPregnancyId if available, otherwise use a default for testing
+    const pregnancyId = currentPregnancyId || 1; // Ganti 1 dengan ID yang valid untuk testing
+    document.getElementById('htFormPregnancyId').value = pregnancyId;
 
     // Add user_id to the form
     if (!document.getElementById('htFormUserId')) {
@@ -1872,118 +1886,116 @@ function openHealthTrackingFormModal(tracking = null) {
         userIdInput.name = 'user_id';
         healthTrackingForm.appendChild(userIdInput);
     }
-    document.getElementById('htFormUserId').value = currentUserId;
+    
+    // Debug: Check if currentUserId is available
+    console.log('currentUserId:', currentUserId);
+    const userId = currentUserId || 1; // Ganti 1 dengan ID yang valid untuk testing
+    document.getElementById('htFormUserId').value = userId;
 
-    if (tracking) {
-        document.getElementById('htFormTrackingId').value = tracking.tracking_id;
-        document.getElementById('htFormDateRecorded').value = tracking.date_recorded.split('T')[0]; // Format date for input
-        document.getElementById('htFormWeight').value = tracking.weight || '';
-        document.getElementById('htFormBloodPressure').value = tracking.blood_pressure || '';
-        document.getElementById('htFormHeartRate').value = tracking.heart_rate || '';
-        document.getElementById('htFormNotes').value = tracking.notes || '';
-    } else {
-        document.getElementById('htFormTrackingId').value = '';
-        document.getElementById('htFormDateRecorded').value = new Date().toISOString().split('T')[0]; // Today's date
-        document.getElementById('htFormWeight').value = '';
-        document.getElementById('htFormBloodPressure').value = '';
-        document.getElementById('htFormHeartRate').value = '';
-        document.getElementById('htFormNotes').value = '';
-    }
+    // Reset form for new data entry
+    document.getElementById('htFormTrackingId').value = '';
+    document.getElementById('htFormDateRecorded').value = new Date().toISOString().split('T')[0]; // Today's date
+    document.getElementById('htFormWeight').value = '';
+    document.getElementById('htFormHeight').value = '';
+    document.getElementById('htFormPregnancyWeek').value = '';
+    document.getElementById('htFormBloodPressure').value = '';
+    document.getElementById('htFormHeartRate').value = '';
+    document.getElementById('htFormNotes').value = '';
 
     healthTrackingFormModal.style.display = 'flex';
 }
 
-// Submit health tracking form (always using POST)
 function submitHealthTrackingForm() {
     const formData = new FormData(healthTrackingForm);
-    const trackingId = document.getElementById('htFormTrackingId').value;
     const pregnancyId = document.getElementById('htFormPregnancyId').value;
 
-    // Always use POST, route includes pregnancyId
-    const url = `/api/health-tracking/Store/${pregnancyId}`;
+    // Debug: Log the pregnancy ID and form data
+    console.log('Pregnancy ID:', pregnancyId);
+    console.log('Form Data:', Object.fromEntries(formData));
 
-    // Include tracking_id in form data if editing
-    if (trackingId) {
-        formData.append('_method', 'PUT'); // Laravel's way to simulate PUT with POST
-        formData.append('tracking_id', trackingId);
-    }
-
-    fetch(url, {
-        method: 'POST', // Always POST
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Data kesehatan berhasil disimpan'
-            });
-            closeHealthTrackingFormModal();
-            loadHealthTrackingData(currentPregnancyId, currentUserId);
-        } else {
-            throw new Error(data.message || 'Failed to save data');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
+    // Pastikan pregnancyId tidak kosong atau undefined
+    if (!pregnancyId || pregnancyId === '') {
+        console.error('Pregnancy ID is missing or empty');
         Swal.fire({
             icon: 'error',
-            title: 'Gagal menyimpan',
-            text: error.message || 'Terjadi kesalahan saat menyimpan data kesehatan'
+            title: 'Error',
+            text: 'Pregnancy ID tidak ditemukan. Silakan refresh halaman.'
         });
+        return;
+    }
+
+    // URL sesuai dengan route yang sudah didefinisikan: /api/health-tracking/store/{pregnancyId}
+    const url = `/api/health-tracking/store/${pregnancyId}`;
+    console.log('Request URL:', url);
+
+    // Pastikan CSRF token ada
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'CSRF token tidak ditemukan. Silakan refresh halaman.'
+        });
+        return;
+    }
+
+    // Only handle POST request for new records
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': csrfToken.content,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+            // Log response text for debugging
+            return response.text().then(text => {
+                console.error('Response text:', text);
+                throw new Error(`HTTP error! status: ${response.status}, response: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success response:', data);
+        handleSuccessResponse(data);
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        handleErrorResponse(error);
     });
 }
 
-// Confirm delete tracking
-function confirmDeleteTracking(trackingId) {
+function handleSuccessResponse(data) {
+    if (data.success) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Data kesehatan berhasil disimpan'
+        });
+        closeHealthTrackingFormModal();
+        loadHealthTrackingData(currentPregnancyId, currentUserId);
+    } else {
+        throw new Error(data.message || 'Failed to save data');
+    }
+}
+
+function handleErrorResponse(error) {
+    console.error('Error:', error);
     Swal.fire({
-        title: 'Hapus Data Kesehatan?',
-        text: "Anda tidak akan dapat mengembalikan data ini!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/api/health-tracking/${trackingId}?user_id=${currentUserId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire(
-                        'Terhapus!',
-                        'Data kesehatan telah dihapus.',
-                        'success'
-                    );
-                    loadHealthTrackingData(currentPregnancyId, currentUserId);
-                } else {
-                    throw new Error(data.message || 'Failed to delete');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal menghapus',
-                    text: 'Terjadi kesalahan saat menghapus data kesehatan'
-                });
-            });
-        }
+        icon: 'error',
+        title: 'Gagal menyimpan',
+        text: error.message || 'Terjadi kesalahan saat menyimpan data kesehatan'
     });
 }
+
 
 // Format date to DD MMM YYYY
 function formatDate(dateString) {
@@ -2008,14 +2020,7 @@ function addHealthTrackingTableEventListeners() {
         });
     });
 
-    // Delete buttons
-    document.querySelectorAll('.delete-tracking-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const trackingId = this.dataset.id;
-            confirmDeleteTracking(trackingId);
-        });
-    });
+  
 
     // Row click to view details
     document.querySelectorAll('#healthTrackingTable tbody tr').forEach(row => {

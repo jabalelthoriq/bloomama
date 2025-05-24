@@ -220,12 +220,14 @@ public function getHealthTrackingData($pregnancyId, $userId = null)
  */
 public function storeHealthTracking(Request $request, $pregnancy_id)
 {
-    // Validate the request data
+    // Validate the request data with new fields
     $validatedData = $request->validate([
         'date_recorded' => 'required|date_format:Y-m-d',
-        'weight' => 'required|numeric|between:0,999.99',
+        'weight' => 'nullable|numeric|between:0,999.99',
+        'height' => 'nullable|numeric|between:0,300', // in cm, nullable
+        'pregnancy_week' => 'required|integer|min:1|max:42', // weeks 1-42
         'blood_pressure' => 'nullable|string|max:20', // e.g., "120/80"
-        'heart_rate' => 'required|integer|min:0',
+        'heart_rate' => 'nullable|integer|min:0',
         'notes' => 'nullable|string|max:500'
     ]);
 
@@ -233,15 +235,23 @@ public function storeHealthTracking(Request $request, $pregnancy_id)
         // Check if the pregnancy exists
         $pregnancy = UserPregnant::findOrFail($pregnancy_id);
 
-        // Create new health tracking record using fillable fields
+        // Create new health tracking record with all fields
         $healthData = HealthTracking::create([
             'user_id' => $pregnancy->user_id,
             'pregnancy_id' => $pregnancy_id,
             'date_recorded' => $validatedData['date_recorded'],
             'weight' => $validatedData['weight'],
+            'height' => $validatedData['height'] ?? null,
+            'pregnancy_week' => $validatedData['pregnancy_week'],
             'blood_pressure' => $validatedData['blood_pressure'] ?? null,
             'heart_rate' => $validatedData['heart_rate'],
             'notes' => $validatedData['notes'] ?? null
+        ]);
+
+        // Update the pregnancy's last check date and pregnancy week
+        $pregnancy->update([
+            'last_check_date' => $validatedData['date_recorded'],
+            'pregnancy_week' => $validatedData['pregnancy_week']
         ]);
 
         return response()->json([

@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\HealthTracking;
 use App\Models\UserPregnant;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class dashboardcontroller extends Controller
 {
@@ -72,38 +75,79 @@ class dashboardcontroller extends Controller
         ], 500);
     }
 }
-    public function getHealthTrackingByUserId($userId)
+public function getLatestHealthData($userId)
 {
-    $data = HealthTracking::with(['user', 'pregnancy'])
-                ->where('user_id', $userId)
-                ->select([
-                    'tracking_id', // biasanya perlu menyertakan primary key
-                    'user_id', // diperlukan untuk relasi
-                    'pregnancy_id', // diperlukan untuk relasi
-                    'date_recorded', // biasanya berguna untuk sorting/filter
-                    'weight',
-                    'blood_pressure',
-                    'heart_rate',
-                    'notes'
-                ])
-                ->get();
+    $latestData = HealthTracking::with(['user', 'pregnancy'])
+        ->where('user_id', $userId)
+        ->latest('date_recorded') // Sama dengan orderBy('date_recorded', 'desc')
+        ->select([
+            'tracking_id',
+            'user_id',
+            'pregnancy_id',
+            'weight',
+            'blood_pressure',
+            'heart_rate',
+            'height',
+            'date_recorded'
+        ])
+        ->first(); // Ambil hanya 1 record teratas (terbaru)
 
-    if ($data->isEmpty()) {
+    if (!$latestData) {
         return response()->json([
             'success' => false,
-            'message' => 'Data tidak ditemukan untuk user_id: ' . $userId,
-            'data' => []
+            'message' => 'Data kesehatan tidak ditemukan',
+            'data' => null
         ], 404);
     }
 
     return response()->json([
         'success' => true,
-        'message' => 'Data health tracking berhasil diambil.',
-        'data' => $data
+        'message' => 'Data kesehatan terbaru berhasil diambil',
+        'data' => $latestData
     ]);
 }
 
+public function getPregnancyData($user_id)
+{
+    try {
+        // Cari data kehamilan berdasarkan user_id yang aktif/terbaru
+        $pregnancy = UserPregnant::where('user_id', $user_id)
+                                 ->where('status', 'active') // atau kondisi status sesuai kebutuhan
+                                 ->latest() // ambil yang terbaru jika ada multiple record
+                                 ->first();
 
-  
+        // Jika tidak ditemukan data kehamilan
+        if (!$pregnancy) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pregnancy data not found for this user'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $pregnancy->pregnancy_id,
+                'gravida' => $pregnancy->gravida,
+                'para' => $pregnancy->para,
+                'abortus' => $pregnancy->abortus,
+                'start_date' => $pregnancy->start_date,
+                'due_date' => $pregnancy->due_date,
+                'pregnancy_week' => $pregnancy->pregnancy_week,
+                'status' => $pregnancy->status,
+                // Tambahkan field lain yang diperlukan
+                'user' => [
+                    'full_name' => $pregnancy->user->name // contoh akses relasi
+                ]
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving pregnancy data: ' . $e->getMessage()
+        ], 500);
+}
+}
 
 }
