@@ -507,97 +507,92 @@
         </div>
 
         <div class="row mb-5">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title m-0 fw-bold">Pregnant Users Statistics</h5>
-                            <span class="text-muted">Tahun {{ \Carbon\Carbon::now()->year }}</span>
-
-                        </div>
-                        <div class="chart-container">
-                            <svg class="chart" viewBox="0 0 500 200" id="pregnant-users-chart">
-
-                            </svg>
-                            <div class="chart-point"></div>
-                            <div class="chart-value"></div>
-                        </div>
-                    </div>
+    {{-- Pregnant Users Statistics --}}
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title m-0 fw-bold">Pregnant Users Statistics</h5>
+                    <span class="text-muted">Tahun {{ \Carbon\Carbon::now()->year }}</span>
                 </div>
-            </div>
-
-
-
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title m-0 fw-bold">Patient Statistics</h5>
-                            <small class="text-muted">Monthly Data</small>
-                        </div>
-                        <div class="chart-container">
-                            <svg class="chart" viewBox="0 0 500 200">
-                                <!-- Grid lines -->
-                                <line x1="0" y1="0" x2="500" y2="0" stroke="#eee"
-                                    stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="50" x2="500" y2="50" stroke="#eee"
-                                    stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="100" x2="500" y2="100" stroke="#eee"
-                                    stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="150" x2="500" y2="150" stroke="#eee"
-                                    stroke-width="1" stroke-dasharray="2" />
-                                <line x1="0" y1="200" x2="500" y2="200" stroke="#eee"
-                                    stroke-width="1" stroke-dasharray="2" />
-
-                                <!-- Labels Y axis -->
-                                <text x="10" y="200" fill="#888" font-size="10">0</text>
-                                <text x="10" y="150" fill="#888" font-size="10">25</text>
-                                <text x="10" y="100" fill="#888" font-size="10">50</text>
-                                <text x="5" y="50" fill="#888" font-size="10">75</text>
-                                <text x="5" y="15" fill="#888" font-size="10">100</text>
-
-                                <!-- Labels X axis -->
-                                <text x="20" y="195" fill="#888" font-size="10">Jan</text>
-                                <text x="70" y="195" fill="#888" font-size="10">Feb</text>
-                                <text x="120" y="195" fill="#888" font-size="10">Mar</text>
-                                <text x="170" y="195" fill="#888" font-size="10">Apr</text>
-                                <text x="220" y="195" fill="#888" font-size="10">May</text>
-                                <text x="270" y="195" fill="#888" font-size="10">Jun</text>
-                                <text x="320" y="195" fill="#888" font-size="10">Jul</text>
-                                <text x="370" y="195" fill="#888" font-size="10">Aug</text>
-                                <text x="420" y="195" fill="#888" font-size="10">Sep</text>
-                                <text x="470" y="195" fill="#888" font-size="10">Oct</text>
-
-                                <!-- Bar chart data -->
-                                <rect x="20" y="80" width="30" height="120" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="70" y="100" width="30" height="100" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="120" y="50" width="30" height="150" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="170" y="90" width="30" height="110" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="220" y="40" width="30" height="160" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="270" y="70" width="30" height="130" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="320" y="100" width="30" height="100" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="370" y="60" width="30" height="140" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                                <rect x="420" y="80" width="30" height="120" fill="rgba(146, 109, 222, 0.8)"
-                                    rx="4" />
-                            </svg>
-                        </div>
-                    </div>
+                <div class="chart-container">
+                    <svg class="chart" viewBox="0 0 500 200" id="pregnant-users-chart">
+                        @php $barWidth = 30; $barGap = 40; $chartHeight = 180; @endphp
+                        @foreach ($monthlyData as $index => $data)
+                            @php
+                                $x = 20 + ($index * $barGap);
+                                $height = $data->count * 2;
+                                $y = $chartHeight - $height;
+                            @endphp
+                            <rect x="{{ $x }}" y="{{ $y }}" width="{{ $barWidth }}" height="{{ $height }}" fill="rgba(255, 99, 132, 0.8)" rx="4" />
+                        @endforeach
+                        @foreach ($monthlyData as $index => $data)
+                            <text x="{{ 20 + ($index * $barGap) + 5 }}" y="195" fill="#888" font-size="10">{{ $data->month_name }}</text>
+                        @endforeach
+                    </svg>
                 </div>
             </div>
         </div>
+    </div>
+
+  {{-- Patient Statistics --}}
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title m-0 fw-bold">Patient Statistics</h5>
+                <span class="text-muted">Tahun {{ \Carbon\Carbon::now()->year }}</span>
+            </div>
+            <div class="chart-container">
+                <svg class="chart" viewBox="0 0 500 200" id="user-chart">
+                    @php
+                        $barWidth = 30;
+                        $barGap = 40;
+                        $chartHeight = 180;
+                        $chartLeftPadding = 30; // ruang untuk label Y
+                        $xStart = $chartLeftPadding + 10; // awal bar chart
+                        $xLabels = [0, 5, 10, 15, 20]; // hanya sampai 20
+                        $scaleFactor = $chartHeight / 20; // scaling agar 20 = tinggi penuh
+                    @endphp
+
+                    {{-- Grid & Y-axis label --}}
+                    @foreach ($xLabels as $value)
+                        @php
+                            $y = $chartHeight - ($value * $scaleFactor);
+                        @endphp
+                        <line x1="{{ $chartLeftPadding }}" y1="{{ $y }}" x2="500" y2="{{ $y }}" stroke="#eee" stroke-width="1" />
+                        <text x="5" y="{{ $y + 4 }}" font-size="9" fill="#aaa">{{ $value }}</text>
+                    @endforeach
+
+                    {{-- Bars --}}
+                    @foreach ($userMonthlyData as $index => $data)
+                        @php
+                            $count = min($data->count, 20); // batasi maksimal 20
+                            $x = $xStart + ($index * $barGap);
+                            $height = $count * $scaleFactor;
+                            $y = $chartHeight - $height;
+                        @endphp
+                        <rect x="{{ $x }}" y="{{ $y }}" width="{{ $barWidth }}" height="{{ $height }}"
+                            fill="rgba(146, 109, 222, 0.8)" rx="4" />
+                    @endforeach
+
+                    {{-- X-axis month labels --}}
+                    @foreach ($userMonthlyData as $index => $data)
+                        <text x="{{ $xStart + ($index * $barGap) + 5 }}" y="195" fill="#888" font-size="10">
+                            {{ $data->month_name }}
+                        </text>
+                    @endforeach
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
-        <div class="row">
+
             <div class="col-12">
+                <br><br>
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title mb-4 fw-bold">Appointment Activity</h5>
