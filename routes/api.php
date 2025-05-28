@@ -10,12 +10,6 @@ use App\Http\Controllers\Mobile\dashboardcontroller;
 use App\Http\Controllers\Mobile\kesehatancontroller;
 
 
-Route::put('/pregnancies/{pregnancyId}', [UsersController::class, 'update'])->name('pregnancies.update');
-Route::delete('/users', [UsersController::class, 'destroy'])->name('users.destroy');
-
-
- 
-
     //mobile api
 
 ///auth
@@ -28,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [authcontroller::class,'logout']);
 
 });
+
 
     ///dashboard
 Route::get('/health-trackings/latest/{userId}', [dashboardcontroller::class, 'getLatestHealthData']);

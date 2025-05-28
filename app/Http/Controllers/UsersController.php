@@ -87,19 +87,18 @@ class UsersController extends Controller
  * @param  int  $id
  * @return \Illuminate\Http\Response
  */
-public function update(Request $request, $pregnancyId): RedirectResponse
+public function update(Request $request, $pregnancy_id): RedirectResponse
 {
     try {
-        $userPregnancy = UserPregnant::findOrFail($pregnancyId);
+        $userPregnancy = UserPregnant::findOrFail($pregnancy_id);
 
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,user_id',
-            'gravida' => 'required|integer|min:0',
-            'para' => 'required|integer|min:0',
-            'abortus' => 'required|integer|min:0',
+            'gravida' => 'nullable|integer|min:0',
+            'para' => 'nullable|integer|min:0',
+            'abortus' => 'nullable|integer|min:0',
             'start_date' => 'required|date',
             'due_date' => 'nullable|date|after:start_date',
-            'pregnancy_week' => 'required|integer|between:1,42',
+            'pregnancy_week' => 'nullable|integer|between:1,42',
             'last_check_date' => 'nullable|date|before_or_equal:today',
             'notes' => 'nullable|string|max:1000',
         ]);
@@ -319,26 +318,275 @@ public function updateHealthTracking(Request $request, $trackingId)
     }
 }
 
-/**
- * Delete health tracking data
- */
-public function deleteHealthTracking($trackingId)
+
+public function storeAppointment(Request $request, $userId)
 {
+    // Debug: Lihat data yang diterima dari form
+    \Log::info('Appointment form data received:', $request->all());
+    
+    $validated = $request->validate([
+        'date_time' => 'required|date|after:now',
+        'notes' => 'nullable|string|max:500',
+        'midwife_id' => 'required|exists:midwives,midwife_id', // midwife_id dari select dropdown
+    ]);
+
+    // Cari user
+    $user = User::find($userId);
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User tidak ditemukan',
+            'debug' => [
+                'requested_user_id' => $userId,
+            ]
+        ], 404);
+    }
+
+    // Cari bidan - perbaikan: gunakan find() dengan midwife_id dari request
+    $midwife = Midwive::find($validated['midwife_id']);
+    if (!$midwife) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Bidan tidak ditemukan',
+            'debug' => [
+                'requested_midwife_id' => $validated['midwife_id'],
+                'available_midwives' => Midwive::pluck('id', 'name')->toArray(), // Debug: tampilkan bidan yang tersedia
+            ]
+        ], 404);
+    }
+
     try {
-        $tracking = HealthTracking::findOrFail($trackingId);
-        $tracking->delete();
+        $appointmentData = [
+            'user_id' => $userId,
+            'midwife_id' => $validated['midwife_id'],
+            'date_time' => $validated['date_time'],
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'pending',
+        ];
+
+        $appointment = Appointment::create($appointmentData);
+
+        // Load relasi untuk response
+        $appointment->load(['user', 'midwife']);
 
         return response()->json([
             'success' => true,
-            'message' => 'Health tracking data deleted successfully'
-        ]);
+            'message' => 'Janji temu berhasil dibuat',
+            'data' => [
+                'appointment' => $appointment,
+                'formatted_date_time' => $appointment->formatted_date_time ?? date('d/m/Y H:i', strtotime($appointment->date_time)),
+                'user' => $appointment->user,
+                'midwife' => $appointment->midwife
+            ],
+            'debug' => [
+                'appointment_input' => $appointmentData,
+                'user_found' => $user->id,
+                'midwife_found' => $midwife->id,
+                'midwife_name' => $midwife->name,
+            ]
+        ], 201);
+
     } catch (\Exception $e) {
-        Log::error("Error deleting health tracking: " . $e->getMessage());
         return response()->json([
             'success' => false,
-            'message' => 'Failed to delete health tracking data'
+            'message' => 'Gagal membuat janji temu',
+            'error' => app()->isLocal() || config('app.debug') ? $e->getMessage() : 'Internal server error',
+            'debug' => [
+                'exception' => get_class($e),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'validated_data' => $validated,
+            ]
         ], 500);
     }
+}
+
+/**
+ * Delete health tracking data
+ */
+ public function storeAppointment2(Request $request, $userId)
+{
+    $debug = [];
+    
+    try {
+        // Validate input data
+        $validated = $request->validate([
+            'date_time' => 'required|date|after:now',
+            'notes' => 'nullable|string|max:500',
+        ]);
+        
+        $debug['validated_data'] = $validated;
+        
+        // Find the user
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User tidak ditemukan',
+                'debug' => [
+                    'requested_user_id' => $userId,
+                ]
+            ], 404);
+        }
+        
+        $debug['user_found'] = $user->id;
+        
+        // Get authenticated midwife - improved authentication logic
+        $midwife = null;
+        
+        // Try different authentication methods
+        if (auth()->guard('midwife')->check()) {
+            $midwife = auth()->guard('midwife')->user();
+            $debug['auth_method'] = 'midwife_guard';
+        } elseif (auth()->guard('web')->check()) {
+            $midwife = auth()->guard('web')->user();
+            $debug['auth_method'] = 'web_guard';
+        } elseif (auth()->check()) {
+            $midwife = auth()->user();
+            $debug['auth_method'] = 'default_guard';
+        } else {
+            // Try to get from session
+            if (session()->has('midwife_id')) {
+                $midwife = User::find(session('midwife_id'));
+                $debug['auth_method'] = 'session_midwife_id';
+            } elseif (session()->has('user_id')) {
+                $midwife = User::find(session('user_id'));
+                $debug['auth_method'] = 'session_user_id';
+            }
+        }
+        
+        $debug['midwife_id'] = $midwife ? $midwife->id : null;
+        
+        if (!$midwife) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized - Anda harus login sebagai bidan untuk membuat janji temu',
+                'debug' => [
+                    'auth_guards_checked' => ['midwife', 'web', 'default'],
+                    'session_data' => [
+                        'has_midwife_id' => session()->has('midwife_id'),
+                        'has_user_id' => session()->has('user_id'),
+                    ]
+                ]
+            ], 401);
+        }
+        
+        // Check for existing appointments at the same time
+        $existingAppointment = Appointment::where('midwife_id', $midwife->id)
+            ->where('date_time', $validated['date_time'])
+            ->where('status', '!=', 'cancelled')
+            ->first();
+            
+        if ($existingAppointment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda sudah memiliki janji temu pada waktu tersebut',
+                'debug' => [
+                    'existing_appointment_id' => $existingAppointment->id
+                ]
+            ], 422);
+        }
+        
+        // Create appointment data
+        $appointmentData = [
+            'user_id' => $userId,
+            'midwife_id' => $midwife->id,
+            'date_time' => $validated['date_time'],
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'pending',
+        ];
+        
+        $debug['appointment_data'] = $appointmentData;
+        
+        // Create the appointment
+        $appointment = Appointment::create($appointmentData);
+        
+        // Load relationships for response
+        $appointment->load(['user', 'midwife']);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Janji temu berhasil dibuat',
+            'data' => [
+                'appointment' => $appointment,
+                'formatted_date_time' => $appointment->created_at->format('d M Y H:i'),
+                'user' => [
+                    'id' => $appointment->user->id,
+                    'name' => $appointment->user->name,
+                ],
+                'midwife' => [
+                    'id' => $appointment->midwife->id,
+                    'name' => $appointment->midwife->name,
+                ]
+            ],
+            'debug' => config('app.debug') ? $debug : null
+        ], 201);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak valid',
+            'errors' => $e->errors(),
+            'debug' => config('app.debug') ? $debug : null
+        ], 422);
+        
+    } catch (\Exception $e) {
+        // Log the error for debugging
+        \Log::error('Appointment creation failed', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'user_id' => $userId,
+            'request_data' => $request->all()
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal membuat janji temu',
+            'error' => config('app.debug') ? $e->getMessage() : 'Terjadi kesalahan sistem',
+            'debug' => config('app.debug') ? [
+                'exception_class' => get_class($e),
+                'exception_message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'debug_data' => $debug
+            ] : null
+        ], 500);
+    }
+}
+
+private function sendNotificationToUser($appointment)
+{
+    // Contoh implementasi notifikasi ke user
+    $user = $appointment->user;
+    $midwife = $appointment->midwife;
+    
+    // Kirim email/SMS/push notification ke user
+    // Mail::to($user->email)->send(new AppointmentCreated($appointment));
+    
+    // Atau simpan ke tabel notifications
+    // $user->notifications()->create([
+    //     'title' => 'Janji Temu Baru',
+    //     'message' => "Janji temu Anda dengan {$midwife->name} telah dijadwalkan pada " . $appointment->date_time,
+    //     'type' => 'appointment_created'
+    // ]);
+}
+
+// Method untuk mengirim notifikasi ke midwife
+private function sendNotificationToMidwife($appointment)
+{
+    // Contoh implementasi notifikasi ke midwife
+    $user = $appointment->user;
+    $midwife = $appointment->midwife;
+    
+    // Kirim notifikasi ke midwife
+    // Mail::to($midwife->email)->send(new AppointmentScheduled($appointment));
+    
+    // Atau simpan ke tabel notifications
+    // $midwife->notifications()->create([
+    //     'title' => 'Janji Temu Baru',
+    //     'message' => "Janji temu baru dengan {$user->name} pada " . $appointment->date_time,
+    //     'type' => 'appointment_scheduled'
+    // ]);
 }
 
 

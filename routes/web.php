@@ -21,7 +21,7 @@ use App\Http\Controllers\SettingController;
             Route::put('/health-tracking/{trackingId}', [UsersController::class, 'updateHealthTracking']);
             Route::delete('/health-tracking/{trackingId}', [UsersController::class, 'deleteHealthTracking']);
 
-    // routes for users
+    
 });
 
 // Public routes - accessible without login
@@ -39,11 +39,13 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 // APPOINTMENT ROUTES - DIPERBAIKI
 Route::put('/appointments/update', [AppointmentController::class, 'update'])->name('appointments.update');
 Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
-
+Route::post('/appointments/user/{userId}', [UsersController::class, 'storeAppointment'])
+    ->middleware(['auth:midwife']);
 
 
 // User management routes for midwives
 Route::get('/user', [UsersController::class, 'showUsersAndMidwives'])->name('user');
+Route::post('/pregnancies/{pregnancy_id}', [UsersController::class, 'update'])->name('pregnancies.update');
 
 // Chat routes
 Route::get('/chat', [ChatController::class, 'chat']);

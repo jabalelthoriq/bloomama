@@ -306,10 +306,6 @@
                                        placeholder="Konfirmasi kata sandi baru">
                             </div>
 
-                            <div class="form-group">
-                                <span>Lupa kata sandi?</span><br>
-                                <span>Kirim melalui <a href="#" data-bs-toggle="modal" data-bs-target="#resetPasswordModal" class="email-link">Email</a> !</span>
-                            </div>
 
                             <div class="d-flex justify-content-end mt-4">
                                 <button type="submit" class="btn btn-primary update-btn">Simpan Kata Sandi</button>

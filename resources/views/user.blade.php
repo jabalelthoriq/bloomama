@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -788,7 +789,7 @@
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                     <button type="button" class="btn btn-sm btn-outline-primary ms-1 edit-pregnancy-btn"
-                                                        data-id="{{ $userPregnancy->id }}"
+                                                        data-id="{{ $userPregnancy->pregnancy_id }}"
                                                         data-patient-id="{{ $userPregnancy->user_id ?? '' }}"
                                                         data-patient-name="{{ $userPregnancy->user->name ?? 'Unknown User' }}"
                                                         data-gravida="{{ $userPregnancy->gravida ?? '0' }}"
@@ -980,13 +981,17 @@
                     </div>
                 </div>
             </div>
+             
 
             <!-- History -->
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="m-0">Riwayat Pemeriksaan</h6>
-                <button class="btn btn-sm btn-primary" id="addNewTrackingBtn">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
-                </button>
+              
+                    <button class="btn btn-sm btn-primary" id="addNewTrackingBtn" data-id="{{ $userPregnancy->pregnancy_id }}">
+                        <i class="fas fa-plus me-1"></i> Tambah Data
+                    </button>
+           
+
             </div>
 
             <div class="table-responsive">
@@ -1130,9 +1135,8 @@
             </button>
         </div>
         <div class="modal-body">
-            <form id="editPregnancyForm" method="POST">
+            <form id="editPregnancyForm" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
                 <input type="hidden" id="editPregnancyId" name="pregnancy_id">
 
                 <div class="mb-3">
@@ -1215,16 +1219,16 @@
                     <label for="appointmentDateTime" class="form-label fw-bold">Tanggal & Waktu*</label>
                     <input type="datetime-local" class="form-control" id="appointmentDateTime" name="date_time" required>
                 </div>
-{{--
+
                 <div class="mb-3">
                     <label for="appointmentMidwife" class="form-label">Bidan*</label>
                     <select class="form-select" id="appointmentMidwife" name="midwife_id" required>
                         <option value="">Pilih Bidan</option>
                         @foreach($midwives as $midwife)
-                            <option value="{{ $midwife->id }}">{{ $midwife->name }}</option>
+                            <option value="{{ $midwife->midwife_id }}">{{ $midwife->name }}</option>
                         @endforeach
                     </select>
-                </div> --}}
+                </div>
 
                 <div class="mb-3">
                     <label for="appointmentNotes" class="form-label fw-bold">Catatan</label>
@@ -1479,50 +1483,87 @@ function confirmDeleteUser(event, button) {
     });
 });
 
+// Edit Pregnancy Modal
+const editPregnancyModal = document.getElementById('editPregnancyModal');
+const closeEditPregnancyModalBtn = document.getElementById('closeEditPregnancyModalBtn');
+const cancelEditPregnancyBtn = document.getElementById('cancelEditPregnancyBtn');
+const updatePregnancyBtn = document.getElementById('updatePregnancyBtn');
+const editPregnancyForm = document.getElementById('editPregnancyForm');
 
-    // Edit Pregnancy Modal
-    const editPregnancyModal = document.getElementById('editPregnancyModal');
-    const closeEditPregnancyModalBtn = document.getElementById('closeEditPregnancyModalBtn');
-    const cancelEditPregnancyBtn = document.getElementById('cancelEditPregnancyBtn');
-    const updatePregnancyBtn = document.getElementById('updatePregnancyBtn');
-    const editPregnancyForm = document.getElementById('editPregnancyForm');
+// Function to close modal
+function closeEditModal() {
+    editPregnancyModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
 
-   // Open edit modal
+// Close modal event listeners
+closeEditPregnancyModalBtn.addEventListener('click', closeEditModal);
+cancelEditPregnancyBtn.addEventListener('click', closeEditModal);
+
+// Close modal when clicking outside
+editPregnancyModal.addEventListener('click', function(e) {
+    if (e.target === editPregnancyModal) {
+        closeEditModal();
+    }
+});
+
+// Open edit modal
 document.querySelectorAll('.edit-pregnancy-btn').forEach(btn => {
     btn.addEventListener('click', function() {
+        // Get data from button attributes
+        const pregnancyId = this.getAttribute('data-id');
+        const patientId = this.getAttribute('data-patient-id');
+        const patientName = this.getAttribute('data-patient-name');
+        const gravida = this.getAttribute('data-gravida');
+        const para = this.getAttribute('data-para');
+        const abortus = this.getAttribute('data-abortus');
+        const startDate = this.getAttribute('data-start-date');
+        const dueDate = this.getAttribute('data-due-date');
+        const pregnancyWeek = this.getAttribute('data-pregnancy-week');
+        const lastCheck = this.getAttribute('data-last-check');
+        const notes = this.getAttribute('data-notes');
+        
         // Set form action with the correct route
-       const pregnancyId = this.dataset.id;
-        editPregnancyForm.action = `/api/pregnancies/${pregnancyId}`;
-
-
+        editPregnancyForm.action = `/pregnancies/${pregnancyId}`;
+        
         // Set hidden pregnancy ID
         document.getElementById('editPregnancyId').value = pregnancyId;
-
+        
         // Set patient info
-        document.getElementById('editPatientName').textContent = this.dataset.patientName;
-        document.getElementById('editPregnancyPatient').value = this.dataset.patientId;
-
+        document.getElementById('editPatientName').textContent = patientName;
+        
+        // Set patient ID - make sure the field name matches your form
+        const patientField = document.getElementById('editPregnancyPatient') || document.querySelector('input[name="user_id"]');
+        if (patientField) {
+            patientField.value = patientId;
+        }
+        
         // Set GPA fields
-        document.getElementById('editGravida').value = this.dataset.gravida;
-        document.getElementById('editPara').value = this.dataset.para;
-        document.getElementById('editAbortus').value = this.dataset.abortus;
-
+        document.getElementById('editGravida').value = gravida || '';
+        document.getElementById('editPara').value = para || '';
+        document.getElementById('editAbortus').value = abortus || '';
+        
         // Format dates for input fields
         const formatDateForInput = (dateString) => {
-            if (!dateString || dateString === '-') return '';
-            const date = new Date(dateString);
-            return date.toISOString().split('T')[0];
+            if (!dateString || dateString === '-' || dateString === 'null' || dateString === '') return '';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return '';
+                return date.toISOString().split('T')[0];
+            } catch (e) {
+                return '';
+            }
         };
-
+        
         // Set date fields
-        document.getElementById('editStartDate').value = formatDateForInput(this.dataset.startDate);
-        document.getElementById('editDueDate').value = formatDateForInput(this.dataset.dueDate);
-        document.getElementById('editLastCheckDate').value = formatDateForInput(this.dataset.lastCheck);
-
+        document.getElementById('editStartDate').value = formatDateForInput(startDate);
+        document.getElementById('editDueDate').value = formatDateForInput(dueDate);
+        document.getElementById('editLastCheckDate').value = formatDateForInput(lastCheck);
+        
         // Set other fields
-        document.getElementById('editPregnancyWeek').value = this.dataset.pregnancyWeek || '';
-        document.getElementById('editNotes').value = this.dataset.notes || '';
-
+        document.getElementById('editPregnancyWeek').value = pregnancyWeek || '';
+        document.getElementById('editNotes').value = notes || '';
+        
         // Show modal
         editPregnancyModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
@@ -1530,18 +1571,89 @@ document.querySelectorAll('.edit-pregnancy-btn').forEach(btn => {
 });
 
 // Handle form submission
-document.getElementById('updatePregnancyBtn').addEventListener('click', async function() {
+updatePregnancyBtn.addEventListener('click', async function(e) {
+    e.preventDefault();
+    
     const form = document.getElementById('editPregnancyForm');
     const formData = new FormData(form);
     const submitBtn = this;
-
+    const pregnancyId = document.getElementById('editPregnancyId').value;
+    
+    // Debug: Log form data
+    console.log('Form data being sent:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+    console.log('Pregnancy ID:', pregnancyId);
+    
+    // Basic form validation - hanya start_date yang required sesuai controller
+    const requiredFields = ['start_date'];
+    let isValid = true;
+    
+    requiredFields.forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field && !field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else if (field) {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    // Validate numeric fields
+    const numericFields = ['gravida', 'para', 'abortus', 'pregnancy_week'];
+    numericFields.forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field && field.value && isNaN(field.value)) {
+            field.classList.add('is-invalid');
+            isValid = false;
+            alert(`Field ${fieldName} harus berupa angka`);
+        }
+    });
+    
+    // Validate pregnancy week range
+    const pregnancyWeekField = form.querySelector('[name="pregnancy_week"]');
+    if (pregnancyWeekField && pregnancyWeekField.value) {
+        const week = parseInt(pregnancyWeekField.value);
+        if (week < 1 || week > 42) {
+            pregnancyWeekField.classList.add('is-invalid');
+            isValid = false;
+            alert('Minggu kehamilan harus antara 1-42');
+        }
+    }
+    
+    // Validate due date after start date
+    const startDateField = form.querySelector('[name="start_date"]');
+    const dueDateField = form.querySelector('[name="due_date"]');
+    if (startDateField && dueDateField && startDateField.value && dueDateField.value) {
+        if (new Date(dueDateField.value) <= new Date(startDateField.value)) {
+            dueDateField.classList.add('is-invalid');
+            isValid = false;
+            alert('Tanggal perkiraan lahir harus setelah tanggal mulai kehamilan');
+        }
+    }
+    
+    if (!isValid) {
+        return;
+    }
+    
+    // Validate pregnancy ID exists
+    if (!pregnancyId) {
+        alert('ID kehamilan tidak ditemukan');
+        return;
+    }
+    
     // Disable button during submission
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
+    
     try {
-        const response = await fetch(form.action, {
-            method: 'PUT', // Laravel will handle PUT via method spoofing
+        // Construct the correct URL with pregnancy_id parameter - matches Laravel route
+        const updateUrl = `/pregnancies/${pregnancyId}`;
+        console.log('Sending request to:', updateUrl);
+        
+        const response = await fetch(updateUrl, {
+            method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                 'Accept': 'application/json',
@@ -1549,33 +1661,112 @@ document.getElementById('updatePregnancyBtn').addEventListener('click', async fu
             },
             body: formData
         });
-
-        if (response.redirected) {
-            // Handle redirect response (non-AJAX)
-            window.location.href = response.url;
-            return;
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        // Log response for debugging
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+        
+        // Try to parse as JSON
+        let data;
+        try {
+            data = JSON.parse(responseText);
+            console.log('Parsed JSON:', data);
+        } catch (jsonError) {
+            console.log('Response is not JSON, treating as HTML/redirect');
+            
+            // If it's a successful response but not JSON, likely a redirect
+            if (response.ok) {
+                alert('Data berhasil diperbarui');
+                closeEditModal();
+                window.location.reload();
+                return;
+            } else {
+                // Check if it's an HTML error page
+                if (responseText.includes('<!DOCTYPE html>') || responseText.includes('<html>')) {
+                    console.error('Received HTML error page');
+                    alert('Terjadi kesalahan server. Silakan cek console untuk detail.');
+                } else {
+                    throw new Error('Response tidak valid dari server');
+                }
+                return;
+            }
         }
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Terjadi kesalahan');
+        
+        // Handle JSON response
+        if (response.ok) {
+            alert(data.message || 'Data berhasil diperbarui');
+            closeEditModal();
+            window.location.reload();
+        } else {
+            // Handle error response
+            if (data.errors) {
+                // Handle validation errors
+                let errorMessage = 'Validasi gagal:\n';
+                Object.keys(data.errors).forEach(field => {
+                    errorMessage += `- ${field}: ${data.errors[field].join(', ')}\n`;
+                    // Highlight error fields
+                    const errorField = form.querySelector(`[name="${field}"]`);
+                    if (errorField) {
+                        errorField.classList.add('is-invalid');
+                    }
+                });
+                alert(errorMessage);
+            } else {
+                alert(data.message || 'Terjadi kesalahan saat memperbarui data');
+            }
         }
-
-        // Show success message and reload
-        alert('Data berhasil diperbarui');
-        window.location.reload();
-
+        
     } catch (error) {
-        console.error('Error:', error);
-        alert(error.message || 'Gagal memperbarui data');
+        console.error('Fetch error:', error);
+        alert(`Error: ${error.message}`);
     } finally {
+        // Re-enable button
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Simpan Perubahan';
     }
 });
 
-// Close modal handlers
+// Clear validation errors when user types
+document.querySelectorAll('#editPregnancyForm input, #editPregnancyForm textarea').forEach(field => {
+    field.addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+});
+
+// Additional helper function to validate dates
+// function validateDates() {
+//     const startDate = document.getElementById('editStartDate').value;
+//     const dueDate = document.getElementById('editDueDate').value;
+//     const lastCheckDate = document.getElementById('editLastCheckDate').value;
+    
+//     if (startDate && dueDate) {
+//         if (new Date(dueDate) <= new Date(startDate)) {
+//             alert('Tanggal perkiraan lahir harus setelah tanggal mulai kehamilan');
+//             return false;
+//         }
+//     }
+    
+//     if (lastCheckDate) {
+//         const today = new Date();
+//         today.setHours(0, 0, 0, 0);
+//         if (new Date(lastCheckDate) > today) {
+//             alert('Tanggal pemeriksaan terakhir tidak boleh di masa depan');
+//             return false;
+//         }
+//     }
+    
+//     return true;
+// }
+
+// Add date validation to form submission
+updatePregnancyBtn.addEventListener('click', function() {
+    if (!validateDates()) {
+        return false;
+    }
+}, true); // Use capture phase to run before the main handler
 document.getElementById('closeEditPregnancyModalBtn').addEventListener('click', function() {
     editPregnancyModal.style.display = 'none';
     document.body.style.overflow = 'auto';
@@ -1867,34 +2058,23 @@ function showTrackingDetails(tracking) {
     document.getElementById('htNotes').textContent = tracking.notes || 'Tidak ada catatan';
 }
 
-// Open form modal for adding new health tracking data only
-function openHealthTrackingFormModal() {
+    // Open form modal for adding new health tracking data
+function openHealthTrackingFormModal(pregnancyId) {
+    // Validate required parameters
+   
+    
+    // Set modal title
     document.getElementById('healthTrackingFormTitle').textContent = 'Tambah Data Kesehatan';
     
-    // Debug: Check if currentPregnancyId is available
-    console.log('currentPregnancyId:', currentPregnancyId);
-    
-    // Set pregnancy ID - use currentPregnancyId if available, otherwise use a default for testing
-    const pregnancyId = currentPregnancyId || 1; // Ganti 1 dengan ID yang valid untuk testing
+    // Set pregnancy ID
     document.getElementById('htFormPregnancyId').value = pregnancyId;
 
-    // Add user_id to the form
-    if (!document.getElementById('htFormUserId')) {
-        const userIdInput = document.createElement('input');
-        userIdInput.type = 'hidden';
-        userIdInput.id = 'htFormUserId';
-        userIdInput.name = 'user_id';
-        healthTrackingForm.appendChild(userIdInput);
-    }
-    
-    // Debug: Check if currentUserId is available
-    console.log('currentUserId:', currentUserId);
-    const userId = currentUserId || 1; // Ganti 1 dengan ID yang valid untuk testing
-    document.getElementById('htFormUserId').value = userId;
+    // Remove user ID field creation (not needed anymore)
+    // The user ID will be handled by the server/backend based on authenticated user
 
-    // Reset form for new data entry
+    // Reset form fields
     document.getElementById('htFormTrackingId').value = '';
-    document.getElementById('htFormDateRecorded').value = new Date().toISOString().split('T')[0]; // Today's date
+    document.getElementById('htFormDateRecorded').value = new Date().toISOString().split('T')[0];
     document.getElementById('htFormWeight').value = '';
     document.getElementById('htFormHeight').value = '';
     document.getElementById('htFormPregnancyWeek').value = '';
@@ -1902,45 +2082,45 @@ function openHealthTrackingFormModal() {
     document.getElementById('htFormHeartRate').value = '';
     document.getElementById('htFormNotes').value = '';
 
-    healthTrackingFormModal.style.display = 'flex';
+    // Show modal
+    document.getElementById('healthTrackingFormModal').style.display = 'flex';
 }
 
 function submitHealthTrackingForm() {
-    const formData = new FormData(healthTrackingForm);
+    const form = document.getElementById('healthTrackingForm');
+    const formData = new FormData(form);
     const pregnancyId = document.getElementById('htFormPregnancyId').value;
 
-    // Debug: Log the pregnancy ID and form data
-    console.log('Pregnancy ID:', pregnancyId);
-    console.log('Form Data:', Object.fromEntries(formData));
-
-    // Pastikan pregnancyId tidak kosong atau undefined
-    if (!pregnancyId || pregnancyId === '') {
-        console.error('Pregnancy ID is missing or empty');
+    // Validate required data
+    if (!pregnancyId) {
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Pregnancy ID tidak ditemukan. Silakan refresh halaman.'
+            text: 'Pregnancy ID tidak valid'
         });
         return;
     }
 
-    // URL sesuai dengan route yang sudah didefinisikan: /api/health-tracking/store/{pregnancyId}
-    const url = `/api/health-tracking/store/${pregnancyId}`;
-    console.log('Request URL:', url);
-
-    // Pastikan CSRF token ada
+    // Get CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) {
-        console.error('CSRF token not found');
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'CSRF token tidak ditemukan. Silakan refresh halaman.'
+            text: 'CSRF token tidak ditemukan'
         });
         return;
     }
 
-    // Only handle POST request for new records
+    // Show loading state
+    const submitBtn = document.getElementById('submitHealthTrackingFormBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+    // Prepare request URL
+    const url = `/api/health-tracking/store/${pregnancyId}`;
+
+    // Submit form data
     fetch(url, {
         method: 'POST',
         body: formData,
@@ -1951,49 +2131,137 @@ function submitHealthTrackingForm() {
         }
     })
     .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        
         if (!response.ok) {
-            // Log response text for debugging
-            return response.text().then(text => {
-                console.error('Response text:', text);
-                throw new Error(`HTTP error! status: ${response.status}, response: ${text}`);
+            return response.json().then(err => {
+                throw new Error(err.message || 'Terjadi kesalahan pada server');
             });
         }
         return response.json();
     })
     .then(data => {
-        console.log('Success response:', data);
-        handleSuccessResponse(data);
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data kesehatan berhasil disimpan',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                closeHealthTrackingFormModal();
+                // Reload health tracking data (only pregnancyId needed)
+                if (typeof loadHealthTrackingData === 'function') {
+                    loadHealthTrackingData(pregnancyId);
+                }
+            });
+        } else {
+            throw new Error(data.message || 'Gagal menyimpan data');
+        }
     })
     .catch(error => {
-        console.error('Fetch error:', error);
-        handleErrorResponse(error);
-    });
-}
-
-function handleSuccessResponse(data) {
-    if (data.success) {
+        console.error('Error:', error);
         Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Data kesehatan berhasil disimpan'
+            icon: 'error',
+            title: 'Gagal menyimpan',
+            text: error.message || 'Terjadi kesalahan saat menyimpan data'
         });
-        closeHealthTrackingFormModal();
-        loadHealthTrackingData(currentPregnancyId, currentUserId);
-    } else {
-        throw new Error(data.message || 'Failed to save data');
-    }
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Simpan';
+    });
 }
 
-function handleErrorResponse(error) {
-    console.error('Error:', error);
-    Swal.fire({
-        icon: 'error',
-        title: 'Gagal menyimpan',
-        text: error.message || 'Terjadi kesalahan saat menyimpan data kesehatan'
+function closeHealthTrackingFormModal() {
+    document.getElementById('healthTrackingFormModal').style.display = 'none';
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle "Tambah Data" button clicks - Fixed to properly target the button
+    document.addEventListener('click', function(e) {
+        // Check if the clicked element or its parent is the addNewTrackingBtn
+        const button = e.target.closest('#addNewTrackingBtn');
+        
+        if (button) {
+            e.preventDefault(); // Prevent any default behavior
+            
+            const pregnancyId = button.getAttribute('data-id');
+            
+            // Debug logging
+            console.log('Button clicked:', button);
+            console.log('Button ID:', button.id);
+            console.log('Button classes:', button.className);
+            console.log('Pregnancy ID from data-id:', pregnancyId);
+            
+            if (pregnancyId && pregnancyId.trim() !== '' && pregnancyId !== 'null' && pregnancyId !== 'undefined') {
+                openHealthTrackingFormModal(pregnancyId);
+            } else {
+                console.error('Pregnancy ID not found, empty, or invalid:', pregnancyId);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data tidak lengkap',
+                    text: `Pregnancy ID tidak valid: "${pregnancyId}"`
+                });
+            }
+        }
     });
+
+    // // Alternative direct event listener for the specific button (backup method)
+    // const addButton = document.getElementById('addNewTrackingBtn');
+    // if (addButton) {
+    //     addButton.addEventListener('click', function(e) {
+    //         e.preventDefault();
+    //         const pregnancyId = this.getAttribute('data-id');
+            
+    //         console.log('Direct button click - Pregnancy ID:', pregnancyId);
+            
+    //         if (pregnancyId && pregnancyId.trim() !== '' && pregnancyId !== 'null' && pregnancyId !== 'undefined') {
+    //             openHealthTrackingFormModal(pregnancyId);
+    //         } else {
+    //             console.error('Direct click - Pregnancy ID not found or invalid:', pregnancyId);
+    //             Swal.fire({
+    //                 icon: 'warning',
+    //                 title: 'Data tidak lengkap',
+    //                 text: `Pregnancy ID tidak valid: "${pregnancyId}"`
+    //             });
+    //         }
+    //     });
+    // }
+
+    // Submit form handler
+    // const submitBtn = document.getElementById('submitHealthTrackingFormBtn');
+    // if (submitBtn) {
+    //     submitBtn.addEventListener('click', function(e) {
+    //         e.preventDefault();
+    //         submitHealthTrackingForm();
+    //     });
+    // }
+
+    // Close modal handlers
+    const closeBtn = document.getElementById('closeHealthTrackingFormModalBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeHealthTrackingFormModal();
+        });
+    }
+
+    const cancelBtn = document.getElementById('cancelHealthTrackingFormBtn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeHealthTrackingFormModal();
+        });
+    }
+});
+
+// Helper function to open form from other parts of the code
+function openHealthTrackingForm(pregnancyId) {
+    if (!pregnancyId) {
+        console.error('Missing pregnancyId parameter for openHealthTrackingForm');
+        return;
+    }
+    openHealthTrackingFormModal(pregnancyId);
 }
 
 
@@ -2151,85 +2419,181 @@ const cancelAppointmentBtn = document.getElementById('cancelAppointmentBtn');
 const submitAppointmentBtn = document.getElementById('submitAppointmentBtn');
 const appointmentForm = document.getElementById('appointmentForm');
 
-// Open appointment modal
-document.querySelectorAll('.appointment-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const pregnancyId = this.dataset.id;
-        const userId = this.dataset.userId;
-        const patientName = this.dataset.patientName;
+// Open appointment modal - Use event delegation to handle dynamically loaded content
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.appointment-btn')) {
+        const btn = e.target.closest('.appointment-btn');
+        
+        // Get data from button attributes
+        const pregnancyId = btn.getAttribute('data-id');
+        const userId = btn.getAttribute('data-user-id');
+        const patientName = btn.getAttribute('data-patient-name');
+
+        console.log('Opening appointment modal for:', { pregnancyId, userId, patientName }); // Debug log
 
         // Set form values
-        document.getElementById('appointmentPregnancyId').value = pregnancyId;
-        document.getElementById('appointmentUserId').value = userId;
-        document.getElementById('appointmentPatientName').textContent = patientName;
+        const pregnancyIdInput = document.getElementById('appointmentPregnancyId');
+        const userIdInput = document.getElementById('appointmentUserId');
+        const patientNameElement = document.getElementById('appointmentPatientName');
+
+        if (pregnancyIdInput) pregnancyIdInput.value = pregnancyId || '';
+        if (userIdInput) userIdInput.value = userId || '';
+        if (patientNameElement) patientNameElement.textContent = patientName || 'Unknown Patient';
 
         // Set default date/time (next hour)
-        const now = new Date();
-        now.setHours(now.getHours() + 1);
-        now.setMinutes(0);
-        now.setSeconds(0);
-        document.getElementById('appointmentDateTime').value = now.toISOString().slice(0, 16);
+        const dateTimeInput = document.getElementById('appointmentDateTime');
+        if (dateTimeInput) {
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            now.setMinutes(0);
+            now.setSeconds(0);
+            dateTimeInput.value = now.toISOString().slice(0, 16);
+        }
 
         // Show modal
-        appointmentModal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    });
+        if (appointmentModal) {
+            appointmentModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
 });
 
 // Close appointment modal
 function closeAppointmentModal() {
-    appointmentModal.style.display = 'none';
+    if (appointmentModal) {
+        appointmentModal.style.display = 'none';
+    }
     document.body.style.overflow = '';
+    // Reset form
+    if (appointmentForm) {
+        appointmentForm.reset();
+    }
 }
 
-closeAppointmentModalBtn.addEventListener('click', closeAppointmentModal);
-cancelAppointmentBtn.addEventListener('click', closeAppointmentModal);
-appointmentModal.addEventListener('click', function(e) {
-    if (e.target === appointmentModal) closeAppointmentModal();
-});
+// Event listeners with null checks
+if (closeAppointmentModalBtn) {
+    closeAppointmentModalBtn.addEventListener('click', closeAppointmentModal);
+}
+
+if (cancelAppointmentBtn) {
+    cancelAppointmentBtn.addEventListener('click', closeAppointmentModal);
+}
+
+if (appointmentModal) {
+    appointmentModal.addEventListener('click', function(e) {
+        if (e.target === appointmentModal) closeAppointmentModal();
+    });
+}
 
 // Submit appointment form
-submitAppointmentBtn.addEventListener('click', function() {
-    const formData = new FormData(appointmentForm);
-
-    // Disable button during submission
-    submitAppointmentBtn.disabled = true;
-    submitAppointmentBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-    fetch('/appointments', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
+if (submitAppointmentBtn) {
+    submitAppointmentBtn.addEventListener('click', function() {
+        // Get userId from hidden input
+        const userIdInput = document.getElementById('appointmentUserId');
+        const dateTimeInput = document.getElementById('appointmentDateTime');
+        
+        if (!userIdInput || !dateTimeInput) {
             Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Janji temu berhasil dibuat'
+                icon: 'error',
+                title: 'Error!',
+                text: 'Form elements tidak ditemukan'
             });
-            closeAppointmentModal();
-        } else {
-            throw new Error(data.message || 'Failed to create appointment');
+            return;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal membuat janji',
-            text: error.message || 'Terjadi kesalahan saat membuat janji temu'
+
+        const userId = userIdInput.value;
+        const dateTime = dateTimeInput.value;
+        
+        console.log('Submitting appointment for userId:', userId, 'dateTime:', dateTime); // Debug log
+        
+        // Validate required fields
+        if (!dateTime) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian!',
+                text: 'Tanggal dan waktu harus diisi'
+            });
+            return;
+        }
+
+        if (!userId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian!',
+                text: 'User ID tidak valid'
+            });
+            return;
+        }
+
+        // Prepare form data
+        const formData = new FormData(appointmentForm);
+        
+        // Add additional data to form
+        formData.append('user_id', userId);
+
+        // Disable button during submission
+        submitAppointmentBtn.disabled = true;
+        submitAppointmentBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'CSRF token tidak ditemukan'
+            });
+            submitAppointmentBtn.disabled = false;
+            submitAppointmentBtn.innerHTML = 'Simpan Janji';
+            return;
+        }
+
+        // Make request to the correct endpoint with userId in URL
+        fetch(`/appointments/user/${userId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken.content,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Response status:', response.status); // Debug log
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data); // Debug log
+            
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message || 'Janji temu berhasil dibuat'
+                });
+                closeAppointmentModal();
+                
+                // Optional: Refresh the page or update the UI
+                // location.reload(); // Uncomment if you want to refresh
+            } else {
+                throw new Error(data.message || 'Failed to create appointment');
+            }
+        })
+        .catch(error => {
+            console.error('Error details:', error); // Enhanced debug log
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal membuat janji temu',
+                text: error.message || 'Terjadi kesalahan saat membuat janji temu'
+            });
+        })
+        .finally(() => {
+            submitAppointmentBtn.disabled = false;
+            submitAppointmentBtn.innerHTML = 'Simpan Janji';
         });
-    })
-    .finally(() => {
-        submitAppointmentBtn.disabled = false;
-        submitAppointmentBtn.innerHTML = 'Simpan Janji';
     });
-});
+}
 
         </script>
 </body>

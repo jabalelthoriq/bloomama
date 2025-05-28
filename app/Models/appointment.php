@@ -22,6 +22,9 @@ class Appointment extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'date_time' => 'datetime',
+    ];      
     /**
      * Format waktu janji temu
      */
@@ -30,6 +33,10 @@ class Appointment extends Model
         return date('h:ia', strtotime($this->date_time));
     }
 
+     public function getFormattedDateTimeAttribute()
+    {
+        return $this->date_time->format('d M Y H:i');
+    }
     /**
      * Ambil inisial dari user_id
      * (sebaiknya diganti jika kamu sudah punya relasi ke tabel user)
@@ -39,19 +46,15 @@ class Appointment extends Model
         return 'U' . $this->user_id;
     }
 
-    /**
-     * Relasi ke User (opsional)
-     */
+   // Relasi dengan User
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Relasi ke Midwife (opsional)
-     */
+    // Relasi dengan Midwife (jika berbeda dengan User)
     public function midwife()
     {
-        return $this->belongsTo(Midwife::class);
+        return $this->belongsTo(User::class, 'midwife_id');
     }
 }

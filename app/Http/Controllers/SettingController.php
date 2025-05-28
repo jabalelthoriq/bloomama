@@ -146,31 +146,36 @@ class SettingController extends Controller
     }
 
 
-    public function changePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => ['required'],
-            'new_password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'new_password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
-        ]);
+   public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => ['required'],
+        'new_password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ], [
+        'new_password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+    ]);
 
-        // Get the authenticated user
-        $user = Auth::user();
+    // Gunakan guard 'midwife'
+    $user = Auth::guard('midwife')->user();
 
-        // Check if current password is correct
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors([
-                'current_password' => 'Kata sandi saat ini tidak cocok.',
-            ])->withInput();
-        }
-
-        // Update the password
-        $user->password = Hash::make($request->new_password);
-        $user->save();
-
-        return redirect()->back()->with('success', 'Kata sandi berhasil diperbarui.');
+    if (!$user) {
+        return back()->withErrors(['error' => 'User tidak terautentikasi.']);
     }
+
+    // Verifikasi kata sandi saat ini
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors([
+            'current_password' => 'Kata sandi saat ini tidak cocok.',
+        ])->withInput();
+    }
+
+    // Update password baru
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return redirect()->back()->with('success', 'Kata sandi berhasil diperbarui.');
+}
+
 
     /**
      * Send a password reset link to the user's email
