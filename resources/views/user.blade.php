@@ -472,6 +472,7 @@
     border-color: #00b8d4;
     box-shadow: 0 0 0 0.25rem rgba(0, 184, 212, 0.25);
 }
+
    </style>
 <body>
     <div class="vertical-navbar">
