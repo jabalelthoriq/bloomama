@@ -10,28 +10,39 @@ use App\Http\Controllers\Mobile\dashboardcontroller;
 use App\Http\Controllers\Mobile\kesehatancontroller;
 
 
+Route::put('/pregnancies/{pregnancyId}', [UsersController::class, 'update'])->name('pregnancies.update');
+Route::delete('/users', [UsersController::class, 'destroy'])->name('users.destroy');
+
+
+ 
+
     //mobile api
 
 ///auth
 Route::post('/register', [authcontroller::class, 'register']);
 Route::post('/login', [authcontroller::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/profile', [authcontroller::class, 'profile']);
+    Route::get('/user-profile', [authcontroller::class, 'getUserProfile']);
     Route::put('/update-profile', [authcontroller::class, 'updateProfile']);
     Route::post('/change-password', [authcontroller::class, 'changePassword']);
+    Route::put('/appointments/{appointment_id}/status', [dashboardcontroller::class, 'updateStatus']);
     Route::post('/logout', [authcontroller::class,'logout']);
 
 });
 
-
     ///dashboard
-Route::get('/health-trackings/latest/{userId}', [dashboardcontroller::class, 'getLatestHealthData']);
+Route::get('/health-trackings/latest/{user_id}', [dashboardcontroller::class, 'getLatestHealthData']);
 Route::post('/register-pregnancies/{user_id}', [dashboardcontroller::class, 'registerUserPregnancy']);
 Route::get('/getPregnancyData/{user_id}', [dashboardcontroller::class, 'getPregnancyData']);
+Route::get('/getHealthTrackingForChart/{user_id}', [dashboardcontroller::class, 'getHealthTrackingForChart']);
+Route::get('/events', [dashboardcontroller::class, 'getEventsByDate']);
+Route::get('/appointments/user/{user_id}', [dashboardcontroller::class, 'getAppointmentByUser']);
+
+
 
 ///kesehatan
 Route::get('/content/latest', [kesehatancontroller::class, 'getLatestContent']);
-Route::get('/content/all', [kesehatancontroller::class, 'getAllContents']);
-Route::get('/user/{user_id}/week/{week}',[kesehatancontroller::class, 'getHealthTrackingByWeek'] )->where(['pregnancy_id' => '[0-9]+','week' => '[0-9]+']);
-
-
+Route::get('/content/one', [kesehatancontroller::class, 'getOneContent']);
+Route::get('/content/all', [kesehatancontroller::class, 'getAllContent']);
+Route::get('/content/category/{category}', [kesehatancontroller::class, 'getContentByCategory']);
+Route::get('/health-trackings/week/{user_id}/{week}',[kesehatancontroller::class, 'getHealthTrackingByWeek'] )->where(['pregnancy_id' => '[0-9]+','week'=>'[0-9]+']);

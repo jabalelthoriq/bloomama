@@ -36,8 +36,18 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $appointments = Appointment::orderBy('date_time', 'asc')->paginate(5);
-        $totalAppointment = Appointment::count();
+       $appointments = Appointment::whereIn('status', ['pending', 'completed','canceled'])
+    ->orderByRaw("CASE 
+        WHEN status = 'pending' THEN 1 
+        WHEN status = 'completed' THEN 2 
+        WHEN status = 'canceled' THEN 3 
+        ELSE 4 
+    END")
+    ->orderBy('date_time', 'asc')
+    ->paginate(5);
+
+        $totalAppointment = Appointment::whereIn('status', ['pending'])->count();
+
         $totalUsers = User::count();
         $totalPregnant = UserPregnant::count();
 

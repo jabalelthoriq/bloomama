@@ -1002,7 +1002,7 @@
                             <th>Berat (kg)</th>
                             <th>Tekanan Darah</th>
                             <th>Denyut Jantung</th>
-                            <th class="text-end">Aksi</th>
+                           
                         </tr>
                     </thead>
                     <tbody id="healthTrackingTableBody">
@@ -2015,11 +2015,7 @@ function renderHealthTrackingTable(data) {
             <td>${tracking.weight || '-'}</td>
             <td>${tracking.blood_pressure || '-'}</td>
             <td>${tracking.heart_rate || '-'}</td>
-            <td class="text-end">
-                <button class="btn btn-sm btn-outline-primary edit-tracking-btn" data-id="${tracking.tracking_id}">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </td>
+           
         </tr>
     `).join('');
 

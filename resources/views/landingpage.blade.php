@@ -970,32 +970,7 @@
                 </div>
             </div>
 
-            <div class="contact-form">
-                <h3 style="margin-bottom: 20px; font-size: 24px;">Kirim Pesan</h3>
-                <form action="#" method="POST">
-                    <div class="form-group">
-                        <label for="name">Nama Lengkap</label>
-                        <input type="text" id="name" name="name" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Alamat Email</label>
-                        <input type="email" id="email" name="email" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subject">Subjek</label>
-                        <input type="text" id="subject" name="subject" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message">Pesan</label>
-                        <textarea id="message" name="message" class="form-control" required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Kirim Pesan</button>
-                </form>
-            </div>
+            
         </div>
     </div>
 </section>

@@ -31,16 +31,59 @@ class kesehatancontroller extends Controller
             ], 404);
         }
     }
-     public function getLatestContent()
-    {
-        $latestContent = Content::latest('created_at')
-            ->limit(1)
-            ->first();
+    public function getLatestContent()
+{
+    $randomContents = Content::inRandomOrder()
+        ->limit(3)
+        ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $latestContent
-        ]);
+    return response()->json([
+        'success' => true,
+        'data' => $randomContents
+    ]);
+}
+
+public function getOneContent()
+{
+    $randomContents = Content::inRandomOrder()
+        ->limit(1)
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $randomContents
+    ]);
+}
+
+    public function getAllContent()
+{
+    $latestContents = Content::latest('created_at')->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $latestContents
+    ]);
+}
+    
+    public function getContentByCategory($category)
+    {
+        try {
+            $contents = Content::where('category', $category)
+                ->latest('created_at')
+                ->get();
+                
+            return response()->json([
+                'success' => true,
+                'data' => $contents
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch content by category',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
 public function getHealthTrackingByWeek($user_id, $week)
@@ -96,7 +139,7 @@ public function getHealthTrackingByWeek($user_id, $week)
             'message' => 'An error occurred',
             'error' => $e->getMessage()
         ], 500);
-    }
+}
 }
 
 

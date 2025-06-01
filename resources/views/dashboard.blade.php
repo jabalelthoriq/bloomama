@@ -475,13 +475,14 @@
                             <p class="text-muted small text-uppercase fw-semibold mb-2">User Pregnant</p>
                             <h2 class="display-6 fw-bold mb-0">{{ number_format($totalPregnant) }}</h2>
                         </div>
-                        <div class="icon-container bg-warning bg-opacity-10 rounded-circle p-3">
-                            <svg class="text-warning" style="width: 32px; height: 32px;" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
+                      <div class="icon-container" style="background-color: rgba(255, 192, 203, 0.2); border-radius: 50%; padding: 12px;">
+                        <svg style="width: 32px; height: 32px; color: #ff69b4;" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2a2 2 0 110 4 2 2 0 010-4zm-1 5h2a1 1 0 011 1v2a3 3 0 010 6v6h-2v-5h-2v5h-2v-6a1 1 0 01.6-.9l1.4-.6V8a1 1 0 011-1z"/>
+                        </svg>
+                    </div>
+
+
+
                     </div>
                 </div>
             </div>
@@ -491,11 +492,11 @@
                 <div class="card shadow-sm stats-card">
                     <div class="card-body d-flex justify-content-between align-items-center p-4">
                         <div>
-                            <p class="text-muted small text-uppercase fw-semibold mb-2">Total Appointment</p>
+                            <p class="text-muted small text-uppercase fw-semibold mb-2">Upcoming Appointment</p>
                             <h2 class="display-6 fw-bold mb-0">{{ number_format($totalAppointment) }}</h2>
                         </div>
-                        <div class="icon-container bg-success bg-opacity-10 rounded-circle p-3">
-                            <svg class="text-success" style="width: 32px; height: 32px;" fill="none"
+                        <div class="icon-container bg-warning bg-opacity-10 rounded-circle p-3">
+                            <svg class="text-warning" style="width: 32px; height: 32px;" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -620,16 +621,13 @@
                                             <td>{{ $appointment->getFormattedVisitTime() }}</td>
                                             <td>
                                                 <span
-                                                    class="badge rounded-pill bg-{{ $appointment->status == 'Completed' ? 'success' : ($appointment->status == 'Cancelled' ? 'danger' : 'warning') }}">
+                                                    class="badge rounded-pill bg-{{ $appointment->status == 'completed' ? 'success' : ($appointment->status == 'pending' ? 'warning' : 'danger') }}">
                                                     {{ $appointment->status }}
                                                 </span>
                                             </td>
                                             <td>{{ $appointment->notes }}</td>
                                             <td class="text-end">
-                                                <a href=""
-                                                    class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
+                                               
                                                 <form action="{{ route('appointments.destroy', $appointment->appointment_id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?')" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
