@@ -47,8 +47,15 @@ Route::post('/appointments/user/{userId}', [UsersController::class, 'storeAppoin
 Route::get('/user', [UsersController::class, 'showUsersAndMidwives'])->name('user');
 Route::post('/pregnancies/{pregnancy_id}', [UsersController::class, 'update'])->name('pregnancies.update');
 
-// Chat routes
-Route::get('/chat', [ChatController::class, 'chat']);
+Route::get('/chat-test', function () {
+    return view('chat-test');
+});
+
+// Route untuk menampilkan halaman chat test tanpa view file
+Route::get('/chat-test-inline', function () {
+    return response(file_get_contents(resource_path('views/chat-test.html')));
+});
+
 
 // Setting routes
 Route::get('/setting', [SettingController::class, 'setting']);

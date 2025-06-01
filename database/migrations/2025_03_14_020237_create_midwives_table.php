@@ -10,19 +10,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('midwives', function (Blueprint $table) {
-            $table->id('midwife_id');
-            $table->string('name', 100);
-            $table->string('email', 100);
-            $table->string('password', 255);
-            $table->string('phone_number', 20)->nullable();
-            $table->string('profile_picture', 255)->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->enum('role', ['midwife', 'admin'])->default('midwife');
-            $table->enum('available_day', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'])->nullable();
-            $table->time('start_time')->nullable();
-            $table->time('end_time')->nullable();
+        Schema::create('messages', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('sender_id');
+            $table->unsignedBigInteger('receiver_id');
+            $table->text('message');
             $table->timestamps();
+
+            // Menyesuaikan dengan midwife_id di tabel midwives
+            $table->foreign('sender_id')->references('midwife_id')->on('midwives')->onDelete('cascade');
+            $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('midwives');
+        Schema::dropIfExists('messages');
     }
 };

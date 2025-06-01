@@ -754,7 +754,7 @@
             // Note: This is a client-side only example. In production, you should:
             // 1. Have your server generate Ably tokens for each user
             // 2. Never expose your API key in client-side code
-            ably = new Ably.Realtime('ooLakg.FjeVTg:aQwgKFtS-8JKmogyEl3Hj1iq5jU0An4aMidPJ5_-i0w'); // Replace with your Ably API key
+            ably = new Ably.Realtime('oSzx-A.rA_fzA:x6LS9dCe9mKbvR2noc5ZPcKJMZEViYSnbua9b5w5Qss'); // Replace with your Ably API key
 
             ably.connection.on('connected', function() {
                 console.log('Connected to Ably');

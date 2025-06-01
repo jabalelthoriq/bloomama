@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\HealthTracking;
 use App\Models\UserPregnant;
 use App\Models\User;
+use App\Models\Event;
+use App\Models\Appointment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -75,10 +77,10 @@ class dashboardcontroller extends Controller
         ], 500);
     }
 }
-public function getLatestHealthData($userId)
+public function getLatestHealthData($user_id)
 {
     $latestData = HealthTracking::with(['user', 'pregnancy'])
-        ->where('user_id', $userId)
+        ->where('user_id', $user_id)
         ->latest('date_recorded') // Sama dengan orderBy('date_recorded', 'desc')
         ->select([
             'tracking_id',
@@ -150,4 +152,63 @@ public function getPregnancyData($user_id)
 }
 }
 
+public function getHealthTrackingForChart($user_id)
+{
+    try {
+        $healthTrackings = HealthTracking::where('user_id', $user_id)
+            ->orderBy('pregnancy_week', 'asc')
+            ->get([
+                'tracking_id',
+                'user_id',
+                'pregnancy_week as week',
+                'weight',
+                'blood_pressure',
+                'heart_rate',
+                'date_recorded'
+            ]);
+
+        if ($healthTrackings->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User ini belum mempunyai data'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $healthTrackings
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function getEventsByDate(Request $request)
+    {
+        $date = $request->query('date'); // format: YYYY-MM-DD
+
+        if (!$date) {
+            return response()->json(['message' => 'Date parameter is required'], 400);
+        }
+
+        $events = Event::whereDate('start_date_time', $date)->get();
+
+        return response()->json($events);
+    }
+
+
+ public function getAppointmentByUser($user_id)
+    {
+        $appointments = Appointment::where('user_id', $user_id)->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $appointments
+        ]);
+    }
 }
