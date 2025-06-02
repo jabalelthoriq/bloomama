@@ -412,7 +412,7 @@
 }
 </style>
 <body>
-    
+
     <div class="vertical-navbar">
         <div class="nav-logo" >
             <img src="{{ asset('image/logo2.png') }}" alt="Logo">
@@ -524,6 +524,47 @@
     </div>
 </div>
 
+
+ <!-- Modal Input Bidan Form -->
+<div class="modal-overlay" id="eventModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="fw-bold m-0">Input Bidan Baru</h5>
+            <button class="close-modal" id="closeModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="eventForm" method="POST" action="{{ route('store.midwife') }}">
+                @csrf
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nama Bidan</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama bidan" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Bidan</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email bidan" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone_number" class="form-label">Nomor Telepon</label>
+                    <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Masukkan nomor telepon" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required minlength="8">
+                </div>
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi password" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
+            <button type="button" class="btn btn-primary" id="submitBtn" style="background-color: #0400d4">Submit</button>
+        </div>
+    </div>
+</div>
 
 
         <!-- Modal Edit Bidan Form - Improved to match pasien form -->
@@ -822,7 +863,7 @@
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
                                                         </form>
-                                                        
+
 
                                                     </td>
                                                 </tr>
@@ -1080,8 +1121,8 @@
 
 
 
-        document.addEventListener('DOMContentLoaded', function() {
-    // === INPUT BIDAN MODAL ===
+      // === INPUT BIDAN MODAL ===
+document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('eventModal');
     const openModalBtn = document.getElementById('openModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -1091,15 +1132,12 @@
 
     // Clear form fields function
     function clearInputForm() {
-        document.getElementById('name').value = '';
-        document.getElementById('email').value = '';
-        document.getElementById('phone_number').value = '';
-        document.getElementById('password').value = '';
+        eventForm.reset();
     }
 
     // Open modal with cleared fields
     openModalBtn.addEventListener('click', function() {
-        clearInputForm(); // Clear any previous data
+        clearInputForm();
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     });
@@ -1119,8 +1157,147 @@
             closeModal();
         }
     });
-    });
 
+    // Submit form with validation
+    submitBtn.addEventListener('click', async function() {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone_number').value.trim();
+        const password = document.getElementById('password').value;
+        const passwordConfirmation = document.getElementById('password_confirmation').value;
+
+        // Simple validation
+        if (!name || !email || !phone || !password || !passwordConfirmation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Semua field harus diisi'
+            });
+            return;
+        }
+
+        if (password !== passwordConfirmation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Password dan konfirmasi password tidak cocok'
+            });
+            return;
+        }
+
+        if (password.length < 8) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Password minimal 8 karakter'
+            });
+            return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (!csrfToken) {
+                throw new Error('CSRF token tidak ditemukan');
+            }
+
+            const formData = new FormData(eventForm);
+
+            const response = await fetch(eventForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest' // Menandakan AJAX request
+                }
+            });
+
+            // Cek content type response
+            const contentType = response.headers.get('content-type');
+
+            // Jika response bukan JSON, handle sebagai error
+            if (!contentType || !contentType.includes('application/json')) {
+                const textResponse = await response.text();
+                console.error('Non-JSON response received:', textResponse);
+
+                // Jika response adalah HTML redirect atau error page
+                if (textResponse.includes('<!DOCTYPE') || textResponse.includes('<html')) {
+                    throw new Error('Server mengembalikan halaman HTML. Periksa route dan controller.');
+                }
+
+                throw new Error('Response tidak dalam format JSON yang diharapkan');
+            }
+
+            const data = await response.json();
+
+            // Handle different response status
+            if (response.status === 422) {
+                // Validation errors
+                let errorMessage = 'Terjadi kesalahan validasi:\n';
+                if (data.errors) {
+                    Object.keys(data.errors).forEach(field => {
+                        errorMessage += `- ${data.errors[field].join(', ')}\n`;
+                    });
+                } else {
+                    errorMessage = data.message || 'Data tidak valid';
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validasi Gagal',
+                    text: errorMessage
+                });
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || `HTTP Error: ${response.status}`);
+            }
+
+            // Success response
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message || 'Bidan berhasil ditambahkan',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    closeModal();
+                    // Lebih baik reload hanya bagian yang diperlukan daripada seluruh halaman
+                    window.location.reload();
+                });
+            } else {
+                throw new Error(data.message || 'Gagal menambahkan bidan');
+            }
+
+        } catch (error) {
+            console.error('Error details:', error);
+
+            let errorMessage = 'Terjadi kesalahan saat menambahkan bidan';
+
+            // Handle different error types
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                errorMessage = 'Koneksi ke server bermasalah. Periksa koneksi internet Anda.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: errorMessage
+            });
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit';
+        }
+    });
+});
 
 // === EDIT BIDAN FUNCTIONALITY ===
 document.addEventListener('DOMContentLoaded', function() {

@@ -93,20 +93,48 @@ class AdminController extends Controller
         return view('admin/menu2', compact('users', 'midwives'));
     }
 
- public function storeMidwife(Request $request) {
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:midwives',
-        'password' => 'required|string|min:8|confirmed',
-        'phone_number' => 'required|string|max:15',
-        'role' => 'nullable|string|in:admin,midwife',
-        'status' => 'nullable|string|in:active,inactive',
-        'available_day' => 'nullable|string',
-        'start_time' => 'nullable|string',
-    ]);
+ public function storeMidwife(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:midwives',
+            'password' => 'required|string|min:8|confirmed',
+            'phone_number' => 'required|string|max:15',
+            'role' => 'nullable|string|in:admin,midwife',
+            'status' => 'nullable|string|in:active,inactive',
+            'start_time' => 'nullable|string',
+        ], [
+            // Custom error messages
+            'name.required' => 'Nama harus diisi',
+            'email.required' => 'Email harus diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah terdaftar',
+            'password.required' => 'Password harus diisi',
+            'password.min' => 'Password minimal 8 karakter',
+            'password.confirmed' => 'Password dan konfirmasi password tidak cocok',
+            'phone_number.required' => 'Nomor telepon harus diisi',
+            'phone_number.max' => 'Nomor telepon maksimal 15 karakter',
+            'role.in' => 'Role harus admin atau midwife',
+            'status.in' => 'Status harus active atau inactive'
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Handle validation errors untuk AJAX request
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        }
+
+        // Untuk non-AJAX request, redirect back dengan errors
+        return back()->withErrors($e->errors())->withInput();
+    }
 
     try {
-        Midwive::create([
+        $midwife = Midwive::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
@@ -117,12 +145,44 @@ class AdminController extends Controller
             'start_time' => $validated['start_time'] ?? null,
         ]);
 
+        // Check if request expects JSON (AJAX request)
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Bidan berhasil ditambahkan',
+                'data' => [
+                    'id' => $midwife->id,
+                    'name' => $midwife->name,
+                    'email' => $midwife->email,
+                    'phone_number' => $midwife->phone_number,
+                    'role' => $midwife->role,
+                    'status' => $midwife->status
+                ]
+            ], 201);
+        }
+
+        // Untuk non-AJAX request, redirect dengan success message
         return redirect()->route('admin.user')->with('success', 'Bidan berhasil ditambahkan.');
+
     } catch (\Exception $e) {
-        Log::error("Error creating midwife: " . $e->getMessage());
+        Log::error("Error creating midwife: " . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+            'request_data' => $request->all()
+        ]);
+
+        // Check if request expects JSON (AJAX request)
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan bidan: ' . $e->getMessage()
+            ], 500);
+        }
+
+        // Untuk non-AJAX request, redirect back dengan error
         return back()->withInput()->with('error', 'Gagal menambahkan bidan');
-    }
 }
+}
+
 /**
  * Update user information
  *

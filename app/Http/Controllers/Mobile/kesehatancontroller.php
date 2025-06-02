@@ -139,7 +139,7 @@ public function getHealthTrackingByWeek($user_id, $week)
             'message' => 'An error occurred',
             'error' => $e->getMessage()
         ], 500);
-    }
+}
 }
 
 

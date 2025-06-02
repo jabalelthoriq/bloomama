@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class authcontroller extends Controller
 {
@@ -120,65 +122,116 @@ class authcontroller extends Controller
     /**
      * Update user profile
      */
-    public function updateProfile(Request $request)
-{
-    try {
-        $user = Auth::user();
+ public function getUserProfile(Request $request)
+    {
+        try {
+            $user = Auth::user();
 
-        // Validate incoming request (excluding email and password)
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:100',
-            'phone_number' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'profile_picture' => 'nullable|string', // assuming profile_picture is stored as string (path or URL)
-        ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'User profile retrieved successfully',
+                'data' => [
+                    'user' => [
+                        'user_id' => $user->user_id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'phone_number' => $user->phone_number,
+                        'address' => $user->address,
+                        'profile_picture' => $user->profile_picture,
+                        'profile_picture_url' => $user->profile_picture ? 
+                            asset('storage/' . $user->profile_picture) : null,
+                    ]
+                ]
+            ], 200);
 
-        if ($validator->fails()) {
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Server error',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Prepare update data (excluding email and password)
-        $updateData = [];
-        if ($request->has('name')) {
-            $updateData['name'] = $request->name;
-        }
-        if ($request->has('phone_number')) {
-            $updateData['phone_number'] = $request->phone_number;
-        }
-        if ($request->has('address')) {
-            $updateData['address'] = $request->address;
-        }
-        if ($request->has('profile_picture')) {
-            $updateData['profile_picture'] = $request->profile_picture;
-        }
-
-        // Update user
-        $user->update($updateData);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Profile updated successfully',
-            'data' => [
-                'user' => $user->only(['user_id', 'name', 'email', 'phone_number', 'address', 'profile_picture'])
-            ]
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Server error',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
-/**
- * Change user password
- */
+    // PERBAIKAN: Update Profile Method
+    public function updateProfile(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'sometimes|string|max:100',
+                'phone_number' => 'nullable|string|max:20',
+                'address' => 'nullable|string',
+                'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation errors',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $updateData = [];
+            
+            if ($request->has('name')) {
+                $updateData['name'] = $request->name;
+            }
+            if ($request->has('phone_number')) {
+                $updateData['phone_number'] = $request->phone_number;
+            }
+            if ($request->has('address')) {
+                $updateData['address'] = $request->address;
+            }
+
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                // Delete old profile picture if exists
+                if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+
+                $file = $request->file('profile_picture');
+                $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                
+                // Store file
+                $path = $file->storeAs('profile_pictures', $filename, 'public');
+                
+                $updateData['profile_picture'] = $path;
+            }
+
+            // Update user
+            $user->update($updateData);
+            $user->refresh();
+
+            // PENTING: Pastikan response konsisten dengan login
+            return response()->json([
+                'status' => true,
+                'message' => 'Profile updated successfully',
+                'data' => [
+                    'user' => [
+                        'user_id' => $user->user_id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'phone_number' => $user->phone_number,
+                        'address' => $user->address,
+                        'profile_picture' => $user->profile_picture,
+                        'profile_picture_url' => $user->profile_picture ? 
+                            asset('storage/' . $user->profile_picture) : null,
+                    ]
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Server error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 public function changePassword(Request $request)
 {
     try {
@@ -221,7 +274,7 @@ public function changePassword(Request $request)
             'status' => false,
             'message' => 'Server error',
             'error' => $e->getMessage()
-        ], 500);
+        ],500);
 }
 }
 

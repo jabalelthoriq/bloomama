@@ -203,12 +203,51 @@ public function getEventsByDate(Request $request)
 
 
  public function getAppointmentByUser($user_id)
-    {
-        $appointments = Appointment::where('user_id', $user_id)->get();
+{
+    $appointments = Appointment::with('midwife') // eager load midwife
+        ->where('user_id', $user_id)
+        ->get()
+        ->map(function ($appointment) {
+            return [
+                'appointment_id' => $appointment->appointment_id,
+                'date_time' => $appointment->date_time,
+                'formatted_time' => $appointment->getFormattedVisitTime(),
+                'status' => $appointment->status,
+                'notes' => $appointment->notes,
+                'midwife_name' => $appointment->midwife?->name, // gunakan null-safe operator
+            ];
+        });
 
+    return response()->json([
+        'status' => 'success',
+        'data' => $appointments
+    ]);
+}
+
+public function updateStatus($appointment_id, Request $request)
+{
+    $request->validate([
+        'status' => 'required|in:pending,confirmed,cancelled,completed',
+    ]);
+
+    $appointment = Appointment::find($appointment_id);
+    
+    if (!$appointment) {
         return response()->json([
-            'status' => 'success',
-            'data' => $appointments
-        ]);
+            'status' => 'error',
+            'message' => 'Appointment not found'
+        ], 404);
     }
+
+    // Add any additional validation logic here
+    // For example, check if user is authorized to update this appointment
+
+    $appointment->status = $request->status;
+    $appointment->save();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Appointment status updated successfully'
+]);
+}
 }

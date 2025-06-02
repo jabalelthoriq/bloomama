@@ -35,55 +35,81 @@ class DashboardController extends Controller
     }
 
     public function index()
-    {
-        $appointments = Appointment::orderBy('date_time', 'asc')->paginate(5);
-        $totalAppointment = Appointment::count();
-        $totalUsers = User::count();
-        $totalPregnant = UserPregnant::count();
+{
+    // Mendapatkan midwife_id dari midwife yang sedang login menggunakan guard 'midwife'
+    $midwifeId = Auth::guard('midwife')->user()->midwife_id;
+    
+    // Alternatif lain untuk mendapatkan midwife_id:
+    // $midwifeId = auth('midwife')->user()->midwife_id;
+    // atau dari session:
+    // $midwifeId = Session::get('user_data.midwife_id');
+    
+    // Filter appointments berdasarkan midwife_id
+    $appointments = Appointment::whereIn('status', ['pending', 'completed', 'canceled'])
+        ->where('midwife_id', $midwifeId) // Tambahkan filter midwife_id
+        ->orderByRaw("CASE 
+            WHEN status = 'pending' THEN 1 
+            WHEN status = 'completed' THEN 2 
+            WHEN status = 'canceled' THEN 3 
+            ELSE 4 
+        END")
+        ->orderBy('date_time', 'asc')
+        ->paginate(5);
 
-        // Statistik kehamilan per bulan
-        $monthlyData = DB::table('user_pregnancies')
-            ->selectRaw('MONTH(start_date) as month, YEAR(start_date) as year, COUNT(*) as count')
-            ->whereNotNull('start_date')
-            ->whereYear('start_date', 2025)
-            ->groupBy('year', 'month')
-            ->orderBy('month')
-            ->get()
-            ->map(function ($item) {
-                $date = Carbon::createFromDate($item->year, $item->month, 1);
-                $item->month_name = $date->format('M');
-                $item->month_year = $date->format('M');
-                return $item;
-            });
+    // Filter total appointment berdasarkan midwife_id
+    $totalAppointment = Appointment::whereIn('status', ['pending'])
+        ->where('midwife_id', $midwifeId) // Tambahkan filter midwife_id
+        ->count();
 
-        $filledMonthlyData = $this->fillMissingMonths($monthlyData);
+    $totalUsers = User::count();
+    $totalPregnant = UserPregnant::count();
 
-        // Statistik pendaftaran user per bulan
-        $userMonthlyData = DB::table('users')
-            ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as count')
-            ->whereYear('created_at', 2025)
-            ->groupBy('year', 'month')
-            ->orderBy('month')
-            ->get()
-            ->map(function ($item) {
-                $date = Carbon::createFromDate($item->year, $item->month, 1);
-                $item->month_name = $date->format('M');
-                $item->month_year = $date->format('M');
-                return $item;
-            });
+    // Statistik kehamilan per bulan - jika perlu filter berdasarkan midwife juga
+    $monthlyData = DB::table('user_pregnancies')
+        ->selectRaw('MONTH(start_date) as month, YEAR(start_date) as year, COUNT(*) as count')
+        ->whereNotNull('start_date')
+        ->whereYear('start_date', 2025)
+        // Tambahkan join jika ada relasi dengan midwife
+        // ->join('appointments', 'user_pregnancies.user_id', '=', 'appointments.user_id')
+        // ->where('appointments.midwife_id', $midwifeId)
+        ->groupBy('year', 'month')
+        ->orderBy('month')
+        ->get()
+        ->map(function ($item) {
+            $date = Carbon::createFromDate($item->year, $item->month, 1);
+            $item->month_name = $date->format('M');
+            $item->month_year = $date->format('M');
+            return $item;
+        });
 
-        $filledUserMonthlyData = $this->fillMissingMonths($userMonthlyData);
+    $filledMonthlyData = $this->fillMissingMonths($monthlyData);
 
-        return view('dashboard', [
-            'totalUsers' => $totalUsers,
-            'totalPregnant' => $totalPregnant,
-            'totalAppointment' => $totalAppointment,
-            'appointments' => $appointments,
-            'monthlyData' => $filledMonthlyData,               // Grafik Kehamilan
-            'userMonthlyData' => $filledUserMonthlyData,       // Grafik Pendaftaran User
-            'activePage' => 'dashboard'
-        ]);
-    }
+    // Statistik pendaftaran user per bulan
+    $userMonthlyData = DB::table('users')
+        ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as count')
+        ->whereYear('created_at', 2025)
+        ->groupBy('year', 'month')
+        ->orderBy('month')
+        ->get()
+        ->map(function ($item) {
+            $date = Carbon::createFromDate($item->year, $item->month, 1);
+            $item->month_name = $date->format('M');
+            $item->month_year = $date->format('M');
+            return $item;
+        });
+
+    $filledUserMonthlyData = $this->fillMissingMonths($userMonthlyData);
+
+    return view('dashboard', [
+        'totalUsers' => $totalUsers,
+        'totalPregnant' => $totalPregnant,
+        'totalAppointment' => $totalAppointment,
+        'appointments' => $appointments,
+        'monthlyData' => $filledMonthlyData,
+        'userMonthlyData' => $filledUserMonthlyData,
+        'activePage' => 'dashboard'
+    ]);
+}
 
     private function fillMissingMonths($monthlyData)
     {

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use App\Models\Event;
 
 class ChatController extends Controller
 {
@@ -38,9 +40,16 @@ class ChatController extends Controller
     {
         //
     }
-    public function chat()
+    public function event()
     {
-        return view('chat');
+         $now = Carbon::now();
+
+    $events = Event::orderByRaw("CASE WHEN status = 'event end' THEN 1 ELSE 0 END")
+             ->orderBy('start_date_time', 'ASC')
+             ->paginate(10);
+
+
+        return view('event', compact('events'));
     }
 
     /**

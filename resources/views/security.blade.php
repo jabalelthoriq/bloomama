@@ -233,8 +233,8 @@
 
 
         <div class="nav-icon">
-            <a href="chat">
-            <i class="far fa-comment-alt"></i>
+            <a href="event">
+            <i class="far fa-calendar-alt"></i>
             </a>
         </div>
 

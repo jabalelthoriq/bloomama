@@ -416,66 +416,52 @@
             <h2 class="fs-3 fw-bold m-0">Content</h2>
         </div>
 
-        <!-- Modal Event Form -->
-        <div class="modal-overlay" id="eventModal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h5 class="fw-bold m-0">Input Content Baru</h5>
-                    <button class="close-modal" id="closeModalBtn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ route('add.event') }}" method="POST" id="eventForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Judul Content</label>
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Masukkan judul content">
-                        </div>
-                        <div class="mb-3">
-                            <label for="url" class="form-label">Media Url</label>
-                            <input type="url" class="form-control" id="url" name="url" placeholder="Masukkan media url">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="category" class="form-label">Category</label>
-                            <select class="form-control" id="category" name="category">
-                                <option value="" selected disabled>Select a category </option>
-                                <option value="nutrition">Nutrition</option>
-                                <option value="exercise">Exercise</option>
-                                <option value="health_tips">Health Tips</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Masukkan deskripsi content"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="thumbnail" class="form-label">Thumbnail</label>
-                            <div class="input-group">
-                                <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
-                                <label class="input-group-text" for="thumbnail">
-                                    <i class="fas fa-upload"></i>
-                                </label>
-                            </div>
-                            <small class="text-muted">Upload image thumbnail (Max: 2MB, Format: JPG, PNG)</small>
-                            <div id="thumbnailPreview" class="mt-2 d-none">
-                                <div class="position-relative" style="max-width: 200px;">
-                                    <img src="" alt="Thumbnail Preview" class="img-thumbnail">
-                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" id="removeThumbnail">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
-                    <button type="button" class="btn btn-primary" id="submitBtn" style="background-color: #0400d4">Submit</button>
-                </div>
-            </div>
+<!-- Modal Tambah Content -->
+<div class="modal fade" id="addContentModal" tabindex="-1" aria-labelledby="addContentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <form action="{{ route('content.store') }}" method="POST" enctype="multipart/form-data" class="modal-content">
+      @csrf
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="addContentModalLabel">Input Content Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="title" class="form-label">Judul</label>
+          <input type="text" name="title" class="form-control" placeholder="Masukkan judul content" required>
         </div>
+
+        <div class="mb-3">
+          <label for="url" class="form-label">Media URL</label>
+          <input type="url" name="url" class="form-control" placeholder="Masukkan media URL" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="category" class="form-label">Kategori</label>
+          <select name="category" class="form-control" required>
+            <option value="" disabled selected>Pilih kategori</option>
+            <option value="nutrition">Nutrition</option>
+            <option value="exercise">Exercise</option>
+            <option value="health_tips">Health Tips</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Deskripsi</label>
+          <textarea name="description" class="form-control" rows="3" placeholder="Masukkan deskripsi content" required></textarea>
+        </div>
+
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Simpan</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 
       <!-- Modal Edit Content Form -->
@@ -515,31 +501,7 @@
                     <label for="editDescription" class="form-label">Deskripsi</label>
                     <textarea class="form-control" id="editDescription" name="description" rows="3" placeholder="Masukkan deskripsi content"></textarea>
                 </div>
-                <div class="mb-3">
-                    <label for="editThumbnail" class="form-label">Thumbnail</label>
-                    <div class="input-group">
-                        <input type="file" class="form-control" id="editThumbnail" name="thumbnail" accept="image/*">
-                        <label class="input-group-text" for="editThumbnail">
-                            <i class="fas fa-upload"></i>
-                        </label>
-                    </div>
-                    <small class="text-muted">Upload image thumbnail (Max: 2MB, Format: JPG, PNG)</small>
-                    <div class="d-flex align-items-center mt-2">
-                        <div id="currentThumbnailContainer" class="me-3">
-                            <p class="mb-1">Current thumbnail:</p>
-                            <img id="currentThumbnail" src="" alt="Current Thumbnail" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
-                        </div>
-                        <div id="editThumbnailPreview" class="d-none">
-                            <div class="position-relative" style="max-width: 100px;">
-                                <p class="mb-1">New thumbnail:</p>
-                                <img src="" alt="Thumbnail Preview" class="img-thumbnail">
-                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" id="removeEditThumbnail">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </form>
         </div>
         <div class="modal-footer">
@@ -586,7 +548,6 @@
                 <th>Title</th>
                 <th>Url</th>
                 <th>Category</th>
-                <th>Thumbnail</th>
                 <th>Created At</th>
                 <th class="text-end">Actions</th>
             </tr>
@@ -605,13 +566,7 @@
                         </div>
                     </td>
                     <td>{{ ucfirst(str_replace('_', ' ', $content->category)) }}</td>
-                    <td>
-                        @if($content->thumbnail)
-                            <img src="{{ asset('storage/' . $content->thumbnail) }}" alt="Thumbnail" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
-                        @else
-                            <span class="badge bg-secondary">No image</span>
-                        @endif
-                    </td>
+                    
                     <td>{{ $content->created_at->format('M d, Y') }}</td>
                     <td class="text-end">
                         <button type="button" class="btn btn-sm btn-outline-primary edit-content-btn"
@@ -620,7 +575,7 @@
                             data-url="{{ $content->url }}"
                             data-category="{{ $content->category }}"
                             data-description="{{ $content->description }}"
-                            data-thumbnail="{{ $content->thumbnail ? asset('storage/' . $content->thumbnail) : '' }}">
+                            >
                             <i class="fas fa-edit"></i>
                         </button>
                         <form action="{{ route('content.destroy', $content->content_id) }}" method="POST" class="d-inline">
@@ -909,12 +864,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     const updateBtn = document.getElementById('updateBtn');
 
-    // Edit thumbnail preview functionality
-    const editThumbnailInput = document.getElementById('editThumbnail');
-    const editThumbnailPreview = document.getElementById('editThumbnailPreview');
-    const editThumbnailImage = editThumbnailPreview?.querySelector('img');
-    const removeEditThumbnailBtn = document.getElementById('removeEditThumbnail');
-    const currentThumbnailContainer = document.getElementById('currentThumbnailContainer');
+    
 
     // Definisikan fungsi route di JavaScript
     function route(name, params = {}) {
@@ -952,7 +902,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
             const category = this.getAttribute('data-category');
             const description = this.getAttribute('data-description');
-            const thumbnailUrl = this.getAttribute('data-thumbnail');
+
 
             console.log("Opening edit modal for content ID:", contentId); // Debug
 
@@ -966,13 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editCategory').value = category;
             document.getElementById('editDescription').value = description;
 
-            // Show current thumbnail if exists
-            if (thumbnailUrl && thumbnailUrl !== '') {
-                document.getElementById('currentThumbnail').src = thumbnailUrl;
-                currentThumbnailContainer.classList.remove('d-none');
-            } else {
-                currentThumbnailContainer.classList.add('d-none');
-            }
+           
 
             // Open modal
             editModal.classList.add('active');
@@ -996,67 +940,10 @@ document.addEventListener('DOMContentLoaded', function() {
         editModal.classList.remove('active');
         document.body.style.overflow = '';
 
-        // Reset form
-        editContentForm.reset();
-        if (editThumbnailPreview) {
-            editThumbnailPreview.classList.add('d-none');
-        }
-        if (editThumbnailImage) {
-            editThumbnailImage.src = '';
-        }
+      
     }
 
-    // Edit thumbnail preview when file is selected
-    if (editThumbnailInput) {
-        editThumbnailInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const file = this.files[0];
-
-                // Check file type
-                if (!file.type.match('image.*')) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Harap pilih file gambar (JPG, PNG)',
-                        icon: 'error',
-                        confirmButtonColor: '#D21F3C'
-                    });
-                    this.value = '';
-                    return;
-                }
-
-                // Check file size (max 2MB)
-                if (file.size > 2 * 1024 * 1024) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Ukuran gambar harus kurang dari 2MB',
-                        icon: 'error',
-                        confirmButtonColor: '#D21F3C'
-                    });
-                    this.value = '';
-                    return;
-                }
-
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if (editThumbnailImage) {
-                        editThumbnailImage.src = e.target.result;
-                        editThumbnailPreview.classList.remove('d-none');
-                    }
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-
-    // Remove edit thumbnail
-    if (removeEditThumbnailBtn) {
-        removeEditThumbnailBtn.addEventListener('click', function() {
-            editThumbnailInput.value = '';
-            editThumbnailPreview.classList.add('d-none');
-            editThumbnailImage.src = '';
-        });
-    }
+  
 
     // Handle form submission for content
     updateBtn.addEventListener('click', async function() {
@@ -1201,5 +1088,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
     </script>
+
+<script>
+document.getElementById('openModalBtn').addEventListener('click', function () {
+    const modal = new bootstrap.Modal(document.getElementById('addContentModal'));
+    modal.show();
+});
+</script>
+
 </body>
 </html>

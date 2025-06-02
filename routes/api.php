@@ -15,20 +15,7 @@ Route::put('/pregnancies/{pregnancyId}', [UsersController::class, 'update'])->na
 Route::delete('/users', [UsersController::class, 'destroy'])->name('users.destroy');
 
 
- Route::middleware('auth:api')->group(function () {
-    
-    // Send message dari user yang sudah login
-    Route::post('/messages/send', [ChatController::class, 'sendMessage']);
-    
-    // Get chat status untuk debugging
-    Route::get('/chat/status', [ChatController::class, 'getChatStatus']);
-});
-
-// Test routes (tanpa auth untuk testing)
-Route::prefix('test')->group(function () {
-    // Send test message dari web interface
-    Route::post('/send-message', [ChatController::class, 'sendTestMessage']);
-});
+ 
 
     //mobile api
 
@@ -36,9 +23,10 @@ Route::prefix('test')->group(function () {
 Route::post('/register', [authcontroller::class, 'register']);
 Route::post('/login', [authcontroller::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/profile', [authcontroller::class, 'profile']);
+    Route::get('/user-profile', [authcontroller::class, 'getUserProfile']);
     Route::put('/update-profile', [authcontroller::class, 'updateProfile']);
     Route::post('/change-password', [authcontroller::class, 'changePassword']);
+    Route::put('/appointments/{appointment_id}/status', [dashboardcontroller::class, 'updateStatus']);
     Route::post('/logout', [authcontroller::class,'logout']);
 
 });
@@ -58,4 +46,4 @@ Route::get('/content/latest', [kesehatancontroller::class, 'getLatestContent']);
 Route::get('/content/one', [kesehatancontroller::class, 'getOneContent']);
 Route::get('/content/all', [kesehatancontroller::class, 'getAllContent']);
 Route::get('/content/category/{category}', [kesehatancontroller::class, 'getContentByCategory']);
-Route::get('/health-trackings/week/{user_id}/{week}',[kesehatancontroller::class, 'getHealthTrackingByWeek'] )->where(['pregnancy_id' => '[0-9]+','week' => '[0-9]+']);
+Route::get('/health-trackings/week/{user_id}/{week}',[kesehatancontroller::class, 'getHealthTrackingByWeek'] )->where(['pregnancy_id' => '[0-9]+','week'=>'[0-9]+']);

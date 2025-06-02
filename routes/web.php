@@ -12,6 +12,19 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ReportController;
+
+
+    Route::get('/reports/yearly-users', [ReportController::class, 'yearlyUsersReport'])
+        ->name('reports.yearly-users');
+    
+    Route::get('/reports/test-simple', [ReportController::class, 'testSimplePdf'])
+        ->name('reports.test-simple');
+    
+    Route::get('/reports/debug-html', [ReportController::class, 'debugHtml'])
+        ->name('reports.debug-html');
+
+
 
 //use api web
  Route::prefix('api')->group(function() {
@@ -47,14 +60,9 @@ Route::post('/appointments/user/{userId}', [UsersController::class, 'storeAppoin
 Route::get('/user', [UsersController::class, 'showUsersAndMidwives'])->name('user');
 Route::post('/pregnancies/{pregnancy_id}', [UsersController::class, 'update'])->name('pregnancies.update');
 
-Route::get('/chat-test', function () {
-    return view('chat-test');
-});
 
-// Route untuk menampilkan halaman chat test tanpa view file
-Route::get('/chat-test-inline', function () {
-    return response(file_get_contents(resource_path('views/chat-test.html')));
-});
+Route::get('/event', [ChatController::class, 'event']);
+
 
 
 // Setting routes
@@ -92,3 +100,11 @@ Route::delete('/admin/users/{id}', [AdminController::class, 'destroyUsers'])->na
         Route::post('/content/update/{id}', [ContentController::class, 'updateContent'])->name('admin.content.update');
         Route::delete('/content/{id}', [ContentController::class, 'destroy'])->name('content.destroy');
     // });
+
+    // Content Management (Admin)
+        Route::prefix('content')->group(function () {
+        Route::get('/', [ContentController::class, 'index'])->name('content.index');
+        Route::post('/', [ContentController::class, 'store'])->name('content.store');
+        Route::post('/update/{id}', [ContentController::class, 'updateContent'])->name('admin.content.update');
+        Route::delete('/{id}', [ContentController::class, 'destroy'])->name('content.destroy');
+    });

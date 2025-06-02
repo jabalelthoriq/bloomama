@@ -55,6 +55,6 @@ class Appointment extends Model
     // Relasi dengan Midwife (jika berbeda dengan User)
     public function midwife()
     {
-        return $this->belongsTo(User::class, 'midwife_id');
+        return $this->belongsTo(Midwive::class, 'midwife_id');
     }
 }
