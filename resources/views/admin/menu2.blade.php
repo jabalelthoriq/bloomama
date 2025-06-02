@@ -605,20 +605,12 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="editBidanAvailableDay" class="form-label">Hari Kerja</label>
-                        <input type="text" class="form-control" id="editBidanAvailableDay" name="available_day">
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="editBidanStartTime" class="form-label">Jam Mulai</label>
                             <input type="time" class="form-control" id="editBidanStartTime" name="start_time">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editBidanEndTime" class="form-label">Jam Selesai</label>
-                            <input type="time" class="form-control" id="editBidanEndTime" name="end_time">
-                        </div>
+
                     </div>
 
                     <div class="mb-3">
@@ -735,9 +727,9 @@
                                                             data-email="{{ $midwife->email }}"
                                                             data-phone-number="{{ $midwife->phone_number }}"
                                                             data-status="{{ $midwife->status }}"
-                                                            data-available-day="{{ $midwife->available_day }}"
+                                                        
                                                             data-start-time="{{ $midwife->start_time }}"
-                                                            data-end-time="{{ $midwife->end_time }}"
+                                                 
                                                             data-photo="{{ $midwife->profile_picture ? asset('storage/' . $midwife->profile_picture) : '' }}">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
@@ -1344,9 +1336,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = this.getAttribute('data-email');
             const phoneNumber = this.getAttribute('data-phone-number');
             const status = this.getAttribute('data-status');
-            const availableDay = this.getAttribute('data-available-day');
             const startTime = this.getAttribute('data-start-time');
-            const endTime = this.getAttribute('data-end-time');
             const photoUrl = this.getAttribute('data-photo');
 
             console.log("Opening edit modal for bidan ID:", id); // Debug
@@ -1360,9 +1350,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editBidanEmail').value = email;
             document.getElementById('editBidanPhoneNumber').value = phoneNumber;
             document.getElementById('editBidanStatus').value = status;
-            document.getElementById('editBidanAvailableDay').value = availableDay || '';
             document.getElementById('editBidanStartTime').value = startTime || '';
-            document.getElementById('editBidanEndTime').value = endTime || '';
 
             // Handle photo preview
             if (photoUrl && photoUrl !== 'null') {

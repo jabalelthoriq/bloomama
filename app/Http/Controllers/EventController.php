@@ -204,31 +204,6 @@ class EventController extends Controller
     /**
      * Update event status
      */
-    public function updateStatus(Request $request, $id, FlasherInterface $flasher)
-    {
-        // Validate status
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|in:active,cancelled,completed,pending'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        try {
-            $event = Event::findOrFail($id);
-            $event->status = $request->status;
-            $event->save();
-
-            $flasher->addSuccess('Status event berhasil diperbarui');
-            return redirect()->back();
-        } catch (\Exception $e) {
-            Log::error("Error updating event status: " . $e->getMessage());
-            $flasher->addError('Gagal memperbarui status event: ' . $e->getMessage());
-            return redirect()->back();
-        }
-    }
+    
 }
 

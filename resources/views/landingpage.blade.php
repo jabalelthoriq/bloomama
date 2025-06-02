@@ -781,10 +781,14 @@
             <div class="hero-text">
                 <h1>Temani Perjalanan <span>Kehamilan Anda</span> Dengan Informasi Terpercaya</h1>
                 <p>Bloomama hadir sebagai sahabat terpercaya untuk ibu hamil, memberikan informasi terkini, tips kesehatan, dan dukungan selama masa kehamilan hingga persalinan.</p>
-                <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary">Unduh Aplikasi</a>
-
-                </div>
+               
+<div class="hero-buttons">                     
+    <a href="https://github.com/ThisIsCogil/Bloomama_Mobile/releases/download/v1.0.0/Bloomama.V.1.0.apk" 
+       class="btn btn-primary" 
+       download="Bloomama.V.1.0.apk">
+        Unduh Aplikasi
+    </a>                  
+</div>
             </div>
             <div class="hero-image">
                 <div id="animation-container" style="width: 100%; height: 400px;"></div>

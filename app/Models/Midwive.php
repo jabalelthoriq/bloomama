@@ -38,7 +38,6 @@ class Midwive extends Authenticatable
         'password',
         'status',
         'profile_picture',
-        'available_day',
         'start_time',
         'end_time',
         'role'

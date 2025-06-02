@@ -18,12 +18,7 @@ use App\Http\Controllers\ReportController;
     Route::get('/reports/yearly-users', [ReportController::class, 'yearlyUsersReport'])
         ->name('reports.yearly-users');
     
-    Route::get('/reports/test-simple', [ReportController::class, 'testSimplePdf'])
-        ->name('reports.test-simple');
-    
-    Route::get('/reports/debug-html', [ReportController::class, 'debugHtml'])
-        ->name('reports.debug-html');
-
+   
 
 
 //use api web

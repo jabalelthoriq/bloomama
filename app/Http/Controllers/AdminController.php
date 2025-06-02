@@ -56,6 +56,7 @@ class AdminController extends Controller
         $totalAppointment = Appointment::count();
         $totalUsers = User::count();
         $totalPregnant = UserPregnant::count();
+        $totalMidwife = Midwive::count();
 
         $monthlyData = DB::table('user_pregnancies')
             ->selectRaw('MONTH(start_date) as month, YEAR(start_date) as year, COUNT(*) as count')
@@ -80,6 +81,7 @@ class AdminController extends Controller
             'totalUsers' => $totalUsers,
             'totalPregnant' => $totalPregnant,
             'totalAppointment' => $totalAppointment,
+            'totalMidwife' => $totalMidwife,
             'appointments' => $appointments,
             'activePage' => 'admin/menu1'
         ]);
@@ -141,7 +143,6 @@ class AdminController extends Controller
             'phone_number' => $validated['phone_number'],
             'role' => $validated['role'] ?? 'midwife',
             'status' => $validated['status'] ?? 'active',
-            'available_day' => $validated['available_day'] ?? null,
             'start_time' => $validated['start_time'] ?? null,
         ]);
 
@@ -294,7 +295,6 @@ public function updateMidwife(Request $request, $id) {
             'email' => 'required|email|max:255|unique:midwives,email,'.$id.',midwife_id',
             'phone_number' => 'required|string|max:20',
             'status' => 'required|in:active,inactive',
-            'available_day' => 'nullable|string|max:255',
             'start_time' => 'nullable',
             'end_time' => 'nullable',
             'password' => 'nullable|string|min:8|confirmed',
@@ -313,7 +313,6 @@ public function updateMidwife(Request $request, $id) {
             'email' => $request->email,
             'phone_number' => $request->phone_number,
             'status' => $request->status,
-            'available_day' => $request->available_day,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
         ];

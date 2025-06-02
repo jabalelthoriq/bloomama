@@ -227,7 +227,7 @@ public function getEventsByDate(Request $request)
 public function updateStatus($appointment_id, Request $request)
 {
     $request->validate([
-        'status' => 'required|in:pending,confirmed,cancelled,completed',
+        'status' => 'required|in:pending,canceled,completed',
     ]);
 
     $appointment = Appointment::find($appointment_id);

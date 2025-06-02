@@ -533,9 +533,7 @@
                             @endforeach
                         </svg>
                     </div>
-                     <button class="btn btn-primary" onclick="function testPdfGeneration()">
-            <i class="fas fa-download me-2"></i> Tes
-        </button>
+                  
                     <button class="btn btn-primary" onclick="generateYearlyReport()">
             <i class="fas fa-download me-2"></i> Download Yearly Report
         </button>
@@ -744,48 +742,7 @@ function generateYearlyReport() {
     });
 }
 
-// Function untuk test simple PDF
-function testSimplePdf() {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = '{{ route("reports.test-simple") }}';
-    document.body.appendChild(iframe);
-    
-    setTimeout(() => {
-        document.body.removeChild(iframe);
-        alert('Simple PDF test initiated. Check your downloads.');
-    }, 1000);
-}
 
-// Function untuk debug HTML
-function debugHtml() {
-    window.open('{{ route("reports.debug-html") }}', '_blank');
-}
-
-
-            // Add this to your existing JavaScript section
-            document.addEventListener('DOMContentLoaded', function() {
-                // Store scroll position in session storage before page unload/refresh
-                window.addEventListener('beforeunload', function() {
-                    sessionStorage.setItem('scrollPosition', window.scrollY);
-                });
-
-                // Set up pagination links to use AJAX if possible, or fallback to regular navigation
-                document.querySelectorAll('.pagination .page-link').forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        // Store the current scroll position
-                        sessionStorage.setItem('scrollPosition', window.scrollY);
-                    });
-                });
-
-                // Restore scroll position after page loads
-                const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-                if (savedScrollPosition) {
-                    window.scrollTo(0, parseInt(savedScrollPosition));
-                    // Optional: Clear the stored position after restoring
-                    // sessionStorage.removeItem('scrollPosition');
-                }
-            });
         </script>
         <script>
             function confirmDeleteAppointment(event, element) {

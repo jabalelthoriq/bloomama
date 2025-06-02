@@ -340,7 +340,7 @@
                     <div class="card-body d-flex justify-content-between align-items-center p-4">
                         <div>
                             <p class="text-muted small text-uppercase fw-semibold mb-2">Total Midwaves</p>
-                            <h2 class="display-6 fw-bold mb-0">{{ number_format($totalAppointment) }}</h2>
+                            <h2 class="display-6 fw-bold mb-0">{{ number_format($totalMidwife) }}</h2>
                         </div>
                         <div class="icon-container bg-success bg-opacity-10 rounded-circle p-3">
                             <svg class="text-success" style="width: 32px; height: 32px;" fill="none"
