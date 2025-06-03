@@ -24,29 +24,29 @@ class AdminController extends Controller
     /**
      * Constructor to check admin role for all methods
      */
-    public function __construct()
-    {
-        $this->checkAdminAccess();
-    }
+    // public function __construct()
+    // {
+    //     $this->checkAdminAccess();
+    // }
 
-    /**
-     * Check if the authenticated user is a midwife with admin role
-     */
-    private function checkAdminAccess()
-    {
-        // Check if user is authenticated as midwife
-        if (!Auth::guard('midwife')->check()) {
-            abort(403, 'Unauthorized access');
-        }
+    // /**
+    //  * Check if the authenticated user is a midwife with admin role
+    //  */
+    // private function checkAdminAccess()
+    // {
+    //     // Check if user is authenticated as midwife
+    //     if (!Auth::guard('midwife')->check()) {
+    //         abort(403, 'Unauthorized access');
+    //     }
 
-        // Check if midwife has admin role
-        $midwife = Auth::guard('midwife')->user();
+    //     // Check if midwife has admin role
+    //     $midwife = Auth::guard('midwife')->user();
 
-        // Check if role field exists, is not null, and is set to 'admin'
-        if (!isset($midwife->role) || $midwife->role === null || empty($midwife->role) || $midwife->role !== 'admin') {
-            abort(403, 'Admin access required');
-        }
-    }
+    //     // Check if role field exists, is not null, and is set to 'admin'
+    //     if (!isset($midwife->role) || $midwife->role === null || empty($midwife->role) || $midwife->role !== 'admin') {
+    //         abort(403, 'Admin access required');
+    //     }
+    // }
     /**
      * Display a listing of the resource.
      */

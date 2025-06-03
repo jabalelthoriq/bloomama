@@ -13,12 +13,26 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ReportController;
+use App\Http\Middleware\MidwifeAdminMiddleware;
 
+
+
+// Public routes - accessible without login
+Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
+
+Route::middleware([MidwifeAdminMiddleware::class])->group(function () {
 
     Route::get('/reports/yearly-users', [ReportController::class, 'yearlyUsersReport'])
         ->name('reports.yearly-users');
-    
-   
+
+
 
 
 //use api web
@@ -29,16 +43,9 @@ use App\Http\Controllers\ReportController;
             Route::put('/health-tracking/{trackingId}', [UsersController::class, 'updateHealthTracking']);
             Route::delete('/health-tracking/{trackingId}', [UsersController::class, 'deleteHealthTracking']);
 
-    
+
 });
 
-// Public routes - accessible without login
-Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Midwife routes
 // Route::middleware('role:midwife')->group(function () {
@@ -102,4 +109,6 @@ Route::delete('/admin/users/{id}', [AdminController::class, 'destroyUsers'])->na
         Route::post('/', [ContentController::class, 'store'])->name('content.store');
         Route::post('/update/{id}', [ContentController::class, 'updateContent'])->name('admin.content.update');
         Route::delete('/{id}', [ContentController::class, 'destroy'])->name('content.destroy');
+    });
+
     });
